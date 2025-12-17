@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration packagingData="true">
+
+    <include resource="com/simply/common/core/logging/simply-logback.xml" />
+
+    <springProfile name="dev,test">
+        <logger name="com.simply.*" level="DEBUG" additivity="false">
+            <appender-ref ref="CONSOLE" />
+            <appender-ref ref="ASYNC" />
+
+        </logger>
+        <logger name="com.alibaba.nacos.spring.util.parse.DefaultYamlConfigParse" level="DEBUG" additivity="false">
+            <appender-ref ref="CONSOLE" />
+            <appender-ref ref="ASYNC" />
+        </logger>
+
+    </springProfile>
+</configuration>

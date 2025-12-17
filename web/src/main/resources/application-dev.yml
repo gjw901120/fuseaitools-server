@@ -1,0 +1,68 @@
+spring:
+  config:
+    activate:
+      on-profile: dev
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    url: jdbc:mysql://localhost:3306/user
+    username: user
+    password: 123456
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    password:
+    database: 1
+
+server:
+  port: 8022
+
+feign:
+  api:
+    sms1:
+      url: http://d1-inner.simply.com
+    order:
+      url: http://d1-inner.simply.com
+      list: /orders
+
+cache-config:
+  redis:
+    token:
+      expireTime: 172800
+    user:
+      expireTime: 60
+  caffeine:
+    test:
+      expireTime: 300
+      maxSize: 10000
+
+mybatis-plus:
+  type-enums-package: com.simply.common.core.entity.bo
+  configuration:
+    default-enum-type-handler: org.apache.ibatis.type.EnumOrdinalTypeHandler
+
+# 邮件配置
+mail:
+  host: smtp.qq.com
+  port: 587
+  username: your-email@qq.com
+  password: your-auth-code
+  default-encoding: UTF-8
+  properties:
+    mail:
+      smtp:
+        auth: true
+        starttls:
+          enable: true
+          required: true
+
+# 自定义配置
+app:
+  # 验证码配置
+  code:
+    expire-minutes: 5          # 验证码有效期
+    max-daily-per-email: 10     # 每个邮箱每日最多发送次数
+    max-daily-per-ip: 30       # 每个IP每日最多发送次数
+    max-global-daily: 1000     # 系统全局每日最多发送次数
+  google:
+    client-id: ${GOOGLE_CLIENT_ID:your-google-client-id-here}
+    client-secret: ${GOOGLE_CLIENT_SECRET:your-google-client-secret-here}

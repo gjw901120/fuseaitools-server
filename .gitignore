@@ -1,0 +1,48 @@
+# 默认忽略的文件
+/shelf/
+/workspace.xml
+# 基于编辑器的 HTTP 客户端请求
+/httpRequests/
+# 依赖于环境的 Maven 主目录路径
+/mavenHomeManager.xml
+# Datasource local storage ignored files
+/dataSources/
+/dataSources.local.xml
+
+.idea/
+
+
+# Maven 编译输出
+target/
+*/target/
+**/target/
+
+# 构建产物
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+
+# 日志文件
+logs/
+*.log
+
+# 依赖管理
+.classpath
+.project
+.settings/
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# 其他
+*.orig
+*.bak

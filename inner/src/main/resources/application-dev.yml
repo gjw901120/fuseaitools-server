@@ -1,0 +1,68 @@
+spring:
+  config:
+    activate:
+      on-profile: dev
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    url: jdbc:mysql://localhost:3306/user
+    username: user
+    password: 123456
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    password:
+    database: 1
+
+server:
+  port: 8021
+
+feign:
+  api:
+    asset:
+      url: http://d1-inner.simply.com
+      list: /assets
+      detail: /asset
+    order:
+      url: http://d1-inner.simply.com
+      list: /orders
+      detail: /order
+      add_pos_flow: /order/pay
+      update_pos_flow: /order/pay
+
+cache-config:
+  redis:
+    token:
+      expireTime: 172800
+    user:
+      expireTime: 60
+  caffeine:
+    test:
+      expireTime: 300
+      maxSize: 10000
+
+mybatis-plus:
+  mapperLocations: classpath:mybatis/mapper/*.xml,mapper/*.xml
+  global-config:
+    db-column-underline: true
+    refresh-mapper: true
+    db-config:
+      logic-delete-value: 1 # 逻辑已删除值(默认为 1)
+      logic-not-delete-value: 0 # 逻辑未删除值(默认为 0)
+    banner: false
+  configuration:
+    default-enum-type-handler: org.apache.ibatis.type.EnumOrdinalTypeHandler
+    map-underscore-to-camel-case: true
+    cache-enabled: true #配置的缓存的全局开关
+    lazyLoadingEnabled: true #延时加载的开关
+    multipleResultSetsEnabled: true #开启的话，延时加载一个属性时会加载该对象全部属性，否则按需加载属性
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl #打印sql语句,调试用
+    jdbc-type-for-null: null
+  type-enums-package: com.simply.common.core.entity.bo
+
+rocketmq:
+  accessKey: XXX
+  secretKey: XX
+  nameSrvAddr: XXX
+  topic: XXX
+  groupId: XXX
+  tag: A

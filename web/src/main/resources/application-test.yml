@@ -1,0 +1,46 @@
+spring:
+  config:
+    activate:
+      on-profile: test
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    url: jdbc:mysql://localhost:3306/user
+    username: user
+    password: 123456
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    password:
+    database: 1
+
+server:
+  port: 8022
+
+feign:
+  api:
+    sms1:
+      url: http://d1-inner.simply.com
+
+cache-config:
+  redis:
+    token:
+      expireTime: 172800
+    user:
+      expireTime: 60
+  caffeine:
+    test:
+      expireTime: 300
+      maxSize: 10000
+
+mybatis-plus:
+  type-enums-package: com.simply.common.core.entity.bo
+  configuration:
+    default-enum-type-handler: org.apache.ibatis.type.EnumOrdinalTypeHandler
+
+rocketmq:
+  accessKey: XXX
+  secretKey: XX
+  nameSrvAddr: XXX
+  topic: XXX
+  groupId: XXX
+  tag: A
