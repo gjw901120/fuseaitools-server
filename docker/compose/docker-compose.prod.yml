@@ -3,6 +3,9 @@ services:
     build:
       context: ../..
       dockerfile: Dockerfile
+      args:
+        GITHUB_USERNAME: ${GITHUB_USERNAME}
+        GITHUB_TOKEN: ${GITHUB_TOKEN}
     container_name: fuse-ai-web-prod
     env_file:
       - .env  # 加载 .env 文件
