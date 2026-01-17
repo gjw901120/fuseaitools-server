@@ -3,11 +3,9 @@ package com.fuse.ai.server.web.model.dto.request.video;
 import com.fuse.ai.server.web.common.enums.VeoModelEnum;
 import com.fuse.ai.server.web.common.enums.VeoGenerationTypeEnum;
 import com.fuse.ai.server.web.common.enums.VeoAspectRatioEnum;
-import com.fuse.ai.server.web.common.utils.FileValidatorUtil;
 import com.fuse.ai.server.web.config.exception.ResponseErrorType;
-import com.simply.common.core.exception.BaseException;
+import com.fuse.common.core.exception.BaseException;
 import lombok.Data;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -36,7 +34,7 @@ public class VeoGenerateDTO {
      * - 2张图片：第一张作为首帧，第二张作为尾帧
      */
     @Size(min = 0, max = 3, message = "Image count cannot exceed 3")
-    private List<MultipartFile> imageFiles;
+    private List<String> imageUrls;
 
     /**
      * 模型类型
@@ -74,25 +72,6 @@ public class VeoGenerateDTO {
     private Boolean enableTranslation = true;
 
     /**
-     * 验证图片文件类型和大小 - 抛出异常方式
-     */
-    public void validateImageFilesWithException(long maxImageSize) {
-        if (imageFiles == null || imageFiles.isEmpty()) {
-            return; // No files to validate
-        }
-
-        FileValidatorUtil.validateImageFilesWithException(imageFiles, maxImageSize, 2);
-    }
-
-    /**
-     * 验证图片文件类型和大小（使用默认大小）
-     */
-    public void validateImageFilesWithException() {
-        // Default 10MB
-        validateImageFilesWithException(10 * 1024 * 1024);
-    }
-
-    /**
      * 验证图片数量与生成模式的匹配
      */
     public void validateImageAndGenerationTypeWithException() {
@@ -109,19 +88,19 @@ public class VeoGenerateDTO {
 
         switch (type) {
             case REFERENCE_2_VIDEO:
-                if (imageFiles == null || imageFiles.isEmpty() || imageFiles.size() > 3) {
+                if (imageUrls == null || imageUrls.isEmpty() || imageUrls.size() > 3) {
                     throw new BaseException(ResponseErrorType.IMAGE_COUNT_ERROR,
                             "REFERENCE_2_VIDEO mode requires 1-3 images");
                 }
                 break;
             case FIRST_AND_LAST_FRAMES_2_VIDEO:
-                if (imageFiles == null || !(imageFiles.size() == 1 || imageFiles.size() == 2)) {
+                if (imageUrls == null || !(imageUrls.size() == 1 || imageUrls.size() == 2)) {
                     throw new BaseException(ResponseErrorType.IMAGE_COUNT_ERROR,
                             "FIRST_AND_LAST_FRAMES_2_VIDEO mode requires exactly 1 or 2 images");
                 }
                 break;
             case TEXT_2_VIDEO:
-                if (imageFiles != null && !imageFiles.isEmpty()) {
+                if (imageUrls != null && !imageUrls.isEmpty()) {
                     throw new BaseException(ResponseErrorType.IMAGE_COUNT_ERROR,
                             "TEXT_2_VIDEO mode should not have images");
                 }

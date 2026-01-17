@@ -16,9 +16,11 @@ public class ModelsPricingRules {
 
     private Integer pricingId;
 
-    private Integer durtion;
+    private Integer duration;
 
     private String quality;
+
+    private String size;
 
     private Integer batchSize;
 

@@ -3,8 +3,9 @@ package com.fuse.ai.server.web.model.dto.request.image;
 import com.fuse.ai.server.web.common.enums.FluxKontextAspectRatioEnum;
 import com.fuse.ai.server.web.common.enums.FluxKontextModelEnum;
 import com.fuse.ai.server.web.common.enums.FluxKontextOutputFormatEnum;
+import com.fuse.common.core.exception.BaseException;
+import com.fuse.common.core.exception.error.UserErrorType;
 import lombok.Data;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -29,8 +30,8 @@ public class FluxKontextGenerateDTO implements Serializable {
      * 对于图像生成，描述完整的场景
      * 重要：仅支持英文
      */
-    @NotBlank(message = "提示词不能为空")
-    @Size(max = 5000, message = "提示词长度不能超过5000个字符")
+    @NotBlank(message = "The prompt cannot be empty")
+    @Size(max = 5000, message = "The length of the prompt cannot exceed 5000 characters")
     private String prompt;
 
     /**
@@ -38,14 +39,14 @@ public class FluxKontextGenerateDTO implements Serializable {
      * 由于 prompt 仅支持英文，当此参数为 true 时，系统会自动将非英文的提示词翻译成英文
      * 如果您的提示词已经是英文，可设置为 false
      */
-    @NotNull(message = "翻译启用状态不能为空")
     private Boolean enableTranslation = true;
 
     /**
      * 编辑模式的输入图像
      * 编辑现有图像时需要
      */
-    private MultipartFile inputImage;
+    @NotNull(message = "The input image cannot be empty")
+    private String imageUrl;
 
     /**
      * 输出图像的长宽比
@@ -65,13 +66,12 @@ public class FluxKontextGenerateDTO implements Serializable {
      * 如果为 true，将对提示词进行增强处理
      * 可能会增加处理时间
      */
-    @NotNull(message = "提示词增强状态不能为空")
     private Boolean promptUpsampling = false;
 
     /**
      * 用于生成的模型版本
      */
-    @NotNull(message = "模型不能为空")
+    @NotNull(message = "The model cannot be empty")
     private FluxKontextModelEnum model = FluxKontextModelEnum.FLUX_KONTEXT_PRO;
 
     /**
@@ -80,59 +80,34 @@ public class FluxKontextGenerateDTO implements Serializable {
      * 图像编辑模式：输入和输出的审核级别
      * 值范围从 0（最严格）到 2（平衡）
      */
-    @NotNull(message = "安全容忍度不能为空")
     private Integer safetyTolerance = 2;
 
     /**
      * 要添加到生成图像的水印标识符
      * 可选，如果提供，将在输出图像上添加水印
      */
-    @Size(max = 100, message = "水印标识符长度不能超过100个字符")
+    @Size(max = 100, message = "The length of the watermark identifier cannot exceed 100 characters")
     private String watermark;
 
     /**
      * 业务参数校验
      */
     public void validateBusinessRules() {
+
         // 校验安全容忍度范围
         if (safetyTolerance < 0 || safetyTolerance > 6) {
-            throw new IllegalArgumentException("安全容忍度必须在0-6之间");
+            throw new BaseException(UserErrorType.USER_CLIENT_ERROR, "The safety tolerance must be between 0 and 6");
         }
 
-        // 如果是编辑模式，必须有输入图片
-        if (inputImage != null && !inputImage.isEmpty()) {
-            validateInputImage();
-        }
 
         // 校验水印长度
         if (watermark != null && watermark.length() > 100) {
-            throw new IllegalArgumentException("水印标识符长度不能超过100个字符");
+            throw new BaseException(UserErrorType.USER_CLIENT_ERROR,"The length of the watermark identifier cannot exceed 100 characters");
         }
 
         // 校验提示词长度
         if (prompt.length() > 5000) {
-            throw new IllegalArgumentException("提示词长度不能超过5000个字符");
-        }
-    }
-
-    /**
-     * 校验输入图片
-     */
-    private void validateInputImage() {
-        if (inputImage.isEmpty()) {
-            throw new IllegalArgumentException("输入图片不能为空");
-        }
-
-        // 校验文件类型
-        String contentType = inputImage.getContentType();
-        if (contentType == null || !contentType.startsWith("image/")) {
-            throw new IllegalArgumentException("输入文件必须是图片格式");
-        }
-
-        // 校验文件大小（例如限制为10MB）
-        long maxSize = 10 * 1024 * 1024; // 10MB
-        if (inputImage.getSize() > maxSize) {
-            throw new IllegalArgumentException("输入图片大小不能超过10MB");
+            throw new BaseException(UserErrorType.USER_CLIENT_ERROR,"The length of the prompt word cannot exceed 5000 characters");
         }
     }
 
@@ -140,7 +115,7 @@ public class FluxKontextGenerateDTO implements Serializable {
      * 判断是否为编辑模式
      */
     public boolean isEditMode() {
-        return inputImage != null && !inputImage.isEmpty();
+        return imageUrl != null && !imageUrl.isEmpty();
     }
 
     /**

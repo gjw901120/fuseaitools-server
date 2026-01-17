@@ -19,7 +19,7 @@ public class MidjourneyImagineDTO {
      * 提示词 (必需)
      * 例如：Cat
      */
-    @NotBlank(message = "提示词不能为空")
+    @NotBlank(message = "prompt cannot be empty")
     @JsonProperty("prompt")
     private String prompt;
 
@@ -27,7 +27,7 @@ public class MidjourneyImagineDTO {
      * 垫图base64编码字符串数组 (可选)
      * 用于提供初始图像或参考图像
      */
-    private List<MultipartFile> imageFiles;
+    private List<String> imageUrls;
 
 
 }

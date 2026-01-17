@@ -1,8 +1,5 @@
 package com.fuse.ai.server.web.model.dto.request.video;
 
-import org.springframework.web.multipart.MultipartFile;
-
-import javax.validation.Valid;
 import javax.validation.constraints.*;
 import lombok.Data;
 import java.util.List;
@@ -31,7 +28,7 @@ public class SoraGenerateDTO {
     /**
      * Image files to use as the first frame
      */
-    private List<MultipartFile> imageFiles;
+    private List<String> imageUrls;
 
     /**
      * Aspect ratio of the image
@@ -50,17 +47,5 @@ public class SoraGenerateDTO {
      */
     private Boolean removeWatermark;
 
-    /**
-     * Custom validation for imageFiles requirement based on model
-     */
-    @AssertTrue(message = "Image files are required for sora-2-image-to-video model")
-    public boolean isImageFilesValid() {
-        if ("sora-2-image-to-video".equals(model)) {
-            return getImageFiles() != null &&
-                    !getImageFiles().isEmpty() &&
-                    getImageFiles().stream().noneMatch(MultipartFile::isEmpty);
-        }
-        return true;
-    }
 
 }

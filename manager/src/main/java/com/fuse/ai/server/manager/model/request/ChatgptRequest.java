@@ -39,6 +39,17 @@ public class ChatgptRequest {
     @JsonProperty("stream")
     private Boolean stream;
 
+    @JsonProperty("stream_options")
+    private StreamOptions streamOptions;  // 新增字段
+
+    @Data
+    public static class StreamOptions {
+
+        @JsonProperty("include_usage")
+        private Boolean includeUsage; // 是否包含使用统计
+
+    }
+
     // 内部类：输入消息
     @Data
     @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -65,10 +76,10 @@ public class ChatgptRequest {
         private String text;
 
         @JsonProperty("image_url")
-        private imageUrl imageUrl;
+        private ImageUrl imageUrl;
 
         @Data
-        public static class imageUrl {
+        public static class ImageUrl {
             private String url;
         }
     }
@@ -87,12 +98,11 @@ public class ChatgptRequest {
 
     // 推理配置
     @Data
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     public static class Reasoning {
         /**
          * 推理强度：low, medium, high
          */
         @JsonProperty("effort")
-        private String effort;
+        private String effort = "medium";
     }
 }

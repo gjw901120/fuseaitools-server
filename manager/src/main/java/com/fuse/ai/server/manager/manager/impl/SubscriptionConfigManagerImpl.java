@@ -23,4 +23,13 @@ public class SubscriptionConfigManagerImpl implements SubscriptionConfigManager 
                 .eq(SubscriptionConfig::getIsDel, 0);
         return subscriptionConfigMapper.selectOne(queryWrapper);
     }
+
+    @Override
+    public SubscriptionConfig getDetailById(Integer id) {
+        LambdaQueryWrapper<SubscriptionConfig> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper
+                .eq(SubscriptionConfig::getId, id)
+                .eq(SubscriptionConfig::getIsDel, 0);
+        return subscriptionConfigMapper.selectOne(queryWrapper);
+    }
 }

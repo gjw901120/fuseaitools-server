@@ -82,5 +82,21 @@
 ### 配置
 * nacos
 ### 工具包
-* simply-common-core 核心公用common包
-* simply-common-cache 缓存公用common包
+* fuse-common-core 核心公用common包
+* fuse-common-cache 缓存公用common包
+
+
+# 1. 给脚本执行权限
+chmod +x docker/scripts/*.sh
+
+# 2. 启动开发环境
+./docker/scripts/start-dev.sh
+
+# 3. 启动测试环境
+./docker/scripts/start-test.sh
+
+# 4. 启动生产环境
+./docker/scripts/start-prod.sh
+
+# 5. 停止所有环境
+./docker/scripts/stop-all.sh

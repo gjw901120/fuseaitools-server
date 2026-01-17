@@ -1,5 +1,6 @@
 package com.fuse.ai.server.manager.enums;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
 import lombok.Getter;
 
 @Getter
@@ -9,6 +10,7 @@ public enum PricingTypeEnum {
     CHARACTER(3, "按字符"),
     DURATION(4, "按时长");
 
+    @EnumValue
     private final Integer code;
     private final String description;
 

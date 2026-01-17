@@ -1,0 +1,33 @@
+services:
+  fuse-ai-web:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+    container_name: fuse-ai-web-test
+    env_file:
+      - .env  # 加载 .env 文件
+    environment:
+      - AI_PROJECT_ENV=dev
+      - GITHUB_USERNAME=${GITHUB_USERNAME}
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - JAVA_OPTS=-Xms512m -Xmx1024m -XX:+UseG1GC
+    ports:
+      - "8080:8080"
+    volumes:
+      - ../../logs-test:/logs
+    networks:
+      - fuse-ai-test-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  fuse-ai-test-network:
+    driver: bridge

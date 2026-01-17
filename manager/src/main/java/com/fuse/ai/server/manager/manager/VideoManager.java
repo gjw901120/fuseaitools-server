@@ -5,14 +5,14 @@ import com.fuse.ai.server.manager.model.response.VideoGenerateResponse;
 
 public interface VideoManager {
 
-    VideoGenerateResponse veoGenerate(VeoGenerateRequest request);
-    VideoGenerateResponse runwayGenerate(RunwayGenerateRequest request);
+    VideoGenerateResponse veoGenerate(VeoGenerateRequest request, String apiKey);
+    VideoGenerateResponse runwayGenerate(RunwayGenerateRequest request, String apiKey);
 
-    VideoGenerateResponse runwayExtend(RunwayExtendRequest request);
+    VideoGenerateResponse runwayExtend(RunwayExtendRequest request, String apiKey);
 
-    VideoGenerateResponse runwayAlephGenerate(RunwayAlephGenerateRequest request);
+    VideoGenerateResponse runwayAlephGenerate(RunwayAlephGenerateRequest request, String apiKey);
 
-    VideoGenerateResponse lumaModify(LumaGenerateRequest request);
+    VideoGenerateResponse lumaModify(LumaGenerateRequest request, String apiKey);
 
-    VideoGenerateResponse veoExtend(VeoExtendRequest request);
+    VideoGenerateResponse veoExtend(VeoExtendRequest request, String apiKey);
 }

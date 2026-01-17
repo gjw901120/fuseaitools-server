@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
-@TableName("models_pricing_durtion")
+@TableName("models_pricing_duration")
 public class ModelsPricingDuration {
 
     @TableId(type = IdType.AUTO)
@@ -15,7 +15,7 @@ public class ModelsPricingDuration {
 
     private Integer modelId;
 
-    private Integer durtion;
+    private Integer duration;
 
     private BigDecimal lossCreadits;
 

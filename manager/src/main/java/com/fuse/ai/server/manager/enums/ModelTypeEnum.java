@@ -1,5 +1,6 @@
 package com.fuse.ai.server.manager.enums;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
 import lombok.Getter;
 
 @Getter
@@ -9,6 +10,7 @@ public enum ModelTypeEnum {
     AUDIO(3, "音频"),
     VIDEO(4, "视频");
 
+    @EnumValue
     private final Integer code;
     private final String description;
 

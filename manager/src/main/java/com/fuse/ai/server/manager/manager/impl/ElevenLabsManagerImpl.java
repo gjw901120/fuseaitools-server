@@ -20,31 +20,31 @@ public class ElevenLabsManagerImpl implements ElevenLabsManager {
      * 文本转语音
      */
     @Override
-    public ElevenLabsResponse textToSpeech(ElevenLabsTTSRequest request) {
-        return elevenLabsFeignClient.textToSpeech(request);
+    public ElevenLabsResponse textToSpeech(ElevenLabsTTSRequest request, String apiKey) {
+        return elevenLabsFeignClient.textToSpeech(request, apiKey);
     }
 
     /**
      * 语音转文本
      */
     @Override
-    public ElevenLabsResponse speechToText(ElevenLabsSTTRequest request) {
-        return elevenLabsFeignClient.speechToText(request);
+    public ElevenLabsResponse speechToText(ElevenLabsSTTRequest request, String apiKey) {
+        return elevenLabsFeignClient.speechToText(request, apiKey);
     }
 
     /**
      * 音效生成
      */
     @Override
-    public ElevenLabsResponse generateSoundEffect(ElevenLabsSoundEffectRequest request) {
-        return elevenLabsFeignClient.generateSoundEffect(request);
+    public ElevenLabsResponse generateSoundEffect(ElevenLabsSoundEffectRequest request, String apiKey) {
+        return elevenLabsFeignClient.generateSoundEffect(request, apiKey);
     }
 
     /**
      * 音频分离
      */
     @Override
-    public ElevenLabsResponse isolateAudio(ElevenLabsAudioIsolationRequest request) {
-        return elevenLabsFeignClient.isolateAudio(request);
+    public ElevenLabsResponse isolateAudio(ElevenLabsAudioIsolationRequest request, String apiKey) {
+        return elevenLabsFeignClient.isolateAudio(request, apiKey);
     }
 }

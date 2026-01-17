@@ -1,6 +1,6 @@
 package com.fuse.ai.server.web;
 
-import com.simply.common.cache.RedisLock;
+import com.fuse.common.cache.RedisLock;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
@@ -16,12 +16,12 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class},
         scanBasePackages = {
-                "com.simply",
+                "com.fuse",
         })
 @EnableAspectJAutoProxy
 @EnableDiscoveryClient
-@EnableFeignClients(basePackages = {"com.simply.**.feign"})
-@ComponentScan(value = {"com.simply"}, excludeFilters = {
+@EnableFeignClients(basePackages = {"com.fuse.**.feign"})
+@ComponentScan(value = {"com.fuse"}, excludeFilters = {
         @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = {RedisLock.class})
 })
 @EnableAsync

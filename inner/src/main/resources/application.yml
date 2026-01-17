@@ -2,7 +2,7 @@ spring:
   profiles:
     active: ${AI_PROJECT_ENV}
   application:
-    name: simply-ai-server-inner
+    name: fuse-ai-server-inner
 
 app:
   defaultTokenAuth: false

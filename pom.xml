@@ -11,15 +11,15 @@
     </modules>
 
     <parent>
-        <groupId>com.simply</groupId>
-        <artifactId>simply-parent</artifactId>
+        <groupId>com.fuse</groupId>
+        <artifactId>fuse-parent</artifactId>
         <version>1.0.0</version>
     </parent>
 
-    <artifactId>simply-ai-server</artifactId>
+    <artifactId>fuse-ai-server</artifactId>
     <version>1.0.0</version>
-    <name>simply-ai-server</name>
-    <description>simply-ai-server project</description>
+    <name>fuse-ai-server</name>
+    <description>fuse-ai-server project</description>
 
     <properties>
         <common-core-version>1.0.0</common-core-version>
@@ -28,8 +28,8 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.simply</groupId>
-            <artifactId>simply-common-core</artifactId>
+            <groupId>com.fuse</groupId>
+            <artifactId>fuse-common-core</artifactId>
             <version>1.0.0</version>
         </dependency>
         <dependency>
@@ -59,12 +59,6 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>1.18.30</version>
-        </dependency>
-
-        <!-- WebClient 所在的响应式Web依赖 -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-webflux</artifactId>
         </dependency>
 
     </dependencies>

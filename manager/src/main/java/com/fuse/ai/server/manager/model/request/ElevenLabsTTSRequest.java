@@ -136,26 +136,26 @@ public class ElevenLabsTTSRequest extends ElevenLabsBaseRequest implements Seria
          */
         public void validateBusinessRules() {
             validateRange(stability, ElevenLabsConstant.MIN_STABILITY, ElevenLabsConstant.MAX_STABILITY,
-                    ElevenLabsConstant.STEP_SMALL, "语音稳定性");
+                    "语音稳定性");
             validateRange(similarityBoost, ElevenLabsConstant.MIN_SIMILARITY_BOOST, ElevenLabsConstant.MAX_SIMILARITY_BOOST,
-                    ElevenLabsConstant.STEP_SMALL, "相似度提升");
+                    "相似度提升");
             validateRange(style, ElevenLabsConstant.MIN_STYLE, ElevenLabsConstant.MAX_STYLE,
-                    ElevenLabsConstant.STEP_SMALL, "风格夸张程度");
+                    "风格夸张程度");
             validateRange(speed, ElevenLabsConstant.MIN_SPEED, ElevenLabsConstant.MAX_SPEED,
-                    ElevenLabsConstant.STEP_SMALL, "语速");
+                    "语速");
 
             validateTextLength(previousText, ElevenLabsConstant.TEXT_MAX_LENGTH, "前文");
             validateTextLength(nextText, ElevenLabsConstant.TEXT_MAX_LENGTH, "后文");
             validateTextLength(languageCode, ElevenLabsConstant.LANGUAGE_CODE_MAX_LENGTH, "语言代码");
         }
 
-        private void validateRange(Double value, Double min, Double max, Double step, String fieldName) {
+        private void validateRange(Double value, Double min, Double max, String fieldName) {
             if (value != null) {
                 if (value < min || value > max) {
                     throw new IllegalArgumentException(fieldName + "必须在" + min + "到" + max + "之间");
                 }
-                if (step != null && Math.abs(value % step) > 0.001) {
-                    throw new IllegalArgumentException(fieldName + "必须是" + step + "的倍数");
+                if (Math.abs(value % (Double) ElevenLabsConstant.STEP_SMALL) > 0.001) {
+                    throw new IllegalArgumentException(fieldName + "必须是" + ElevenLabsConstant.STEP_SMALL + "的倍数");
                 }
             }
         }

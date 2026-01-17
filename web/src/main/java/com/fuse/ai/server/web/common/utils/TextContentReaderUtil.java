@@ -111,6 +111,76 @@ public class TextContentReaderUtil {
     }
 
     /**
+     * 根据URL读取远程文件内容
+     * @param url 文件的URL地址
+     * @return TextReadResultUtil 包含读取结果的对象
+     */
+    public static TextReadResultUtil readContentFromUrl(String url) {
+        try {
+            // 使用URL获取内容
+            java.net.URL fileUrl = new java.net.URL(url);
+            String fileName = extractFileNameFromUrl(url);
+            String fileExtension = getFileExtension(fileName).toLowerCase();
+
+            // 检查是否为支持的文本文件类型
+            if (!isSupportedTextFile(fileExtension)) {
+                return TextReadResultUtil.unsupportedFormat(fileName, fileExtension);
+            }
+
+            // 读取URL内容
+            String content = readUrlContent(fileUrl);
+
+            return TextReadResultUtil.success(fileName, fileExtension, content);
+        } catch (Exception e) {
+            return TextReadResultUtil.error("远程文件", e.getMessage());
+        }
+    }
+
+    /**
+     * 从URL中提取文件名
+     * @param url URL地址
+     * @return 文件名
+     */
+    private static String extractFileNameFromUrl(String url) {
+        try {
+            java.net.URL fileUrl = new java.net.URL(url);
+            String path = fileUrl.getPath();
+            String fileName = path.substring(path.lastIndexOf('/') + 1);
+            if (fileName.isEmpty()) {
+                fileName = "remote_file_" + System.currentTimeMillis();
+            }
+            return fileName;
+        } catch (Exception e) {
+            return "remote_file_" + System.currentTimeMillis();
+        }
+    }
+
+    /**
+     * 读取URL内容为字符串
+     * @param url URL对象
+     * @return 文件内容字符串
+     * @throws IOException 读取异常
+     */
+    private static String readUrlContent(java.net.URL url) throws IOException {
+        try (InputStream inputStream = url.openStream();
+             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
+
+            StringBuilder content = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                content.append(line).append("\n");
+            }
+
+            // 移除最后多余的换行符
+            if (content.length() > 0 && content.charAt(content.length() - 1) == '\n') {
+                content.deleteCharAt(content.length() - 1);
+            }
+
+            return content.toString();
+        }
+    }
+
+    /**
      * 提取二进制文档内容
      */
     private static String extractBinaryDocumentContent(Object file, String fileExtension) throws Exception {

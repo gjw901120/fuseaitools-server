@@ -10,13 +10,11 @@ public interface UserService {
 
     Boolean sendEmailCode(SendEmailCodeDTO sendEmailCodeDTO, HttpServletRequest request);
 
-    Boolean registerByEmail(RegisterByEmailDTO registerByEmailDTO);
-
     LoginResponse loginByEmail(LoginByEmailDTO  loginByEmailDTO);
 
-    LoginResponse loginByGoogle(LoginByGoogleDTO loginByGoogleDTO);
+    LoginResponse loginByGoogle(String code);
 
-    UserDetailVO detail(UserJwtDTO userJwtDTO);
+    UserDetailVO detail(UserJwtDTO userJwtDTO, String timeZone);
 
     Boolean update(UserJwtDTO userJwtDTO, UpdateUserDTO updateUserDTO);
 

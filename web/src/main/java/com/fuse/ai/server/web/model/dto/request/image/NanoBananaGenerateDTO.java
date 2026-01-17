@@ -1,6 +1,5 @@
 package com.fuse.ai.server.web.model.dto.request.image;
 
-import javax.validation.Valid;
 import javax.validation.constraints.*;
 import lombok.Data;
 
@@ -14,7 +13,7 @@ public class NanoBananaGenerateDTO {
      * The model name to use for generation
      */
     @NotBlank(message = "Model cannot be empty")
-    @Pattern(regexp = "google/nano-banana", message = "Model must be google/nano-banana")
+    @Pattern(regexp = "nano-banana", message = "Model must be nano-banana")
     private String model;
 
     /**

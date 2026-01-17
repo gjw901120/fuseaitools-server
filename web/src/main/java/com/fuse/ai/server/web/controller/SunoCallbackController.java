@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/suno/callback")
+@RequestMapping("/api/callback/suno")
 @RequiredArgsConstructor
 public class SunoCallbackController {
 

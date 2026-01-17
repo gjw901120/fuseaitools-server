@@ -1,6 +1,5 @@
 package com.fuse.ai.server.web.model.dto.request.video;
 
-import org.springframework.web.multipart.MultipartFile;
 import javax.validation.constraints.*;
 import lombok.Data;
 
@@ -20,7 +19,7 @@ public class RunwayAlephDTO {
      * Reference video file
      */
     @NotNull(message = "Video URL cannot be null")
-    private MultipartFile videoUrl;
+    private String videoUrl;
 
     /**
      * Optional watermark text displayed on the generated video
@@ -43,5 +42,5 @@ public class RunwayAlephDTO {
     /**
      * Optional reference image to influence output style or content
      */
-    private MultipartFile referenceImageFile;
+    private String referenceImageUrl;
 }

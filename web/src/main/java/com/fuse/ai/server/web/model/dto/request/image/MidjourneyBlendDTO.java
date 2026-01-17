@@ -20,8 +20,8 @@ public class MidjourneyBlendDTO {
      * 图片base64编码字符串数组 (可选)
      * 用于混合的图片列表，通常为2-5张图片
      */
-    @Size(min = 2, max = 5, message = "base64数组元素数量必须在2到5个之间")
-    private List<MultipartFile> imageFiles;
+    @Size(min = 2, max = 5, message = "The number of images must be between 2 and 5")
+    private List<String> imageUrls;
 
     /**
      * 输出图片比例 (可选)
@@ -29,6 +29,6 @@ public class MidjourneyBlendDTO {
      */
 
     @Pattern(regexp = "^(PORTRAIT|SQUARE|LANDSCAPE)$",
-            message = "dimensions参数值必须为 PORTRAIT, SQUARE 或 LANDSCAPE 其中之一")
+            message = "The value of the dimensions parameter must be one of PORTRAIT, SQUARE, or LANDSCAPE")
     private String dimensions;
 }

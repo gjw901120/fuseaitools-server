@@ -19,8 +19,8 @@ public class MidjourneyDescribeDTO {
      * 图片的Base64编码数据 (可选，但描述图片时通常必需)
      * 支持完整的Data URL格式（如 data:image/png;base64,iVBOR...）或纯Base64字符串
      */
-    @NotBlank(message = "描述图片时，base64数据不能为空")
-    private MultipartFile imageFile;
+    @NotBlank(message = "image cannot be empty")
+    private String imageUrl;
 
 
 }

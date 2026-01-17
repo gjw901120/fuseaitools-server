@@ -73,10 +73,10 @@ public class GeminiRequest {
         private String text;
 
         @JsonProperty("image_url")
-        private imageUrl imageUrl;
+        private ImageUrl imageUrl;
 
         @Data
-        public static class imageUrl {
+        public static class ImageUrl {
             private String url;
         }
     }
@@ -87,7 +87,8 @@ public class GeminiRequest {
          * 是否包含使用情况统计
          */
         @JsonProperty("include_usage")
-        private Boolean includeUsage = true;
+        private Boolean includeUsage ; // 是否包含使用统计
+
     }
 
 }

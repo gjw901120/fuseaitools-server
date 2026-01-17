@@ -1,9 +1,6 @@
 package com.fuse.ai.server.manager.model.response;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.*;
 import lombok.Data;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +32,7 @@ public abstract class ClaudeResponse {
     // Message Start Event
     @Data
     @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class MessageStart extends ClaudeResponse {
         private ClaudeMessage message;
 
@@ -46,6 +44,7 @@ public abstract class ClaudeResponse {
     // Message Delta Event
     @Data
     @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class MessageDelta extends ClaudeResponse {
         private MessageDeltaData delta;
         private Usage usage;
@@ -67,6 +66,7 @@ public abstract class ClaudeResponse {
     // Message Stop Event
     @Data
     @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class MessageStop extends ClaudeResponse {
         public MessageStop() {
             super.type = "message_stop";
@@ -76,6 +76,7 @@ public abstract class ClaudeResponse {
     // Content Block Start Event
     @Data
     @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class ContentBlockStart extends ClaudeResponse {
         private Integer index;
         @JsonProperty("content_block")
@@ -89,6 +90,7 @@ public abstract class ClaudeResponse {
     // Content Block Delta Event
     @Data
     @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class ContentBlockDelta extends ClaudeResponse {
         private Integer index;
         private Delta delta;
@@ -101,6 +103,7 @@ public abstract class ClaudeResponse {
     // Content Block Stop Event
     @Data
     @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class ContentBlockStop extends ClaudeResponse {
         private Integer index;
 
@@ -112,6 +115,7 @@ public abstract class ClaudeResponse {
     // Ping Event
     @Data
     @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Ping extends ClaudeResponse {
         public Ping() {
             super.type = "ping";
@@ -121,6 +125,7 @@ public abstract class ClaudeResponse {
     // Error Event
     @Data
     @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Error extends ClaudeResponse {
         private String error;
 
@@ -132,6 +137,7 @@ public abstract class ClaudeResponse {
     // 自定义聚合事件（用于Service层处理）
     @Data
     @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class AggregatedEvent extends ClaudeResponse {
         private String content;
         private String delta;
@@ -148,6 +154,7 @@ public abstract class ClaudeResponse {
 
     @Data
     @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class ClaudeMessage {
         private String id;
         private String type;
@@ -166,6 +173,7 @@ public abstract class ClaudeResponse {
 
     @Data
     @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class ContentBlock {
         private String type;
         private String text;
@@ -175,6 +183,7 @@ public abstract class ClaudeResponse {
 
     @Data
     @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Delta {
         private String type;
         private String text;
@@ -182,6 +191,7 @@ public abstract class ClaudeResponse {
 
     @Data
     @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonIgnoreProperties(ignoreUnknown = true) // 添加这行，忽略未知字段
     public static class Usage {
         @JsonProperty("input_tokens")
         private Integer inputTokens;
@@ -200,5 +210,8 @@ public abstract class ClaudeResponse {
 
         @JsonProperty("server_tool_use")
         private Map<String, Object> serverToolUse;
+
+        @JsonProperty("service_tier")
+        private String serviceTier;
     }
 }

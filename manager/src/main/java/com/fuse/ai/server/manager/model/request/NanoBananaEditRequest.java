@@ -57,7 +57,7 @@ public class NanoBananaEditRequest implements Serializable {
          * 输入图像URL列表
          */
         @NotNull(message = "输入图像URL列表不能为空")
-        @Size(min = 1, max = NanoBananaConstant.MAX_IMAGES_EDIT, message = "输入图像数量必须在1到" + NanoBananaConstant.MAX_IMAGES_EDIT + "之间")
+        @Size(min = 1, max = 8, message = "输入图像数量必须在 1 到 8 之间")
         @JsonProperty("image_urls")
         private List<@URL(message = "图像URL格式不正确") String> imageUrls;
 

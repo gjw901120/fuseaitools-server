@@ -2,6 +2,8 @@ package com.fuse.ai.server.web.model.dto.request.elevenlabs;
 
 import com.fuse.ai.server.web.common.enums.ElevenLabsModelEnum;
 import com.fuse.ai.server.web.common.enums.ElevenLabsVoiceEnum;
+import com.fuse.common.core.exception.BaseException;
+import com.fuse.common.core.exception.error.UserErrorType;
 import lombok.Data;
 
 import javax.validation.constraints.DecimalMax;
@@ -12,6 +14,7 @@ import javax.validation.constraints.Size;
 import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Objects;
 
 /**
  * ElevenLabs Turbo text-to-speech request parameters
@@ -96,18 +99,18 @@ public class ElevenlabsTTSDTO implements Serializable {
      */
     public void validateBusinessRules() {
         // Validate model
-        if (model != ElevenLabsModelEnum.TEXT_TO_SPEECH_TURBO.getCode() && model != ElevenLabsModelEnum.TEXT_TO_SPEECH_MULTILINGUAL.getCode()) {
-            throw new IllegalArgumentException("Turbo TTS only supports text-to-speech-turbo-2-5/text-to-speech-multilingual_v2 model");
+        if (!Objects.equals(model, "elevenlabs_text_to_speech_multilingual") && !Objects.equals(model, "elevenlabs_text_to_speech_turbo")) {
+            throw new BaseException(UserErrorType.USER_CLIENT_ERROR,"Turbo TTS only supports text-to-speech-turbo-2-5/text-to-speech-multilingual_v2 model");
         }
 
         // Validate text length
         if (text.length() > 5000) {
-            throw new IllegalArgumentException("Text length cannot exceed 5000 characters");
+            throw new BaseException(UserErrorType.USER_CLIENT_ERROR,"Text length cannot exceed 5000 characters");
         }
 
         // Validate language code format (optional)
         if (languageCode != null && !languageCode.matches("^[a-z]{2}$")) {
-            throw new IllegalArgumentException("Language code format is incorrect, should be ISO 639-1 format");
+            throw new BaseException(UserErrorType.USER_CLIENT_ERROR,"Language code format is incorrect, should be ISO 639-1 format");
         }
     }
 }

@@ -1,6 +1,5 @@
 package com.fuse.ai.server.web.model.dto.request.video;
 
-import org.springframework.web.multipart.MultipartFile;
 import javax.validation.constraints.*;
 import lombok.Data;
 
@@ -35,7 +34,7 @@ public class RunwayGenerateDTO {
     /**
      * Image file as video base
      */
-    private MultipartFile imageFile;
+    private String imageUrl;
 
     /**
      * Video aspect ratio parameter
@@ -64,7 +63,7 @@ public class RunwayGenerateDTO {
      */
     @AssertTrue(message = "Aspect ratio is required when no image file is provided")
     public boolean isAspectRatioValid() {
-        if (imageFile == null || imageFile.isEmpty()) {
+        if (imageUrl == null || imageUrl.isEmpty()) {
             return aspectRatio != null && !aspectRatio.trim().isEmpty();
         }
         return true;

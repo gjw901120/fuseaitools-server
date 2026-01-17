@@ -1,6 +1,7 @@
 // SubscriptionTypeEnum.java
 package com.fuse.ai.server.manager.enums;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
 import lombok.Getter;
 
 @Getter
@@ -9,6 +10,7 @@ public enum SubscriptionTypeEnum {
     MONTHLY(2, "月订阅"),
     YEARLY(3, "年订阅");
 
+    @EnumValue
     private final Integer code;
     private final String description;
 

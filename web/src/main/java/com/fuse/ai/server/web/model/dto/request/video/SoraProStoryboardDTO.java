@@ -1,8 +1,5 @@
 package com.fuse.ai.server.web.model.dto.request.video;
 
-import org.springframework.web.multipart.MultipartFile;
-
-import javax.validation.Valid;
 import javax.validation.constraints.*;
 import lombok.Data;
 import java.util.List;
@@ -36,7 +33,7 @@ public class SoraProStoryboardDTO {
     /**
      * Image files to use as input
      */
-    private List<MultipartFile> imageFiles;
+    private List<String> imageUrls;
 
     /**
      * Aspect ratio of the image
@@ -88,20 +85,4 @@ public class SoraProStoryboardDTO {
         return Math.abs(totalDuration - nFrames) < 0.1; // Allow small floating point difference
     }
 
-    /**
-     * Custom validation for image file types and size
-     */
-    @AssertTrue(message = "Image files must be JPEG, PNG, or WebP and under 10MB")
-    public boolean isImageFilesFormatValid() {
-        if (getImageFiles() != null) {
-            return getImageFiles().stream()
-                    .allMatch(file -> file.isEmpty() ||
-                            (file.getContentType() != null &&
-                                    (file.getContentType().equals("image/jpeg") ||
-                                            file.getContentType().equals("image/png") ||
-                                            file.getContentType().equals("image/webp")) &&
-                                    file.getSize() <= 10 * 1024 * 1024)); // 10MB
-        }
-        return true;
-    }
 }

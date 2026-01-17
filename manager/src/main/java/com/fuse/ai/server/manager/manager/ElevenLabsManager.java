@@ -11,20 +11,20 @@ public interface ElevenLabsManager {
     /**
      * 文本转语音
      */
-    ElevenLabsResponse textToSpeech(ElevenLabsTTSRequest request);
+    ElevenLabsResponse textToSpeech(ElevenLabsTTSRequest request,String apiKey);
 
     /**
      * 语音转文本
      */
-    ElevenLabsResponse speechToText(ElevenLabsSTTRequest request);
+    ElevenLabsResponse speechToText(ElevenLabsSTTRequest request,String apiKey);
 
     /**
      * 音效生成
      */
-    ElevenLabsResponse generateSoundEffect(ElevenLabsSoundEffectRequest request);
+    ElevenLabsResponse generateSoundEffect(ElevenLabsSoundEffectRequest request,String apiKey);
 
     /**
      * 音频分离
      */
-    ElevenLabsResponse isolateAudio(ElevenLabsAudioIsolationRequest request);
+    ElevenLabsResponse isolateAudio(ElevenLabsAudioIsolationRequest request,String apiKey);
 }

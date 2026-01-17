@@ -21,13 +21,13 @@ public class Gpt4oImageGenerateDTO {
     /**
      * Mask image file
      */
-    private MultipartFile maskFile;
+    private String maskUrl;
 
     /**
      * Image files list
      */
     @Size(max = 5, message = "Cannot exceed 5 image files")
-    private List<MultipartFile> files;
+    private List<String> imageUrls;
 
     /**
      * Prompt describing the desired content
@@ -52,48 +52,7 @@ public class Gpt4oImageGenerateDTO {
     @AssertTrue(message = "Either prompt or files must be provided")
     public boolean isPromptOrFilesValid() {
         return (prompt != null && !prompt.trim().isEmpty()) ||
-                (files != null && !files.isEmpty());
+                (imageUrls != null && !imageUrls.isEmpty());
     }
 
-    /**
-     * Custom validation: mask file cannot be used with multiple files
-     */
-    @AssertTrue(message = "Mask file cannot be used when multiple files are provided")
-    public boolean isMaskFileValid() {
-        if (maskFile != null && !maskFile.isEmpty()) {
-            return files == null || files.size() <= 1;
-        }
-        return true;
-    }
-
-    /**
-     * Custom validation: mask file size validation
-     */
-    @AssertTrue(message = "Mask file must be under 25MB")
-    public boolean isMaskFileSizeValid() {
-        if (maskFile != null && !maskFile.isEmpty()) {
-            return maskFile.getSize() <= 25 * 1024 * 1024;
-        }
-        return true;
-    }
-
-    /**
-     * Custom validation: image files format validation
-     */
-    @AssertTrue(message = "Image files must be JFIF, JPEG, JPG, PNG, or WebP format")
-    public boolean isImageFilesFormatValid() {
-        if (files != null) {
-            return files.stream()
-                    .allMatch(file -> file.isEmpty() ||
-                            (file.getContentType() != null &&
-                                    (file.getContentType().equals("image/jpeg") ||
-                                            file.getContentType().equals("image/jpg") ||
-                                            file.getContentType().equals("image/pjpeg") ||
-                                            file.getContentType().equals("image/jfif") ||
-                                            file.getContentType().equals("image/pjp") ||
-                                            file.getContentType().equals("image/png") ||
-                                            file.getContentType().equals("image/webp"))));
-        }
-        return true;
-    }
 }

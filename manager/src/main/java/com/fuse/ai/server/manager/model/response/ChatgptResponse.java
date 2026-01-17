@@ -1,10 +1,12 @@
 package com.fuse.ai.server.manager.model.response;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import java.util.List;
 
 @Data
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ChatgptResponse {
     private String id;
 
@@ -25,7 +27,7 @@ public class ChatgptResponse {
     public boolean isFinished() {
         return choices != null &&
                 !choices.isEmpty() &&
-                "stop".equals(choices.get(0).finish_reason);
+                "stop".equals(choices.get(0).finishReason);
     }
 
     // 获取内容
@@ -37,17 +39,22 @@ public class ChatgptResponse {
     }
 
     @Data
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Choice {
         private Delta delta;
-        private String finish_reason;
+
+        @JsonProperty("finish_reason")
+        private String finishReason;
     }
 
     @Data
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Delta {
         private String content;
     }
 
     @Data
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Usage {
         @JsonProperty("prompt_tokens")
         private Integer promptTokens;
@@ -68,6 +75,7 @@ public class ChatgptResponse {
     }
 
     @Data
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class PromptTokensDetails {
         @JsonProperty("cached_tokens")
         private Integer cachedTokens;
@@ -76,6 +84,7 @@ public class ChatgptResponse {
     }
 
     @Data
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class CompletionTokensDetails {
         @JsonProperty("reasoning_tokens")
         private Integer reasoningTokens;

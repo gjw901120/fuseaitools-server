@@ -1,6 +1,9 @@
 package com.fuse.ai.server.web.common.utils;
 
 import com.fuse.ai.server.web.model.dto.request.user.UserJwtDTO;
+import com.fuse.common.core.exception.BaseException;
+import com.fuse.common.core.exception.error.SystemErrorType;
+import com.fuse.common.core.exception.error.UserErrorType;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -57,10 +60,10 @@ public class JwtTokenUtil {
             return true;
         } catch (ExpiredJwtException e) {
             // Token 已过期
-            throw new RuntimeException("Token已过期", e);
+            throw new BaseException(UserErrorType.USER_IDENTIFICATION_INVALID, "User login expired");
         } catch (JwtException | IllegalArgumentException e) {
             // Token 无效、被篡改或格式错误
-            throw new RuntimeException("Token无效", e);
+            throw new BaseException(UserErrorType.USER_IDENTIFICATION_INVALID, "User login expired");
         }
     }
 

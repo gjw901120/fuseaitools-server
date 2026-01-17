@@ -1,6 +1,5 @@
 package com.fuse.ai.server.web.model.dto.request.video;
 
-import org.springframework.web.multipart.MultipartFile;
 import javax.validation.constraints.*;
 import lombok.Data;
 
@@ -19,8 +18,8 @@ public class LumaGenerateDTO {
     /**
      * Input video file for modification
      */
-    @NotNull(message = "Video file cannot be null")
-    private MultipartFile videoFile;
+    @NotNull(message = "Video url cannot be null")
+    private String videoUrl;
 
     /**
      * Watermark identifier to add to generated video

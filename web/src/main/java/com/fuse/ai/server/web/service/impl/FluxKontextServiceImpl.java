@@ -1,19 +1,26 @@
 package com.fuse.ai.server.web.service.impl;
 
+import com.fuse.ai.server.manager.entity.Models;
 import com.fuse.ai.server.manager.entity.UserModelTask;
 import com.fuse.ai.server.manager.enums.ImageResponseCodeEnum;
 import com.fuse.ai.server.manager.enums.TaskStatusEnum;
 import com.fuse.ai.server.manager.manager.ImageManager;
 import com.fuse.ai.server.manager.model.request.FluxKontextImageRequest;
 import com.fuse.ai.server.manager.model.response.ImageGenerateResponse;
+import com.fuse.ai.server.web.model.bo.ExtraDataBO;
+import com.fuse.ai.server.web.model.bo.verifyCreditsBO;
 import com.fuse.ai.server.web.model.dto.request.image.FluxKontextGenerateDTO;
+import com.fuse.ai.server.web.model.dto.request.user.UserJwtDTO;
 import com.fuse.ai.server.web.model.dto.response.BaseResponse;
 import com.fuse.ai.server.web.service.FluxKontextService;
+import com.fuse.ai.server.web.service.ModelsService;
 import com.fuse.ai.server.web.service.RecordsService;
-import com.simply.common.core.exception.BaseException;
-import com.simply.common.core.exception.error.ThirdpartyErrorType;
+import com.fuse.ai.server.web.service.UserCreditsService;
+import com.fuse.common.core.exception.BaseException;
+import com.fuse.common.core.exception.error.ThirdpartyErrorType;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -29,8 +36,21 @@ public class FluxKontextServiceImpl implements FluxKontextService {
     @Autowired
     private RecordsService recordsService;
 
+    @Autowired
+    private ModelsService modelsService;
+
+    @Autowired
+    private UserCreditsService userCreditsService;
+
+    @Value("${callback.url}")
+    private String callbackUrl;
+
     @Override
-    public BaseResponse fluxKontextGenerate(FluxKontextGenerateDTO fluxKontextGenerateDTO) {
+    public BaseResponse fluxKontextGenerate(FluxKontextGenerateDTO fluxKontextGenerateDTO, UserJwtDTO userJwtDTO) {
+
+        Models model = modelsService.getModelByName(fluxKontextGenerateDTO.getModel().getCode());
+
+        verifyCreditsBO verifyCreditsBO = userCreditsService.verifyCredits(userJwtDTO.getId(), model, new ExtraDataBO());
 
         // 实现视频生成逻辑
         FluxKontextImageRequest request = new FluxKontextImageRequest();
@@ -38,12 +58,13 @@ public class FluxKontextServiceImpl implements FluxKontextService {
         BeanUtils.copyProperties(fluxKontextGenerateDTO, request);
 
         List<String> inputUrls = new ArrayList<>();
-        String inputImage = "";
 
-        request.setInputImage(inputImage);
-        inputUrls.add(inputImage);
+        request.setInputImage(fluxKontextGenerateDTO.getImageUrl());
+        inputUrls.add(fluxKontextGenerateDTO.getImageUrl());
 
-        ImageGenerateResponse response = imageManager.fluxKontextGenerate(request);
+        request.setCallBackUrl(callbackUrl.concat("/image/flux-kontext"));
+
+        ImageGenerateResponse response = imageManager.fluxKontextGenerate(request, model.getRequestToken());
 
         if(!ImageResponseCodeEnum.SUCCESS.equals(response.getCode())) {
             throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, response.getMessage());
@@ -65,7 +86,7 @@ public class FluxKontextServiceImpl implements FluxKontextService {
                 new HashMap<>()
         );
 
-        return new BaseResponse(recordsService.create(fluxKontextGenerateDTO.getModel().getCode(), userModelTask));
+        return new BaseResponse(recordsService.create(model, request.getPrompt(), userModelTask, verifyCreditsBO));
 
     }
 }

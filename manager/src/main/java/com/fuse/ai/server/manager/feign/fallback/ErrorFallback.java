@@ -1,7 +1,7 @@
 package com.fuse.ai.server.manager.feign.fallback;
 
-import com.simply.common.core.exception.SystemErrorException;
-import com.simply.common.core.exception.error.ThirdpartyErrorType;
+import com.fuse.common.core.exception.SystemErrorException;
+import com.fuse.common.core.exception.error.ThirdpartyErrorType;
 import feign.Response;
 import feign.codec.ErrorDecoder;
 import lombok.SneakyThrows;

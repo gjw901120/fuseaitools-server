@@ -19,7 +19,7 @@ server:
 feign:
   api:
     sms1:
-      url: http://d1-inner.simply.com
+      url: http://d1-inner.fuse.com
 
 cache-config:
   redis:
@@ -33,7 +33,7 @@ cache-config:
       maxSize: 10000
 
 mybatis-plus:
-  type-enums-package: com.simply.common.core.entity.bo
+  type-enums-package: com.fuse.common.core.entity.bo
   configuration:
     default-enum-type-handler: org.apache.ibatis.type.EnumOrdinalTypeHandler
 

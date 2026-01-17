@@ -1,6 +1,7 @@
 package com.fuse.ai.server.manager.model.request;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import java.util.List;
 import java.util.Map;
@@ -13,7 +14,9 @@ public class ClaudeRequest {
     private List<Message> messages;
     private Boolean stream = true;
     private List<Tool> tools;
-    private StreamOptions stream_options;  // 新增字段
+
+    @JsonProperty("stream_options")
+    private StreamOptions streamOptions;  // 新增字段
 
     @Data
     @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -49,14 +52,10 @@ public class ClaudeRequest {
     }
 
     @Data
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     public static class StreamOptions {
-        private Boolean include_usage;
 
-        public static StreamOptions includeUsage() {
-            StreamOptions options = new StreamOptions();
-            options.setInclude_usage(true);
-            return options;
-        }
+        @JsonProperty("include_usage")
+        private Boolean includeUsage ; // 是否包含使用统计
+
     }
 }

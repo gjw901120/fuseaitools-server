@@ -6,10 +6,10 @@ import com.fuse.ai.server.manager.model.response.VideoGenerateResponse;
 
 public interface SoraManager {
 
-    VideoGenerateResponse generateVideo(SoraGenerateRequest request);
+    VideoGenerateResponse generateVideo(SoraGenerateRequest request, String apiKey);
 
-    VideoGenerateResponse soraWatermarkRemover(SoraGenerateRequest request);
+    VideoGenerateResponse soraWatermarkRemover(SoraGenerateRequest request, String apiKey);
 
-    VideoGenerateResponse soraStoryboard(SoraGenerateRequest request);
+    VideoGenerateResponse soraStoryboard(SoraGenerateRequest request, String apiKey);
 
 }

@@ -17,7 +17,4 @@ public class SendEmailCodeDTO implements Serializable {
     private String email;
 
 
-    @Pattern(regexp = "^(register|login)$", message = "sendType must be 'register' or 'login'")
-    private String sendType;
-
 }

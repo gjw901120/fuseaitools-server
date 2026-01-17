@@ -6,8 +6,9 @@ import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.JWTVerifier;
-import com.simply.common.core.exception.BaseException;
-import com.simply.common.core.exception.error.SystemErrorType;
+import com.fuse.common.core.exception.BaseException;
+import com.fuse.common.core.exception.error.SystemErrorType;
+import com.fuse.common.core.exception.error.UserErrorType;
 import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigInteger;
@@ -24,7 +25,7 @@ public class JwtUtil {
     /**
      * ISSUER
      */
-    private static final String ISSUER = "simply";
+    private static final String ISSUER = "fuse";
 
     public static String generateUserToken(BigInteger userId, String jwtSecretKey) {
         Algorithm algorithm = Algorithm.HMAC512(jwtSecretKey);
@@ -32,15 +33,14 @@ public class JwtUtil {
         Date issuedAt = new Date();
 
         try {
-            String token = JWT.create()
+            return JWT.create()
                     .withClaim(USER_ID_KEY, userId.toString())
                     .withIssuer(ISSUER)
                     .withIssuedAt(issuedAt)
                     .sign(algorithm);
-            return token;
         } catch (JWTCreationException e){
             log.error("生成JWT token失败", e);
-            throw new BaseException(SystemErrorType.SYSTEM_EXECUTION_ERROR, "生成JWT token报错");
+            throw new BaseException(SystemErrorType.SYSTEM_EXECUTION_ERROR, "generate JWT token fail");
         }
     }
 
@@ -49,7 +49,7 @@ public class JwtUtil {
     }
 
     public static BigInteger getUserId(String token) {
-        return new BigInteger(getStringValue(token, USER_ID_KEY));
+        return new BigInteger(getStringValue(token));
     }
 
     private static String verifyAndGetStringValue(String token, String name, String jwtSecretKey) {
@@ -69,13 +69,13 @@ public class JwtUtil {
                     .build(); //Reusable verifier instance
             return verifier.verify(token);
         } catch (JWTVerificationException e) {
-            throw new IllegalArgumentException(e);
+            throw new BaseException(UserErrorType.USER_IDENTIFICATION_INVALID, "Invalid token");
         }
     }
 
-    private static String getStringValue(String token, String name) {
+    private static String getStringValue(String token) {
         try {
-            return JWT.decode(token).getClaim(name).asString();
+            return JWT.decode(token).getClaim(JwtUtil.USER_ID_KEY).asString();
         } catch (Exception e) {
             throw new IllegalArgumentException("invalid user token:" + token, e);
         }

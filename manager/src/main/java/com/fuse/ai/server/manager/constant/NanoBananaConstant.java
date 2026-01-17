@@ -11,6 +11,8 @@ public final class NanoBananaConstant {
     public static final String MODEL_GENERATE = "google/nano-banana";
     public static final String MODEL_EDIT = "google/nano-banana-edit";
 
+    public static final String MODEL_PRO_GENERATE = "nano-banana-pro";
+
     // 长宽比
     public static final String ASPECT_RATIO_1_1 = "1:1";
     public static final String ASPECT_RATIO_9_16 = "9:16";

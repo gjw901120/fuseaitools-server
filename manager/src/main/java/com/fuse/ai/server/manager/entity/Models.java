@@ -1,6 +1,7 @@
 package com.fuse.ai.server.manager.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.core.handlers.MybatisEnumTypeHandler;
 import com.fuse.ai.server.manager.enums.ModelTypeEnum;
 import com.fuse.ai.server.manager.enums.PricingTypeEnum;
 import lombok.Data;
@@ -24,9 +25,14 @@ public class Models {
 
     private String originalToken;
 
+    @TableField(typeHandler = MybatisEnumTypeHandler.class)
     private ModelTypeEnum type;
 
     private Integer isPricingRules;
+
+    private Integer isSearch;
+
+    private Integer isThink;
 
     private PricingTypeEnum pricingType;
 

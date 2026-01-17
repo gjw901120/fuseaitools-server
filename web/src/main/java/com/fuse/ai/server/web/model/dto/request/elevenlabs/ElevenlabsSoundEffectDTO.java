@@ -2,6 +2,8 @@ package com.fuse.ai.server.web.model.dto.request.elevenlabs;
 
 import com.fuse.ai.server.web.common.enums.ElevenLabsModelEnum;
 import com.fuse.ai.server.web.common.enums.ElevenLabsOutputFormatEnum;
+import com.fuse.common.core.exception.BaseException;
+import com.fuse.common.core.exception.error.UserErrorType;
 import lombok.Data;
 
 import javax.validation.constraints.DecimalMax;
@@ -12,6 +14,7 @@ import javax.validation.constraints.Size;
 import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Objects;
 
 /**
  * ElevenLabs sound effect generation request parameters
@@ -64,20 +67,20 @@ public class ElevenlabsSoundEffectDTO implements Serializable {
      */
     public void validateBusinessRules() {
         // Validate model
-        if (model != ElevenLabsModelEnum.SOUND_EFFECT.getCode()) {
-            throw new IllegalArgumentException("Sound effect generation only supports elevenlabs/sound-effect-v2 model");
+        if (!Objects.equals(model, "elevenlabs_sound_effect")) {
+            throw new BaseException(UserErrorType.USER_CLIENT_ERROR,"Sound effect generation only supports sound-effect-v2 model");
         }
 
         // Validate text length
         if (text.length() > 5000) {
-            throw new IllegalArgumentException("Sound effect description text length cannot exceed 5000 characters");
+            throw new BaseException(UserErrorType.USER_CLIENT_ERROR,"Sound effect description text length cannot exceed 5000 characters");
         }
 
         // Validate duration range
         if (durationSeconds != null &&
                 (durationSeconds.compareTo(BigDecimal.valueOf(0.5)) < 0 ||
                         durationSeconds.compareTo(BigDecimal.valueOf(22.0)) > 0)) {
-            throw new IllegalArgumentException("Duration must be between 0.5 and 22 seconds");
+            throw new BaseException(UserErrorType.USER_CLIENT_ERROR,"Duration must be between 0.5 and 22 seconds");
         }
     }
 }

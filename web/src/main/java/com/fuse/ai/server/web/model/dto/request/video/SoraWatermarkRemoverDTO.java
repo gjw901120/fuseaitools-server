@@ -1,6 +1,5 @@
 package com.fuse.ai.server.web.model.dto.request.video;
 
-import javax.validation.Valid;
 import javax.validation.constraints.*;
 import lombok.Data;
 

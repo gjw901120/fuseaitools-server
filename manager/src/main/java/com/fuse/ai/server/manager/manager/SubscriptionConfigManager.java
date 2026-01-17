@@ -7,4 +7,6 @@ public interface SubscriptionConfigManager {
 
     SubscriptionConfig getDetailByPackage(Integer packageType);
 
+    SubscriptionConfig getDetailById(Integer id);
+
 }

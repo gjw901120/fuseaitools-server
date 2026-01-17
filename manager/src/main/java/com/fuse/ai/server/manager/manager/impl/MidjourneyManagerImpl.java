@@ -18,48 +18,48 @@ public class MidjourneyManagerImpl implements MidjourneyManager {
      * 提交 Imagine 任务 - 文本生成图片
      */
     @Override
-    public MidjourneyBaseResponse<String> submitImagine(MidjourneyImagineRequest request) {
-        return midjourneyFeignClient.submitImagine(request);
+    public MidjourneyBaseResponse<String> submitImagine(MidjourneyImagineRequest request, String apiKey) {
+        return midjourneyFeignClient.submitImagine(request, apiKey);
     }
 
     /**
      * 提交 Blend 任务 - 多图混合
      */
     @Override
-    public MidjourneyBaseResponse<String> submitBlend(MidjourneyBlendRequest request) {
-        return midjourneyFeignClient.submitBlend(request);
+    public MidjourneyBaseResponse<String> submitBlend(MidjourneyBlendRequest request, String apiKey) {
+        return midjourneyFeignClient.submitBlend(request, apiKey);
     }
 
     /**
      * 提交 Describe 任务 - 图片描述
      */
     @Override
-    public MidjourneyBaseResponse<String> submitDescribe(MidjourneyDescribeRequest request) {
-        return midjourneyFeignClient.submitDescribe(request);
+    public MidjourneyBaseResponse<String> submitDescribe(MidjourneyDescribeRequest request, String apiKey) {
+        return midjourneyFeignClient.submitDescribe(request, apiKey);
     }
 
     /**
      * 提交 Modal 任务 - 模态操作
      */
     @Override
-    public MidjourneyBaseResponse<String> submitModal(MidjourneyModalRequest request) {
-        return midjourneyFeignClient.submitModal(request);
+    public MidjourneyBaseResponse<String> submitModal(MidjourneyModalRequest request, String apiKey) {
+        return midjourneyFeignClient.submitModal(request, apiKey);
     }
 
     /**
      * 提交 Swap Face 任务 - 人脸替换
      */
     @Override
-    public MidjourneyBaseResponse<String> submitSwapFace(MidjourneySwapFaceRequest request) {
-        return midjourneyFeignClient.submitSwapFace(request);
+    public MidjourneyBaseResponse<String> submitSwapFace(MidjourneySwapFaceRequest request, String apiKey) {
+        return midjourneyFeignClient.submitSwapFace(request, apiKey);
     }
 
     /**
      * 执行 Action 动作 - 图片操作
      */
     @Override
-    public MidjourneyBaseResponse<String> submitAction(MidjourneyActionRequest request) {
-        return midjourneyFeignClient.submitAction(request);
+    public MidjourneyBaseResponse<String> submitAction(MidjourneyActionRequest request, String apiKey) {
+        return midjourneyFeignClient.submitAction(request, apiKey);
     }
 
 }

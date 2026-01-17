@@ -34,6 +34,25 @@ public class ModelsManagerImpl implements ModelsManager {
     }
 
     @Override
+    public Models getDetailByName(String modelName) {
+        if (modelName == null || modelName.trim().isEmpty()) {
+            return null;
+        }
+
+        LambdaQueryWrapper<Models> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.select(Models::getId, Models::getName, Models::getCategoryId, Models::getRequestName, Models::getRequestToken, Models::getOriginalToken, Models::getType, Models::getIsPricingRules, Models::getPricingType)
+                .eq(Models::getName, modelName.trim())
+                .eq(Models::getIsDel, 0);
+
+        return modelsMapper.selectOne(queryWrapper);
+    }
+
+    @Override
+    public Models getDetailById(Integer  id) {
+        return modelsMapper.selectById(id);
+    }
+
+    @Override
     public List<Models> getAll() {
         return modelsMapper.selectList(new LambdaQueryWrapper<Models>()
                 .eq(Models::getIsDel, 0));

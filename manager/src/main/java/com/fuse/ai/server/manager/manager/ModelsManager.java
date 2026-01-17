@@ -9,6 +9,10 @@ public interface ModelsManager {
 
     Integer getModelIdByName(@Param("modelName") String modelName);
 
+    Models getDetailByName(@Param("modelName") String modelName);
+
+    Models getDetailById(@Param("id") Integer id);
+
     List<Models> getAll();
 
 }

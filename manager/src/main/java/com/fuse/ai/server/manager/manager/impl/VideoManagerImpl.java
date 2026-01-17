@@ -16,33 +16,33 @@ public class VideoManagerImpl implements VideoManager {
     private VideoFeignClient videoFeignClient;
 
     @Override
-    public VideoGenerateResponse veoGenerate(VeoGenerateRequest request) {
+    public VideoGenerateResponse veoGenerate(VeoGenerateRequest request, String apiKey) {
 
-        return videoFeignClient.veoGenerate(request);
+        return videoFeignClient.veoGenerate(request, apiKey);
     }
 
     @Override
-    public VideoGenerateResponse runwayGenerate(RunwayGenerateRequest request) {
-        return videoFeignClient.runwayGenerate(request);
+    public VideoGenerateResponse runwayGenerate(RunwayGenerateRequest request, String apiKey) {
+        return videoFeignClient.runwayGenerate(request, apiKey);
     }
 
     @Override
-    public VideoGenerateResponse runwayExtend(RunwayExtendRequest request) {
-        return videoFeignClient.runwayExtend(request);
+    public VideoGenerateResponse runwayExtend(RunwayExtendRequest request, String apiKey) {
+        return videoFeignClient.runwayExtend(request, apiKey);
     }
 
     @Override
-    public VideoGenerateResponse runwayAlephGenerate(RunwayAlephGenerateRequest request) {
-        return videoFeignClient.alephGenerate(request);
+    public VideoGenerateResponse runwayAlephGenerate(RunwayAlephGenerateRequest request, String apiKey) {
+        return videoFeignClient.alephGenerate(request, apiKey);
     }
 
     @Override
-    public VideoGenerateResponse lumaModify(LumaGenerateRequest request) {
-        return videoFeignClient.lumaModify(request);
+    public VideoGenerateResponse lumaModify(LumaGenerateRequest request, String apiKey) {
+        return videoFeignClient.lumaModify(request, apiKey);
     }
 
     @Override
-    public VideoGenerateResponse veoExtend(VeoExtendRequest request) {
-        return videoFeignClient.veoExtend(request);
+    public VideoGenerateResponse veoExtend(VeoExtendRequest request, String apiKey) {
+        return videoFeignClient.veoExtend(request, apiKey);
     }
 }

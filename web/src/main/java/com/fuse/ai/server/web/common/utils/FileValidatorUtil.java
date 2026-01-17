@@ -2,8 +2,9 @@ package com.fuse.ai.server.web.common.utils;
 
 import com.fuse.ai.server.web.config.exception.ResponseErrorType;
 import com.fuse.ai.server.web.common.enums.FileTypeEnum;
-import com.simply.common.core.exception.BaseException;
+import com.fuse.common.core.exception.BaseException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Arrays;
@@ -13,6 +14,7 @@ import java.util.List;
  * File upload validation utility class
  */
 @Slf4j
+@Component
 public class FileValidatorUtil {
 
     private FileValidatorUtil() {

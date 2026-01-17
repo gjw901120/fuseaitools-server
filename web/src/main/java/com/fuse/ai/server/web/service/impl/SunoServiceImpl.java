@@ -1,19 +1,26 @@
 package com.fuse.ai.server.web.service.impl;
 
+import com.fuse.ai.server.manager.entity.Models;
 import com.fuse.ai.server.manager.entity.UserModelTask;
 import com.fuse.ai.server.manager.enums.SunoResponseCodeEnum;
 import com.fuse.ai.server.manager.enums.TaskStatusEnum;
 import com.fuse.ai.server.manager.manager.SunoManger;
 import com.fuse.ai.server.manager.model.request.*;
 import com.fuse.ai.server.manager.model.response.SunoMusicResponse;
+import com.fuse.ai.server.web.model.bo.ExtraDataBO;
+import com.fuse.ai.server.web.model.bo.verifyCreditsBO;
 import com.fuse.ai.server.web.model.dto.request.suno.*;
+import com.fuse.ai.server.web.model.dto.request.user.UserJwtDTO;
 import com.fuse.ai.server.web.model.dto.response.BaseResponse;
+import com.fuse.ai.server.web.service.ModelsService;
 import com.fuse.ai.server.web.service.RecordsService;
 import com.fuse.ai.server.web.service.SunoService;
-import com.simply.common.core.exception.BaseException;
-import com.simply.common.core.exception.error.ThirdpartyErrorType;
+import com.fuse.ai.server.web.service.UserCreditsService;
+import com.fuse.common.core.exception.BaseException;
+import com.fuse.common.core.exception.error.ThirdpartyErrorType;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -29,15 +36,30 @@ public class SunoServiceImpl implements SunoService {
     @Autowired
     private RecordsService recordsService;
 
+    @Autowired
+    private ModelsService modelsService;
+
+    @Autowired
+    private UserCreditsService userCreditsService;
+
+    @Value("${callback.url}")
+    private String callbackUrl;
+
     @Override
-    public BaseResponse sunoGenerate(SunoGenerateDTO sunoGenerateDTO) {
+    public BaseResponse sunoGenerate(SunoGenerateDTO sunoGenerateDTO, UserJwtDTO userJwtDTO) {
+
+        Models model = modelsService.getModelByName("suno_generate");
+
+        verifyCreditsBO verifyCreditsBO = userCreditsService.verifyCredits(userJwtDTO.getId(), model, new ExtraDataBO());
 
         // 实现视频生成逻辑
         SunoGenerateRequest request = new SunoGenerateRequest();
 
         BeanUtils.copyProperties(sunoGenerateDTO, request);
 
-        SunoMusicResponse response = sunoManger.generateMusic(request);
+        request.setCallBackUrl(callbackUrl.concat("/suno/generate"));
+
+        SunoMusicResponse response = sunoManger.generateMusic(request, model.getRequestToken());
 
         if(!SunoResponseCodeEnum.SUCCESS.equals(response.getCode())) {
             throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, response.getMsg());
@@ -59,19 +81,25 @@ public class SunoServiceImpl implements SunoService {
                 new HashMap<>()
         );
 
-        return new BaseResponse(recordsService.create("suno_generate", userModelTask));
+        return new BaseResponse(recordsService.create(model, sunoGenerateDTO.getPrompt() , userModelTask, verifyCreditsBO));
 
     }
 
     @Override
-    public BaseResponse sunoExtend(SunoExtendDTO sunoExtendDTO) {
+    public BaseResponse sunoExtend(SunoExtendDTO sunoExtendDTO, UserJwtDTO userJwtDTO) {
+
+        Models model = modelsService.getModelByName("suno_extend");
+
+        verifyCreditsBO verifyCreditsBO = userCreditsService.verifyCredits(userJwtDTO.getId(), model, new ExtraDataBO());
 
         // 实现视频生成逻辑
         SunoExtendRequest request = new SunoExtendRequest();
 
         BeanUtils.copyProperties(sunoExtendDTO, request);
 
-        SunoMusicResponse response = sunoManger.extendMusic(request);
+        request.setCallBackUrl(callbackUrl.concat("/suno/extend"));
+
+        SunoMusicResponse response = sunoManger.extendMusic(request, model.getRequestToken());
 
         if(!SunoResponseCodeEnum.SUCCESS.equals(response.getCode())) {
             throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, response.getMsg());
@@ -93,12 +121,16 @@ public class SunoServiceImpl implements SunoService {
                 new HashMap<>()
         );
 
-        return new BaseResponse(recordsService.create("suno_extend", userModelTask));
+        return new BaseResponse(recordsService.create(model, sunoExtendDTO.getPrompt(), userModelTask, verifyCreditsBO));
 
     }
 
     @Override
-    public BaseResponse sunoUploadCover(SunoUploadCoverDTO sunoUploadCoverDTO) {
+    public BaseResponse sunoUploadCover(SunoUploadCoverDTO sunoUploadCoverDTO, UserJwtDTO userJwtDTO) {
+
+        Models model = modelsService.getModelByName("suno_upload_cover");
+
+        verifyCreditsBO verifyCreditsBO = userCreditsService.verifyCredits(userJwtDTO.getId(), model, new ExtraDataBO());
 
         // 实现视频生成逻辑
         SunoUploadCoverRequest request = new SunoUploadCoverRequest();
@@ -107,13 +139,13 @@ public class SunoServiceImpl implements SunoService {
 
         BeanUtils.copyProperties(sunoUploadCoverDTO, request);
 
-        String uploadUrl = "";
+        request.setCallBackUrl(callbackUrl.concat("/suno/upload-cover"));
 
-        inputUrls.add(uploadUrl);
+        inputUrls.add(sunoUploadCoverDTO.getFileUrl());
 
-        request.setUploadUrl(uploadUrl);
+        request.setUploadUrl(sunoUploadCoverDTO.getFileUrl());
 
-        SunoMusicResponse response = sunoManger.uploadCover(request);
+        SunoMusicResponse response = sunoManger.uploadCover(request, model.getRequestToken());
 
         if(!SunoResponseCodeEnum.SUCCESS.equals(response.getCode())) {
             throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, response.getMsg());
@@ -135,12 +167,16 @@ public class SunoServiceImpl implements SunoService {
                 new HashMap<>()
         );
 
-        return new BaseResponse(recordsService.create("suno_upload_cover", userModelTask));
+        return new BaseResponse(recordsService.create(model, sunoUploadCoverDTO.getPrompt() , userModelTask, verifyCreditsBO));
 
     }
 
     @Override
-    public BaseResponse sunoAddVocal(SunoAddVocalsDTO sunoAddVocalsDTO) {
+    public BaseResponse sunoAddVocal(SunoAddVocalsDTO sunoAddVocalsDTO, UserJwtDTO userJwtDTO) {
+
+        Models model = modelsService.getModelByName("suno_add_vocals");
+
+        verifyCreditsBO verifyCreditsBO = userCreditsService.verifyCredits(userJwtDTO.getId(), model, new ExtraDataBO());
 
         // 实现视频生成逻辑
         SunoAddVocalsRequest request = new SunoAddVocalsRequest();
@@ -149,13 +185,15 @@ public class SunoServiceImpl implements SunoService {
 
         BeanUtils.copyProperties(sunoAddVocalsDTO, request);
 
+        request.setCallBackUrl(callbackUrl.concat("/suno/add-vocals"));
+
         String uploadUrl = "";
 
         inputUrls.add(uploadUrl);
 
         request.setUploadUrl(uploadUrl);
 
-        SunoMusicResponse response = sunoManger.addVocals(request);
+        SunoMusicResponse response = sunoManger.addVocals(request, model.getRequestToken());
 
         if(!SunoResponseCodeEnum.SUCCESS.equals(response.getCode())) {
             throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, response.getMsg());
@@ -177,12 +215,16 @@ public class SunoServiceImpl implements SunoService {
                 new HashMap<>()
         );
 
-        return new BaseResponse(recordsService.create("suno_add_vocals", userModelTask));
+        return new BaseResponse(recordsService.create(model, sunoAddVocalsDTO.getPrompt(), userModelTask, verifyCreditsBO));
 
     }
 
     @Override
-    public BaseResponse sunoUploadExtend(SunoUploadExtendDTO sunoUploadExtendDTO) {
+    public BaseResponse sunoUploadExtend(SunoUploadExtendDTO sunoUploadExtendDTO, UserJwtDTO userJwtDTO) {
+
+        Models model = modelsService.getModelByName("suno_upload_extend");
+
+        verifyCreditsBO verifyCreditsBO = userCreditsService.verifyCredits(userJwtDTO.getId(), model, new ExtraDataBO());
 
         // 实现视频生成逻辑
         SunoUploadExtendRequest request = new SunoUploadExtendRequest();
@@ -191,13 +233,13 @@ public class SunoServiceImpl implements SunoService {
 
         List<String> inputUrls = new ArrayList<>();
 
-        String uploadUrl = "";
+        inputUrls.add(sunoUploadExtendDTO.getFileUrl());
 
-        inputUrls.add(uploadUrl);
+        request.setUploadUrl(sunoUploadExtendDTO.getFileUrl());
 
-        request.setUploadUrl(uploadUrl);
+        request.setCallBackUrl(callbackUrl.concat("/suno/upload-extend"));
 
-        SunoMusicResponse response = sunoManger.uploadExtend(request);
+        SunoMusicResponse response = sunoManger.uploadExtend(request, model.getRequestToken());
 
         if(!SunoResponseCodeEnum.SUCCESS.equals(response.getCode())) {
             throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, response.getMsg());
@@ -219,12 +261,16 @@ public class SunoServiceImpl implements SunoService {
                 new HashMap<>()
         );
 
-        return new BaseResponse(recordsService.create("suno_upload_extend", userModelTask));
+        return new BaseResponse(recordsService.create(model, sunoUploadExtendDTO.getPrompt(), userModelTask, verifyCreditsBO));
 
     }
 
     @Override
-    public BaseResponse sunoAddInstrumental(SunoAddInstrumentalDTO sunoAddInstrumentalDTO) {
+    public BaseResponse sunoAddInstrumental(SunoAddInstrumentalDTO sunoAddInstrumentalDTO, UserJwtDTO userJwtDTO) {
+
+        Models model = modelsService.getModelByName("suno_add_instrumental");
+
+        verifyCreditsBO verifyCreditsBO = userCreditsService.verifyCredits(userJwtDTO.getId(), model, new ExtraDataBO());
 
         // 实现视频生成逻辑
         SunoAddInstrumentalRequest request = new SunoAddInstrumentalRequest();
@@ -233,13 +279,13 @@ public class SunoServiceImpl implements SunoService {
 
         List<String> inputUrls = new ArrayList<>();
 
-        String uploadUrl = "";
+        inputUrls.add(sunoAddInstrumentalDTO.getFileUrl());
 
-        inputUrls.add(uploadUrl);
+        request.setUploadUrl(sunoAddInstrumentalDTO.getFileUrl());
 
-        request.setUploadUrl(uploadUrl);
+        request.setCallBackUrl(callbackUrl.concat("/suno/add-instrumental"));
 
-        SunoMusicResponse response = sunoManger.addInstrumental(request);
+        SunoMusicResponse response = sunoManger.addInstrumental(request, model.getRequestToken());
 
         if(!SunoResponseCodeEnum.SUCCESS.equals(response.getCode())) {
             throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, response.getMsg());
@@ -261,7 +307,7 @@ public class SunoServiceImpl implements SunoService {
                 new HashMap<>()
         );
 
-        return new BaseResponse(recordsService.create("suno_add_instrumental", userModelTask));
+        return new BaseResponse(recordsService.create(model, sunoAddInstrumentalDTO.getTitle(), userModelTask, verifyCreditsBO));
 
     }
 

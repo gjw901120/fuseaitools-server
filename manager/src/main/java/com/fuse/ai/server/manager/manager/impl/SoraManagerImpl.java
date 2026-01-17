@@ -14,18 +14,18 @@ public class SoraManagerImpl implements SoraManager {
     private SoraFeignClient soraFeignClient;
 
     @Override
-    public VideoGenerateResponse generateVideo(SoraGenerateRequest request) {
-        return soraFeignClient.generateVideo(request);
+    public VideoGenerateResponse generateVideo(SoraGenerateRequest request, String apiKey) {
+        return soraFeignClient.generateVideo(request, apiKey);
     }
 
     @Override
-    public VideoGenerateResponse soraWatermarkRemover(SoraGenerateRequest request) {
-        return soraFeignClient.soraWatermarkRemover(request);
+    public VideoGenerateResponse soraWatermarkRemover(SoraGenerateRequest request, String apiKey) {
+        return soraFeignClient.soraWatermarkRemover(request, apiKey);
     }
 
     @Override
-    public VideoGenerateResponse soraStoryboard(SoraGenerateRequest request) {
-        return soraFeignClient.soraStoryboard(request);
+    public VideoGenerateResponse soraStoryboard(SoraGenerateRequest request, String apiKey) {
+        return soraFeignClient.soraStoryboard(request, apiKey);
     }
 
 

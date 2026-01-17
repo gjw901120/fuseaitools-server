@@ -1,12 +1,15 @@
 package com.fuse.ai.server.web.model.dto.request.elevenlabs;
 
 import com.fuse.ai.server.web.common.enums.ElevenLabsModelEnum;
+import com.fuse.common.core.exception.BaseException;
+import com.fuse.common.core.exception.error.UserErrorType;
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * ElevenLabs audio isolation request parameters
@@ -26,34 +29,23 @@ public class ElevenlabsAudioIsolationDTO implements Serializable {
     /**
      * Audio file
      */
-    @NotNull(message = "Audio file cannot be empty")
-    private MultipartFile audioFile;
+    @NotNull(message = "Audio url cannot be empty")
+    private String audioUrl;
 
     /**
      * Business parameter validation
      */
     public void validateBusinessRules() {
         // Validate model
-        if (model != ElevenLabsModelEnum.AUDIO_ISOLATION.getCode()) {
-            throw new IllegalArgumentException("Audio isolation only supports elevenlabs/audio-isolation model");
+        if (!Objects.equals(model, "elevenlabs_audio_isolation")) {
+            throw new BaseException(UserErrorType.USER_CLIENT_ERROR,"Audio isolation only supports audio-isolation model");
         }
 
         // Validate file
-        if (audioFile == null || audioFile.isEmpty()) {
-            throw new IllegalArgumentException("Audio file cannot be empty");
+        if (audioUrl == null || audioUrl.isEmpty()) {
+            throw new BaseException(UserErrorType.USER_CLIENT_ERROR,"Audio url cannot be empty");
         }
 
-        // Validate file type
-        String contentType = audioFile.getContentType();
-        if (contentType == null || !isSupportedAudioType(contentType)) {
-            throw new IllegalArgumentException("Audio file format not supported. Supported formats: audio/mpeg, audio/wav, audio/x-wav, audio/aac, audio/mp4, audio/ogg");
-        }
-
-        // Validate file size (10MB)
-        long maxSize = 10L * 1024 * 1024;
-        if (audioFile.getSize() > maxSize) {
-            throw new IllegalArgumentException("Audio file size cannot exceed 10MB");
-        }
     }
 
     private boolean isSupportedAudioType(String contentType) {

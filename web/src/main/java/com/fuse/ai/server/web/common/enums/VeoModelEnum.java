@@ -1,5 +1,7 @@
 package com.fuse.ai.server.web.common.enums;
 
+import javax.validation.constraints.NotNull;
+
 /**
  * Veo视频生成模型枚举
  */

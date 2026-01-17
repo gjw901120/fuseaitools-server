@@ -1,10 +1,12 @@
 package com.fuse.ai.server.manager.model.response;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import java.util.List;
 import java.util.Map;
 
 @Data
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class DeepseekResponse {
 
     private String id;
@@ -26,12 +28,14 @@ public class DeepseekResponse {
     private String finishReason;
 
     @Data
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Choice {
         private Integer index;
         private Delta delta;
         private String finishReason;
 
         @Data
+        @JsonIgnoreProperties(ignoreUnknown = true)
         public static class Delta {
             private String content;
             private String role;
@@ -39,6 +43,7 @@ public class DeepseekResponse {
     }
 
     @Data
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Usage {
 
         private Integer promptTokens;
@@ -52,6 +57,7 @@ public class DeepseekResponse {
     }
 
     @Data
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class SearchResult {
         private Integer index;
         private String url;

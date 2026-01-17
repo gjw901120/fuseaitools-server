@@ -1,5 +1,6 @@
 package com.fuse.ai.server.manager.feign.config;
 
+import com.fuse.ai.server.manager.feign.interceptor.ApiKeyAuthInterceptor;
 import feign.Logger;
 import feign.RequestInterceptor;
 import org.springframework.context.annotation.Bean;
@@ -13,11 +14,4 @@ public class FeignConfig {
         return Logger.Level.FULL;
     }
 
-    @Bean
-    public RequestInterceptor videoRequestInterceptor() {
-        return template -> {
-            template.header("Content-Type", "application/json");
-            // 添加认证头等其他配置
-        };
-    }
 }

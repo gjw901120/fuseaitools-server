@@ -18,7 +18,7 @@ import java.lang.reflect.Method;
 @Component
 public class FeignAspect {
 
-    @Pointcut("execution( * com.simply.feign.client.*.*(..))")
+    @Pointcut("execution( * com.fuse.feign.client.*.*(..))")
     public void logCut() {
     }
 

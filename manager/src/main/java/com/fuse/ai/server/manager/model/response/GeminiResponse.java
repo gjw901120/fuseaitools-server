@@ -1,5 +1,6 @@
 package com.fuse.ai.server.manager.model.response;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
@@ -8,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 @Data
-@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class GeminiResponse {
 
     /**
@@ -67,7 +68,7 @@ public class GeminiResponse {
     // 内部类定义
 
     @Data
-    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Choice {
         /**
          * 索引
@@ -95,7 +96,7 @@ public class GeminiResponse {
     }
 
     @Data
-    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Delta {
         /**
          * 角色
@@ -123,7 +124,7 @@ public class GeminiResponse {
     }
 
     @Data
-    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Usage {
         /**
          * 提示词Token数
@@ -175,7 +176,7 @@ public class GeminiResponse {
     }
 
     @Data
-    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class TokenDetails {
         /**
          * 缓存Token数

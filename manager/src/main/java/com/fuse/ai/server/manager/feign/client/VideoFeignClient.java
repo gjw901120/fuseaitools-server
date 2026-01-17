@@ -4,15 +4,17 @@ import com.fuse.ai.server.manager.feign.config.FeignConfig;
 import com.fuse.ai.server.manager.feign.fallback.ErrorFallback;
 import com.fuse.ai.server.manager.model.request.*;
 import com.fuse.ai.server.manager.model.response.VideoGenerateResponse;
+import feign.Headers;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.Valid;
 
 @FeignClient(
         name = "video-service",
-        url = "${feign.client.video-service.url}",
+        url = "${feign.api.video.url}",
         fallback = ErrorFallback.class,
         configuration = FeignConfig.class
 )
@@ -22,35 +24,41 @@ public interface VideoFeignClient {
      * 生成veo视频
      */
     @PostMapping("/api/v1/veo/generate")
-    VideoGenerateResponse veoGenerate(@Valid @RequestBody VeoGenerateRequest request);
+    @Headers("Content-Type: application/json")
+    VideoGenerateResponse veoGenerate(@Valid @RequestBody VeoGenerateRequest request, @RequestParam("apiKey") String apiKey);
 
     /**
      * 生成runway视频
      */
     @PostMapping("/api/v1/runway/generate")
-    VideoGenerateResponse runwayGenerate(@Valid @RequestBody RunwayGenerateRequest request);
+    @Headers("Content-Type: application/json")
+    VideoGenerateResponse runwayGenerate(@Valid @RequestBody RunwayGenerateRequest request, @RequestParam("apiKey") String apiKey);
 
     /**
      * 生成runwayextend视频
      */
     @PostMapping("/api/v1/runway/extend")
-    VideoGenerateResponse runwayExtend(@Valid @RequestBody RunwayExtendRequest request);
+    @Headers("Content-Type: application/json")
+    VideoGenerateResponse runwayExtend(@Valid @RequestBody RunwayExtendRequest request, @RequestParam("apiKey") String apiKey);
 
     /**
      * 视频runwayaleph生成
      */
     @PostMapping("/api/v1/aleph/generate")
-    VideoGenerateResponse alephGenerate(@Valid @RequestBody RunwayAlephGenerateRequest request);
+    @Headers("Content-Type: application/json")
+    VideoGenerateResponse alephGenerate(@Valid @RequestBody RunwayAlephGenerateRequest request, @RequestParam("apiKey") String apiKey);
 
     /**
      * 视频Luma修改
      */
     @PostMapping("/api/v1/luma/modify")
-    VideoGenerateResponse lumaModify(@Valid @RequestBody LumaGenerateRequest request);
+    @Headers("Content-Type: application/json")
+    VideoGenerateResponse lumaModify(@Valid @RequestBody LumaGenerateRequest request, @RequestParam("apiKey") String apiKey);
 
     /**
      * 扩展veo视频
      */
     @PostMapping("/api/v1/veo/extend")
-    VideoGenerateResponse veoExtend(@Valid @RequestBody VeoExtendRequest request);
+    @Headers("Content-Type: application/json")
+    VideoGenerateResponse veoExtend(@Valid @RequestBody VeoExtendRequest request, @RequestParam("apiKey") String apiKey);
 }

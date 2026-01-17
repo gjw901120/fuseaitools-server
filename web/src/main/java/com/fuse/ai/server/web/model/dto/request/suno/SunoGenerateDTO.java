@@ -2,6 +2,8 @@ package com.fuse.ai.server.web.model.dto.request.suno;
 
 import com.fuse.ai.server.web.common.enums.SunoModelEnum;
 import com.fuse.ai.server.web.common.enums.SunoVocalGenderEnum;
+import com.fuse.common.core.exception.BaseException;
+import com.fuse.common.core.exception.error.UserErrorType;
 import lombok.Data;
 
 import javax.validation.constraints.DecimalMax;
@@ -14,7 +16,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 
 /**
- * Suno音频生成请求参数
+ * Suno Audio Generation Request Parameters
  */
 @Data
 public class SunoGenerateDTO implements Serializable {
@@ -23,122 +25,122 @@ public class SunoGenerateDTO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 描述所需音频内容的提示词
+     * Prompt describing the desired audio content
      */
-    @NotBlank(message = "提示词不能为空")
+    @NotBlank(message = "Prompt cannot be empty")
     private String prompt;
 
     /**
-     * 是否启用自定义模式
+     * Whether to enable custom mode
      */
-    @NotNull(message = "自定义模式不能为空")
+    @NotNull(message = "Custom mode cannot be empty")
     private Boolean customMode;
 
     /**
-     * 是否为纯音乐
+     * Whether it's instrumental only
      */
-    @NotNull(message = "是否为纯音乐不能为空")
+    @NotNull(message = "Instrumental flag cannot be empty")
     private Boolean instrumental;
 
     /**
-     * 模型版本
+     * Model version
      */
-    @NotNull(message = "模型不能为空")
+    @NotNull(message = "Model cannot be empty")
     private SunoModelEnum model;
 
     /**
-     * 音乐风格
+     * Music style
      */
-    @Size(max = 1000, message = "风格长度不能超过1000个字符")
+    @Size(max = 1000, message = "Style length cannot exceed 1000 characters")
     private String style;
 
     /**
-     * 音乐标题
+     * Music title
      */
-    @Size(max = 100, message = "标题长度不能超过100个字符")
+    @Size(max = 100, message = "Title length cannot exceed 100 characters")
     private String title;
 
     /**
-     * 排除的音乐风格
+     * Excluded music styles
      */
     private String negativeTags;
 
     /**
-     * 人声性别偏好
+     * Vocal gender preference
      */
     private SunoVocalGenderEnum vocalGender;
 
     /**
-     * 风格遵循强度
+     * Style adherence intensity
      */
-    @DecimalMin(value = "0.0", message = "风格权重最小为0")
-    @DecimalMax(value = "1.0", message = "风格权重最大为1")
+    @DecimalMin(value = "0.0", message = "Style weight must be at least 0")
+    @DecimalMax(value = "1.0", message = "Style weight must be at most 1")
     private BigDecimal styleWeight;
 
     /**
-     * 创意偏离程度
+     * Creative deviation degree
      */
-    @DecimalMin(value = "0.0", message = "创意偏离程度最小为0")
-    @DecimalMax(value = "1.0", message = "创意偏离程度最大为1")
+    @DecimalMin(value = "0.0", message = "Creative deviation degree must be at least 0")
+    @DecimalMax(value = "1.0", message = "Creative deviation degree must be at most 1")
     private BigDecimal weirdnessConstraint;
 
     /**
-     * 音频要素权重
+     * Audio element weight
      */
-    @DecimalMin(value = "0.0", message = "音频权重最小为0")
-    @DecimalMax(value = "1.0", message = "音频权重最大为1")
+    @DecimalMin(value = "0.0", message = "Audio weight must be at least 0")
+    @DecimalMax(value = "1.0", message = "Audio weight must be at most 1")
     private BigDecimal audioWeight;
 
     /**
-     * 业务参数校验
+     * Business parameter validation
      */
     public void validateBusinessRules() {
-        // 自定义模式下的校验
+        // Validation in custom mode
         if (Boolean.TRUE.equals(customMode)) {
             if (style == null || style.trim().isEmpty()) {
-                throw new IllegalArgumentException("自定义模式下风格不能为空");
+                throw new BaseException(UserErrorType.USER_CLIENT_ERROR, "Style cannot be empty in custom mode");
             }
             if (title == null || title.trim().isEmpty()) {
-                throw new IllegalArgumentException("自定义模式下标题不能为空");
+                throw new BaseException(UserErrorType.USER_CLIENT_ERROR, "Title cannot be empty in custom mode");
             }
             if (Boolean.FALSE.equals(instrumental) && (prompt == null || prompt.trim().isEmpty())) {
-                throw new IllegalArgumentException("非纯音乐模式下提示词不能为空");
+                throw new BaseException(UserErrorType.USER_CLIENT_ERROR, "Prompt cannot be empty in non-instrumental mode");
             }
         }
 
-        // 非自定义模式下的校验
+        // Validation in non-custom mode
         if (Boolean.FALSE.equals(customMode)) {
             if (prompt == null || prompt.trim().isEmpty()) {
-                throw new IllegalArgumentException("非自定义模式下提示词不能为空");
+                throw new BaseException(UserErrorType.USER_CLIENT_ERROR, "Prompt cannot be empty in non-custom mode");
             }
         }
 
-        // 根据模型校验字符长度
+        // Validate character length based on model
         validateCharacterLimits();
     }
 
     /**
-     * 根据模型校验字符长度限制
+     * Validate character length limits based on the model
      */
     private void validateCharacterLimits() {
         if (prompt != null) {
             int promptMaxLength = getPromptMaxLength();
             if (prompt.length() > promptMaxLength) {
-                throw new IllegalArgumentException("提示词长度不能超过" + promptMaxLength + "个字符");
+                throw new IllegalArgumentException("Prompt length cannot exceed " + promptMaxLength + " characters");
             }
         }
 
         if (style != null) {
             int styleMaxLength = getStyleMaxLength();
             if (style.length() > styleMaxLength) {
-                throw new IllegalArgumentException("风格长度不能超过" + styleMaxLength + "个字符");
+                throw new IllegalArgumentException("Style length cannot exceed " + styleMaxLength + " characters");
             }
         }
 
         if (title != null) {
             int titleMaxLength = getTitleMaxLength();
             if (title.length() > titleMaxLength) {
-                throw new IllegalArgumentException("标题长度不能超过" + titleMaxLength + "个字符");
+                throw new IllegalArgumentException("Title length cannot exceed " + titleMaxLength + " characters");
             }
         }
     }

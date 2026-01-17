@@ -10,4 +10,8 @@ public interface BillManager {
 
     List<Bill> getListByUserId(Integer userId);
 
+    Bill getDetailByRecordId(String recordId);
+
+    Integer updateById(Bill bill);
+
 }

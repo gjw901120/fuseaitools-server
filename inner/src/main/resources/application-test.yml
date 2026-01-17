@@ -19,11 +19,11 @@ server:
 feign:
   api:
     asset:
-      url: http://d1-inner.simply.com
+      url: http://d1-inner.fuse.com
       list: /assets
       detail: /asset
     order:
-      url: http://d1-inner.simply.com
+      url: http://d1-inner.fuse.com
       list: /orders
       detail: /order
       add_pos_flow: /order/pay
@@ -57,7 +57,7 @@ mybatis-plus:
     multipleResultSetsEnabled: true #开启的话，延时加载一个属性时会加载该对象全部属性，否则按需加载属性
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl #打印sql语句,调试用
     jdbc-type-for-null: null
-  type-enums-package: com.simply.common.core.entity.bo
+  type-enums-package: com.fuse.common.core.entity.bo
 
 rocketmq:
   accessKey: XXX

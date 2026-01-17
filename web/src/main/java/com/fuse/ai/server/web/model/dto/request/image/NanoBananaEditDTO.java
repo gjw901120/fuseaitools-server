@@ -1,6 +1,5 @@
 package com.fuse.ai.server.web.model.dto.request.image;
 
-import org.springframework.web.multipart.MultipartFile;
 import javax.validation.constraints.*;
 import lombok.Data;
 import java.util.List;
@@ -15,7 +14,7 @@ public class NanoBananaEditDTO {
      * The model name to use for generation
      */
     @NotBlank(message = "Model cannot be empty")
-    @Pattern(regexp = "google/nano-banana-edit", message = "Model must be google/nano-banana-edit")
+    @Pattern(regexp = "nano-banana-edit", message = "Model must be nano-banana-edit")
     private String model;
 
     /**
@@ -30,7 +29,7 @@ public class NanoBananaEditDTO {
      */
     @NotNull(message = "Image files cannot be null")
     @Size(min = 1, max = 10, message = "Image files must contain 1 to 10 images")
-    private List<MultipartFile> imageFiles;
+    private List<String> imageUrls;
 
     /**
      * Output format for the images
@@ -46,20 +45,4 @@ public class NanoBananaEditDTO {
     private String imageSize;
 
 
-    /**
-     * Custom validation for image file types and size
-     */
-    @AssertTrue(message = "Image files must be JPEG, PNG, or WebP and under 10MB")
-    public boolean isImageFilesFormatValid() {
-        if (getImageFiles() != null) {
-            return getImageFiles().stream()
-                    .allMatch(file -> file.isEmpty() ||
-                            (file.getContentType() != null &&
-                                    (file.getContentType().equals("image/jpeg") ||
-                                            file.getContentType().equals("image/png") ||
-                                            file.getContentType().equals("image/webp")) &&
-                                    file.getSize() <= 10 * 1024 * 1024)); // 10MB
-        }
-        return true;
-    }
 }

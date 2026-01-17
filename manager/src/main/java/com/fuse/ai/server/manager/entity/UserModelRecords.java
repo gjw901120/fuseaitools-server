@@ -53,6 +53,7 @@ public class UserModelRecords {
         return UserModelRecords.builder()
                 .userId(userId)
                 .modelId(modelId)
+                .title(title)
                 .isCompleted(isCompleted)
                 .build();
     }

@@ -19,7 +19,7 @@ public class MidjourneyActionDTO {
      * true: 使用同一频道下的账号执行动作
      * false: 默认行为，只使用任务关联的原始账号
      */
-    @NotNull(message = "是否选择同一频道不能为空")
+    @NotNull(message = "Whether to choose the same channel cannot be empty")
     @JsonProperty("chooseSameChannel")
     private Boolean chooseSameChannel;
 
@@ -27,7 +27,7 @@ public class MidjourneyActionDTO {
      * 动作标识 (必需)
      * 示例值: MJ::JOB::upsample::2::3dbbd469-36af-4a0f-8f02-df6c579e7011
      */
-    @NotBlank(message = "动作标识不能为空")
+    @NotBlank(message = "The action identifier cannot be empty")
     @JsonProperty("customId")
     private String customId;
 
@@ -35,7 +35,7 @@ public class MidjourneyActionDTO {
      * 任务ID (必需)
      * 需要执行动作的原始任务ID
      */
-    @NotBlank(message = "任务ID不能为空")
+    @NotBlank(message = "The task ID cannot be empty")
     @JsonProperty("recordId")
     private String recordId;
 

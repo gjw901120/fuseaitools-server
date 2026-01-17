@@ -38,7 +38,6 @@ logs/
 Thumbs.db
 
 # IDE
-.idea/
 *.iml
 *.iws
 *.ipr
@@ -46,3 +45,9 @@ Thumbs.db
 # 其他
 *.orig
 *.bak
+
+
+# 环境变量文件
+.env
+.env.local
+.env.*.local

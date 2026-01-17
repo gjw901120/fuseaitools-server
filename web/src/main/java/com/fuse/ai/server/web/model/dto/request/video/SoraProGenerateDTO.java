@@ -1,9 +1,7 @@
 package com.fuse.ai.server.web.model.dto.request.video;
 
-import javax.validation.Valid;
 import javax.validation.constraints.*;
 import lombok.Data;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -31,7 +29,7 @@ public class SoraProGenerateDTO {
     /**
      * URL of the image to use as the first frame
      */
-    private List<MultipartFile> imageFiles;
+    private List<String> imageUrls;
 
     /**
      * Aspect ratio of the image
@@ -62,7 +60,7 @@ public class SoraProGenerateDTO {
     @AssertTrue(message = "Image URLs are required for sora-2-pro-image-to-video model")
     public boolean isImageUrlsValid() {
         if ("sora-2-pro-text-to-video".equals(model)) {
-            return getImageFiles() != null && !getImageFiles().isEmpty();
+            return getImageUrls() != null && !getImageUrls().isEmpty();
         }
         return true;
     }

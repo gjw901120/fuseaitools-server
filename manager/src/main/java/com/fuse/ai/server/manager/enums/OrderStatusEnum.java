@@ -1,5 +1,6 @@
 package com.fuse.ai.server.manager.enums;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
 import lombok.Getter;
 
 @Getter
@@ -9,6 +10,7 @@ public enum OrderStatusEnum {
     FAILED(3, "付款失败"),
     REFUNDED(4, "已退款");
 
+    @EnumValue
     private final Integer code;
     private final String description;
 

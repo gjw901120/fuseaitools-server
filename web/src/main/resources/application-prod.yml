@@ -1,25 +1,69 @@
 spring:
   config:
     activate:
-      on-profile: prod
+      on-profile: dev
   datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
     type: com.alibaba.druid.pool.DruidDataSource
-    url: jdbc:mysql://localhost:3306/user
-    username: user
+    url: jdbc:mysql://localhost:3306/ai_tools
+    username: root
     password: 123456
   redis:
     host: 127.0.0.1
     port: 6379
-    password:
-    database: 1
+    password: YourStrongRedisPassword123!
+    database: 0
+
+# AWS SES 配置
+aws:
+  ses:
+    region: ap-southeast-2
+    credentials:
+      access-key: ${AWS_ACCESS_KEY_ID}  # 第22行改为环境变量
+      secret-key: ${AWS_SECRET_ACCESS_KEY}  # 第23行改为环境变量
+  s3:
+    region: us-west-1
+    accessKey: ${AWS_ACCESS_KEY_ID}  # 第26行改为环境变量
+    secretKey: ${AWS_SECRET_ACCESS_KEY}  # 第27行改为环境变量
+    bucketName: fuse-ai-s3
+
+
+  # 邮件发送配置
+  email:
+    default-from: no-reply@fuseaitools.com
+    default-reply-to: support@fuseaitools.com
+    default-charset: UTF-8
+    configuration-set: MyConfigSet  # 可选
+
+    # 发送设置
+    max-retries: 3
+    retry-delay-ms: 1000
 
 server:
-  port: 8022
+  port: 8080
 
 feign:
   api:
-    sms1:
-      url: http://d1-inner.simply.com
+    openai:
+      url: https://www.towerfun.net/v1
+    deepseek:
+      url: https://www.towerfun.net/v1
+    claude:
+      url: https://www.towerfun.net/v1
+    gemini:
+      url: https://www.towerfun.net/v1
+    elevenlabs:
+      url: https://api.kie.ai
+    image:
+      url: https://api.kie.ai
+    midjourney:
+      url: https://www.towerfun.net/v1
+    sora:
+      url: https://api.kie.ai
+    suno:
+      url: https://api.kie.ai
+    video:
+      url: https://api.kie.ai
 
 cache-config:
   redis:
@@ -33,14 +77,60 @@ cache-config:
       maxSize: 10000
 
 mybatis-plus:
-  type-enums-package: com.simply.common.core.entity.bo
+  type-enums-package: com.fuse.common.core.entity.bo
   configuration:
-    default-enum-type-handler: org.apache.ibatis.type.EnumOrdinalTypeHandler
+    default-enum-type-handler: com.baomidou.mybatisplus.core.handlers.MybatisEnumTypeHandler
+    map-underscore-to-camel-case: true
 
-rocketmq:
-  accessKey: XXX
-  secretKey: XX
-  nameSrvAddr: XXX
-  topic: XXX
-  groupId: XXX
-  tag: A
+callback:
+  url: https://api.fuseaitools.com/api/callback
+
+
+# 自定义配置
+app:
+  # 验证码配置
+  code:
+    expire-minutes: 5          # 验证码有效期
+    max-daily-per-email: 10     # 每个邮箱每日最多发送次数
+    max-daily-per-ip: 30       # 每个IP每日最多发送次数
+    max-global-daily: 1000     # 系统全局每日最多发送次数
+  google:
+    client-id: ${GOOGLE_CLIENT_ID}  # 第98行改为环境变量
+    client-secret: ${GOOGLE_CLIENT_SECRET}  # 第99行改为环境变量
+  # TraceId配置
+  trace:
+    enabled: true
+    header-name: X-Trace-Id
+
+# 日志配置 - 正确结构
+logging:
+  # 配置文件路径
+  config: classpath:logback-spring.xml
+  # 文件输出
+  file:
+    name: logs/application.log
+  # 日志模式（pattern）必须放在这里，不能放在level下面
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%X{traceId}] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%X{traceId}] %-5level %logger{36} - %msg%n"
+  # 日志级别配置
+  level:
+    # 应用包
+    com.fuse.ai.server: DEBUG
+    # SQL日志
+    SQL_LOGGER: DEBUG
+    # MyBatis
+    org.mybatis: DEBUG
+    com.baomidou.mybatisplus: DEBUG
+    # Spring
+    org.springframework.web: INFO
+    org.springframework.security: DEBUG
+    org.springframework.transaction: DEBUG
+    # 数据库连接池
+    com.zaxxer.hikari: INFO
+    # JDBC
+    java.sql: WARN
+    java.sql.Connection: WARN
+    java.sql.Statement: WARN
+    java.sql.PreparedStatement: DEBUG
+    java.sql.ResultSet: WARN

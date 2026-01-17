@@ -29,8 +29,10 @@ public class DeepseekRequest {
 
     @Data
     public static class StreamOptions {
+
         @JsonProperty("include_usage")
-        private Boolean includeUsage = true; // 是否包含使用统计
+        private Boolean includeUsage ; // 是否包含使用统计
+
     }
 
     @Data

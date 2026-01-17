@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings>
+    <!-- 添加 servers 部分 -->
+    <servers>
+        <server>
+            <id>github</id> <!-- 这个ID很重要，必须与profile中的repository id一致 -->
+            <username>${env.GITHUB_USERNAME}</username>
+            <password>${env.GITHUB_TOKEN}</password>
+        </server>
+    </servers>
+
+    <profiles>
+        <profile>
+            <id>default</id>
+            <repositories>
+                <repository>
+                    <id>central</id>
+                    <name>Central Repository</name>
+                    <url>https://repo1.maven.org/maven2</url>
+                    <layout>default</layout>
+                    <snapshots>
+                        <enabled>false</enabled>
+                    </snapshots>
+                </repository>
+
+                <!-- 添加 GitHub Packages 仓库 -->
+                <repository>
+                    <id>github</id> <!-- 与server中的id对应 -->
+                    <name>GitHub Apache Maven Packages</name>
+                    <url>https://maven.pkg.github.com/gjw901120/repository</url>
+                    <releases>
+                        <enabled>true</enabled>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled> <!-- 如果你也发布SNAPSHOT版本 -->
+                    </snapshots>
+                </repository>
+            </repositories>
+        </profile>
+    </profiles>
+
+    <!-- 激活配置 -->
+    <activeProfiles>
+        <activeProfile>default</activeProfile>
+    </activeProfiles>
+</settings>

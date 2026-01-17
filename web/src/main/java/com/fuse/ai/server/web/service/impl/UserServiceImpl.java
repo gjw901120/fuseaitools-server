@@ -1,7 +1,10 @@
 package com.fuse.ai.server.web.service.impl;
 
+import com.fuse.ai.server.web.common.utils.EmailSenderUtil;
+import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeTokenRequest;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+
 import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
@@ -16,25 +19,17 @@ import com.fuse.ai.server.web.model.dto.request.user.*;
 import com.fuse.ai.server.web.model.dto.response.LoginResponse;
 import com.fuse.ai.server.web.model.vo.UserDetailVO;
 import com.fuse.ai.server.web.service.UserService;
-import com.simply.common.core.exception.BaseException;
-import com.simply.common.core.exception.error.SystemErrorType;
-import com.simply.common.core.exception.error.ThirdpartyErrorType;
-import com.simply.common.core.exception.error.UserErrorType;
+import com.fuse.common.core.exception.BaseException;
+import com.fuse.common.core.exception.error.SystemErrorType;
+import com.fuse.common.core.exception.error.ThirdpartyErrorType;
+import com.fuse.common.core.exception.error.UserErrorType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
@@ -49,16 +44,13 @@ public class UserServiceImpl implements UserService {
     private RedisUtil redisUtil;
 
     @Autowired
-    private JavaMailSender mailSender;
+    private EmailSenderUtil emailSenderUtil;
 
     @Autowired
     private UserManager userManager;
 
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
-
-    @Value("${spring.mail.username}")
-    private String mailFrom;
 
     @Value("${app.code.expire-minutes}")
     private int codeExpireMinutes;
@@ -84,21 +76,11 @@ public class UserServiceImpl implements UserService {
         //验证防盗刷逻辑
         checkAntiSpam(sendEmailCodeDTO.getEmail(), request);
 
-        User user = userManager.selectByEmail(sendEmailCodeDTO.getEmail());
-        //验证发送类型
-        if("login".equals(sendEmailCodeDTO.getSendType()) && user == null) {
-            throw new BaseException(UserErrorType.USER_ACCOUNT_NOT_EXIST);
-        }
-
-        if("register".equals(sendEmailCodeDTO.getSendType()) && user != null) {
-            throw new BaseException(UserErrorType.USER_IDENTIFICATION_INVALID, "User account already exist");
-        }
-
         //  生成验证码
         String code = generateCode();
 
         //  存储到Redis
-        String key = RedisKeysEnum.EMAIL_CODE.format(sendEmailCodeDTO.getSendType().concat(sendEmailCodeDTO.getEmail()));
+        String key = RedisKeysEnum.EMAIL_CODE.format(sendEmailCodeDTO.getEmail());
 
         //  发送邮件
         redisUtil.set(key, code, codeExpireMinutes, TimeUnit.MINUTES);
@@ -106,51 +88,36 @@ public class UserServiceImpl implements UserService {
         //  更新发送计数
         updateSendCounters(sendEmailCodeDTO.getEmail(), request);
 
-        return true;
-    }
-
-    @Override
-    public Boolean registerByEmail(RegisterByEmailDTO registerByEmailDTO) {
-
-        String key = RedisKeysEnum.EMAIL_CODE.format("register".concat(registerByEmailDTO.getEmail()));
-        String storedCode = (String) redisUtil.get(key);
-        if (!registerByEmailDTO.getCode().equals(storedCode)) {
-            throw new BaseException(UserErrorType.VERIFICATION_CODE_ERROR);
-        }
-
-        User user = User.create(
-                registerByEmailDTO.getUsername(),
-                registerByEmailDTO.getEmail(),
-                "",
-                 "",
-                AuthTypeEnum.EMAIL,
-                0,
-                0,
-                SubscriptionPackageEnum.NONE,
-                registerByEmailDTO.getTimeZone() == null || "".equals(registerByEmailDTO.getTimeZone()) ? "UTC" : registerByEmailDTO.getTimeZone()
-        );
-
-        userManager.insert(user);
-
-        redisUtil.delete(key);
+        sendCodeEmail(sendEmailCodeDTO.getEmail(), code);
 
         return true;
     }
 
     @Override
     public LoginResponse loginByEmail(LoginByEmailDTO loginByEmailDTO) {
-        String key = RedisKeysEnum.EMAIL_CODE.format("login".concat(loginByEmailDTO.getEmail()));
+        String key = RedisKeysEnum.EMAIL_CODE.format(loginByEmailDTO.getEmail());
         String storedCode = (String) redisUtil.get(key);
         if (!loginByEmailDTO.getCode().equals(storedCode)) {
-            throw new BaseException(UserErrorType.VERIFICATION_CODE_ERROR);
+            throw new BaseException(UserErrorType.VERIFICATION_CODE_ERROR, "The verification code is incorrect");
         }
         redisUtil.delete(key);
         User user = userManager.selectByEmail(loginByEmailDTO.getEmail());
         if (user == null) {
-            throw new BaseException(UserErrorType.USER_ACCOUNT_NOT_EXIST);
+            user = User.create(
+                    "",
+                    loginByEmailDTO.getEmail(),
+                    "",
+                    "",
+                    AuthTypeEnum.fromJson(AuthTypeEnum.EMAIL.getCode()),
+                    0,
+                    0,
+                    SubscriptionPackageEnum.NONE,
+                    0
+            );
+            userManager.insert(user);
+        } else {
+            userManager.updateById(user);
         }
-        user.setTimeZone(loginByEmailDTO.getTimeZone());
-        userManager.updateById(user);
 
         UserJwtDTO userJwtDTO = UserJwtDTO.builder()
                 .id(user.getId())
@@ -163,11 +130,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public LoginResponse loginByGoogle(LoginByGoogleDTO loginByGoogleDTO) {
+    public LoginResponse loginByGoogle(String code) {
 
 //        User user = userManager.selectByEmail(loginByGoogleDTO.getEmail());
 
-        GoogleTokenResponse tokenResponse = exchangeCodeForTokens(loginByGoogleDTO.getAuthorizationCode());
+        GoogleTokenResponse tokenResponse = exchangeCodeForTokens(code);
 
 
         GoogleIdToken.Payload payload = verifyIdToken(tokenResponse.getIdToken());
@@ -183,11 +150,11 @@ public class UserServiceImpl implements UserService {
                 "",
                 payload.getSubject(),
                 (String) payload.get("picture"),
-                AuthTypeEnum.GOOGLE,
+                AuthTypeEnum.fromJson(AuthTypeEnum.GOOGLE.getCode()),
                 0,
                 0,
                 SubscriptionPackageEnum.NONE,
-                loginByGoogleDTO.getTimeZone() == null || "".equals(loginByGoogleDTO.getTimeZone()) ? "UTC" : loginByGoogleDTO.getTimeZone()
+                0
             );
             userManager.insert(newUser);
             userJwtDTO = UserJwtDTO.builder()
@@ -213,28 +180,27 @@ public class UserServiceImpl implements UserService {
      * 核心方法：用授权码交换Google令牌
      */
     private GoogleTokenResponse exchangeCodeForTokens(String authorizationCode) {
-        RestTemplate restTemplate = new RestTemplate();
-        String tokenUrl = "https://oauth2.googleapis.com/token";
+        try {
+            // 1. 创建HTTP传输和JSON工厂
+            NetHttpTransport httpTransport = new NetHttpTransport();
+            GsonFactory jsonFactory = GsonFactory.getDefaultInstance();
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+            // 2. 使用Google官方API构建令牌请求
+            return new GoogleAuthorizationCodeTokenRequest(
+                    httpTransport,
+                    jsonFactory,
+                    "https://oauth2.googleapis.com/token",
+                    googleClientId,
+                    googleClientSecret,
+                    authorizationCode,
+                    "http://127.0.0.1:8080/api/user/login/google/callback") // 请确认与前端完全一致
+                    .execute();
 
-        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.add("code", authorizationCode);
-        params.add("client_id", googleClientId);
-        params.add("client_secret", googleClientSecret); // 密钥在此安全使用
-        params.add("redirect_uri", "http://localhost:8080"); // 必须与前端完全一致
-        params.add("grant_type", "authorization_code");
-
-        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
-
-        ResponseEntity<GoogleTokenResponse> response = restTemplate.postForEntity(
-                tokenUrl, request, GoogleTokenResponse.class);
-
-        if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
-            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, "Google exchange token failed");
+        } catch (IOException e) {
+            log.error("Failed to exchange code for Google tokens", e);
+            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR,
+                    "Google token exchange failed: " + e.getMessage());
         }
-        return response.getBody();
     }
 
 
@@ -276,7 +242,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDetailVO detail(UserJwtDTO userJwtDTO) {
+    public UserDetailVO detail(UserJwtDTO userJwtDTO, String timeZone) {
         //TODO 查询user和拼接订阅，余额等信息
         User user = userManager.selectById(userJwtDTO.getId());
         return UserDetailVO.builder()
@@ -365,26 +331,19 @@ public class UserServiceImpl implements UserService {
 
 
     private void sendCodeEmail(String to, String code) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom(mailFrom);
-        message.setTo(to);
-        message.setSubject("Your App - Email Verification Code");
-        message.setText(String.format(
-                "Your verification code is: %s\n" +
-                        "Valid for: %d minutes\n" +
-                        "Please do not share this code with anyone.\n\n" +
-                        "If you did not request this, please ignore this email.",
-                code, codeExpireMinutes
-        ));
 
-        // Send email asynchronously
-        new Thread(() -> {
-            try {
-                mailSender.send(message);
-            } catch (Exception e) {
-                log.error("Failed to send email to: {}, Error: {}", to, e.getMessage());
-            }
-        }).start();
+        String messageId = emailSenderUtil.sendEmail(
+                to,
+                "Your App - Email Verification Code",
+                String.format(
+                        "Your verification code is: %s\n" +
+                                "Valid for: %d minutes\n" +
+                                "Please do not share this code with anyone.\n\n" +
+                                "If you did not request this, please ignore this email.",
+                        code, codeExpireMinutes
+                )
+        );
+        log.info("Email sent successfully. Message ID: {}", messageId);
     }
 
     /**
@@ -414,8 +373,8 @@ public class UserServiceImpl implements UserService {
     }
 
     private Integer getInteger(String key) {
-        String value = redisUtil.get(key).toString();
-        return value != null ? Integer.parseInt(value) : null;
+        Object value = redisUtil.get(key);
+        return value != null ? Integer.parseInt(value.toString()) : null;
     }
 
 }

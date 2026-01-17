@@ -1,5 +1,6 @@
 package com.fuse.ai.server.manager.enums;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
 import lombok.Getter;
 
 /**
@@ -24,6 +25,7 @@ public enum UserRoleEnum {
     /**
      * 角色编码
      */
+    @EnumValue
     private final Integer code;
 
     /**

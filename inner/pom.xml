@@ -2,21 +2,21 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>com.simply</groupId>
-        <artifactId>simply-ai-server</artifactId>
+        <groupId>com.fuse</groupId>
+        <artifactId>fuse-ai-server</artifactId>
         <version>1.0.0</version>
     </parent>
 
-    <artifactId>simply-ai-server-inner</artifactId>
+    <artifactId>fuse-ai-server-inner</artifactId>
     <dependencies>
         <dependency>
-            <groupId>com.simply</groupId>
-            <artifactId>simply-common-cache</artifactId>
+            <groupId>com.fuse</groupId>
+            <artifactId>fuse-common-cache</artifactId>
             <version>1.0.0</version>
         </dependency>
         <dependency>
-            <groupId>com.simply</groupId>
-            <artifactId>simply-ai-server-manager</artifactId>
+            <groupId>com.fuse</groupId>
+            <artifactId>fuse-ai-server-manager</artifactId>
             <version>1.0.0</version>
         </dependency>
 

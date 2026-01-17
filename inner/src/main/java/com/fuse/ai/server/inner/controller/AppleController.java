@@ -1,6 +1,6 @@
 package com.fuse.ai.server.inner.controller;
 
-import com.simply.common.core.entity.vo.ResponseResult;
+import com.fuse.common.core.entity.vo.ResponseResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

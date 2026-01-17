@@ -1,5 +1,6 @@
 package com.fuse.ai.server.web.common.utils;
 
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -11,6 +12,7 @@ import java.util.regex.Pattern;
 /**
  * 文件类型判断工具类
  */
+@Component
 public class FileTypeUtil {
 
     // 图片文件扩展名集合

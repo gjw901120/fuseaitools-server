@@ -2,8 +2,9 @@ package com.fuse.ai.server.web.model.dto.request.suno;
 
 import com.fuse.ai.server.web.common.enums.SunoModelEnum;
 import com.fuse.ai.server.web.common.enums.SunoVocalGenderEnum;
+import com.fuse.common.core.exception.BaseException;
+import com.fuse.common.core.exception.error.UserErrorType;
 import lombok.Data;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
@@ -14,7 +15,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 
 /**
- * Suno上传延长请求参数
+ * Suno Upload Extension Request Parameters
  */
 @Data
 public class SunoUploadExtendDTO implements Serializable {
@@ -23,117 +24,105 @@ public class SunoUploadExtendDTO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 上传的音频文件
+     * Uploaded audio file
      */
-    @NotNull(message = "上传文件不能为空")
-    private MultipartFile uploadFile;
+    @NotNull(message = "File url cannot be empty")
+    private String fileUrl;
 
     /**
-     * 是否启用自定义参数模式
+     * Whether to enable custom parameter mode
      */
-    @NotNull(message = "自定义参数模式不能为空")
+    @NotNull(message = "Custom parameter mode cannot be empty")
     private Boolean defaultParamFlag;
 
     /**
-     * 模型版本
+     * Model version
      */
-    @NotNull(message = "模型不能为空")
+    @NotNull(message = "Model cannot be empty")
     private SunoModelEnum model;
 
     /**
-     * 是否为纯音乐
+     * Whether it's instrumental only
      */
     private Boolean instrumental;
 
     /**
-     * 延长内容提示词
+     * Extension content prompt
      */
-    @Size(max = 5000, message = "提示词长度不能超过5000个字符")
+    @Size(max = 5000, message = "Prompt length cannot exceed 5000 characters")
     private String prompt;
 
     /**
-     * 音乐风格
+     * Music style
      */
-    @Size(max = 1000, message = "风格长度不能超过1000个字符")
+    @Size(max = 1000, message = "Style length cannot exceed 1000 characters")
     private String style;
 
     /**
-     * 音乐标题
+     * Music title
      */
-    @Size(max = 100, message = "标题长度不能超过100个字符")
+    @Size(max = 100, message = "Title length cannot exceed 100 characters")
     private String title;
 
     /**
-     * 延长开始时间点
+     * Extension start time point
      */
-    @DecimalMin(value = "0.0", inclusive = false, message = "延长开始时间必须大于0")
+    @DecimalMin(value = "0.0", inclusive = false, message = "Extension start time must be greater than 0")
     private BigDecimal continueAt;
 
     /**
-     * 排除的音乐风格
+     * Excluded music styles
      */
     private String negativeTags;
 
     /**
-     * 人声性别偏好
+     * Vocal gender preference
      */
     private SunoVocalGenderEnum vocalGender;
 
     /**
-     * 风格遵循强度
+     * Style adherence intensity
      */
-    @DecimalMin(value = "0.0", message = "风格权重最小为0")
-    @DecimalMax(value = "1.0", message = "风格权重最大为1")
+    @DecimalMin(value = "0.0", message = "Style weight must be at least 0")
+    @DecimalMax(value = "1.0", message = "Style weight must be at most 1")
     private BigDecimal styleWeight;
 
     /**
-     * 创意偏离程度
+     * Creative deviation degree
      */
-    @DecimalMin(value = "0.0", message = "创意偏离程度最小为0")
-    @DecimalMax(value = "1.0", message = "创意偏离程度最大为1")
+    @DecimalMin(value = "0.0", message = "Creative deviation degree must be at least 0")
+    @DecimalMax(value = "1.0", message = "Creative deviation degree must be at most 1")
     private BigDecimal weirdnessConstraint;
 
     /**
-     * 音频要素权重
+     * Audio element weight
      */
-    @DecimalMin(value = "0.0", message = "音频权重最小为0")
-    @DecimalMax(value = "1.0", message = "音频权重最大为1")
+    @DecimalMin(value = "0.0", message = "Audio weight must be at least 0")
+    @DecimalMax(value = "1.0", message = "Audio weight must be at most 1")
     private BigDecimal audioWeight;
 
     /**
-     * 业务参数校验
+     * Business parameter validation
      */
     public void validateBusinessRules() {
-        // 校验文件
-        if (uploadFile == null || uploadFile.isEmpty()) {
-            throw new IllegalArgumentException("上传文件不能为空");
+        // Validate file
+        if (fileUrl == null || fileUrl.isEmpty()) {
+            throw new BaseException(UserErrorType.USER_CLIENT_ERROR, "File url cannot be empty");
         }
 
-        // 校验文件类型
-        String contentType = uploadFile.getContentType();
-        if (contentType == null || !contentType.startsWith("audio/")) {
-            throw new IllegalArgumentException("上传文件必须是音频格式");
-        }
-
-        // 校验文件大小
-        long maxSize = 10 * 1024 * 1024; // 10MB
-        if (uploadFile.getSize() > maxSize) {
-            throw new IllegalArgumentException("上传文件大小不能超过10MB");
-        }
-
-        // 自定义参数模式下的校验
+        // Validation in custom parameter mode
         if (Boolean.TRUE.equals(defaultParamFlag)) {
             if (style == null || style.trim().isEmpty()) {
-                throw new IllegalArgumentException("自定义参数模式下风格不能为空");
+                throw new BaseException(UserErrorType.USER_CLIENT_ERROR, "Style cannot be empty in custom parameter mode");
             }
             if (title == null || title.trim().isEmpty()) {
-                throw new IllegalArgumentException("自定义参数模式下标题不能为空");
+                throw new BaseException(UserErrorType.USER_CLIENT_ERROR, "Title cannot be empty in custom parameter mode");
             }
             if (continueAt == null) {
-                throw new IllegalArgumentException("自定义参数模式下延长开始时间不能为空");
+                throw new BaseException(UserErrorType.USER_CLIENT_ERROR, "Extension start time cannot be empty in custom parameter mode");
             }
             if (Boolean.FALSE.equals(instrumental) && (prompt == null || prompt.trim().isEmpty())) {
-                throw new IllegalArgumentException("非纯音乐模式下提示词不能为空");
+                throw new BaseException(UserErrorType.USER_CLIENT_ERROR, "Prompt cannot be empty in non-instrumental mode");
             }
         }
     }

@@ -1,6 +1,6 @@
 package com.fuse.ai.server.web.config.exception;
 
-import com.simply.common.core.exception.error.ErrorType;
+import com.fuse.common.core.exception.error.ErrorType;
 import lombok.Getter;
 
 @Getter
@@ -28,7 +28,16 @@ public enum ResponseErrorType implements ErrorType {
     // Business logic errors
     BUSINESS_VALIDATION_ERROR("B0001", "Business validation error"),
     IMAGE_COUNT_ERROR("B0002", "Image count does not match generation mode"),
-    PROMPT_REQUIRED_ERROR("B0003", "Prompt is required");
+    PROMPT_REQUIRED_ERROR("B0003", "Prompt is required"),
+
+
+    //积分相关
+    CREDITS_IS_NOT_ENOUGH("C0001", "credits is not enough"),
+
+
+    MODEL_IS_NOT_EXIST("M0001", "MODEL_IS_NOT_EXIST"),
+    MODEL_IS_NOT_SUPPORT("M0002", "MODEL_IS_NOT_SUPPORT");
+
 
     private String code;
     private String message;
