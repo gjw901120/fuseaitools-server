@@ -35,7 +35,7 @@ check_dependency docker-compose || exit 1
 
 # 进入项目目录
 echo "=== 设置工作目录 ==="
-PROJECT_ROOT="/c/project/fuseaitools-server"
+PROJECT_ROOT="/opt/fuseai/backend/fuseaitools-server"
 if [ ! -d "$PROJECT_ROOT" ]; then
     echo "❌ 项目目录不存在: $PROJECT_ROOT"
     exit 1
