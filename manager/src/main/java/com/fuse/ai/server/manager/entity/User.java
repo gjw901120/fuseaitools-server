@@ -36,7 +36,9 @@ public class User {
 
     private SubscriptionPackageEnum subscriptionPackage;
 
-    private Integer timeZone;
+    private String timeZone;
+
+    private Integer timeZoneOffset;
 
     @Builder.Default
     private Integer isDel = 0;
@@ -51,7 +53,7 @@ public class User {
      * 创建用户对象的便捷方法
      */
     public static User create(String name, String email, String thirdPartyId, String avatar, AuthTypeEnum authType,
-                              Integer isTopUp, Integer isSubscription, SubscriptionPackageEnum subscriptionPackage, Integer timeZone) {
+                              Integer isTopUp, Integer isSubscription, SubscriptionPackageEnum subscriptionPackage, String timeZone, Integer timeZoneOffset) {
         return User.builder()
                 .name(name)
                 .email(email)
@@ -62,6 +64,7 @@ public class User {
                 .isSubscription(isSubscription != null ? isSubscription : 0)
                 .subscriptionPackage(subscriptionPackage)
                 .timeZone(timeZone)
+                .timeZoneOffset(timeZoneOffset)
                 .build();
     }
 }

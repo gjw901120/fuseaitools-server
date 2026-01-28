@@ -5,19 +5,28 @@ import com.fuse.ai.server.manager.entity.UserModelConversation;
 import com.fuse.ai.server.manager.entity.UserModelConversationMessage;
 import com.fuse.ai.server.manager.enums.UserRoleEnum;
 import com.fuse.ai.server.manager.manager.*;
-import com.fuse.ai.server.manager.model.request.*;
-import com.fuse.ai.server.manager.model.response.*;
+import com.fuse.ai.server.manager.model.request.ChatgptRequest;
+import com.fuse.ai.server.manager.model.request.ClaudeRequest;
+import com.fuse.ai.server.manager.model.request.DeepseekRequest;
+import com.fuse.ai.server.manager.model.request.GeminiRequest;
+import com.fuse.ai.server.manager.model.response.ChatgptResponse;
+import com.fuse.ai.server.manager.model.response.ClaudeResponse;
+import com.fuse.ai.server.manager.model.response.DeepseekResponse;
+import com.fuse.ai.server.manager.model.response.GeminiResponse;
 import com.fuse.ai.server.web.common.utils.FileTypeUtil;
 import com.fuse.ai.server.web.common.utils.TextContentReaderUtil;
 import com.fuse.ai.server.web.controller.ChatController.SseCallback;
+import com.fuse.ai.server.web.exception.SseBaseException;
 import com.fuse.ai.server.web.model.bo.ExtraDataBO;
-import com.fuse.ai.server.web.model.dto.request.chat.*;
+import com.fuse.ai.server.web.model.dto.request.chat.ChatgptConversationDTO;
+import com.fuse.ai.server.web.model.dto.request.chat.ClaudeConversationDTO;
+import com.fuse.ai.server.web.model.dto.request.chat.DeepseekConversationDTO;
+import com.fuse.ai.server.web.model.dto.request.chat.GeminiConversationDTO;
 import com.fuse.ai.server.web.model.dto.request.user.UserJwtDTO;
 import com.fuse.ai.server.web.service.ChatConversationService;
 import com.fuse.ai.server.web.service.ModelsService;
 import com.fuse.ai.server.web.service.RecordsService;
 import com.fuse.ai.server.web.service.UserCreditsService;
-import com.fuse.common.core.exception.BaseException;
 import com.fuse.common.core.exception.error.UserErrorType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -69,11 +78,13 @@ public class ChatConversationServiceImpl implements ChatConversationService {
     public void processDeepseekStream(DeepseekConversationDTO request, UserJwtDTO userJwtDT, SseCallback callback) {
         try {
             // 获取模型信息
-            Models model = modelsService.getModelByName(request.getModel());
+            Models model = modelsService.getSseModelByName(request.getModel(), callback);
 
-            // 业务逻辑：验证
-            verifyConversation(request.getConversationId());
-            userCreditsService.verifyCredits(userJwtDT.getId(), model, new ExtraDataBO());
+            // 验证会话是否存在
+            verifyConversation(request.getConversationId(), callback);
+            
+            // 验证积分，如果不足会抛出异常，但会被SseExceptionHandlingUtil处理
+            userCreditsService.sseVerifyCredits(userJwtDT.getId(), model, new ExtraDataBO(), callback);
 
             // 业务逻辑：构建请求
             DeepseekRequest deepseekRequest = buildDeepseekRequest(request, model);
@@ -129,20 +140,18 @@ public class ChatConversationServiceImpl implements ChatConversationService {
                                     messageIdRef.set(messageId);
                                 }
 
-                                // 完成事件处理（业务逻辑）
-                                if("stop".equals(choice.getFinishReason())) {
-                                    DeepseekResponse.Usage usage = response.getUsage();
-                                    log.info("token消耗: {}", usage);
-                                    // 完成事件处理
-                                    if (usage != null && usage.getPromptTokens() != null) {
-                                        String conversationId = recordsService.completed(messageIdRef.get(), contents.toString(),
-                                                usage.getPromptTokens(), usage.getTotalTokens() - usage.getPromptTokens());
-                                        Map<String, Object> eventData = new HashMap<>();
-                                        eventData.put("eventId", conversationId);
-                                        callback.onComplete(eventData);
-                                    }
 
-                                }
+                            }
+                            // 完成事件处理（业务逻辑）
+                            DeepseekResponse.Usage usage = response.getUsage();
+                            // 完成事件处理
+                            if (usage != null && usage.getPromptTokens() != null) {
+                                log.info("token消耗: {}", usage);
+                                String conversationId = recordsService.completed(messageIdRef.get(), contents.toString(),
+                                        usage.getPromptTokens(), usage.getTotalTokens() - usage.getPromptTokens());
+                                Map<String, Object> eventData = new HashMap<>();
+                                eventData.put("eventId", conversationId);
+                                callback.onComplete(eventData);
                             }
                         }
 
@@ -168,11 +177,13 @@ public class ChatConversationServiceImpl implements ChatConversationService {
     public void processChatgptStream(ChatgptConversationDTO request, UserJwtDTO userJwtDT, SseCallback callback) {
         try {
             // 获取模型信息
-            Models model = modelsService.getModelByName(request.getModel());
+            Models model = modelsService.getSseModelByName(request.getModel(), callback);
 
-            // 业务逻辑：验证
-            verifyConversation(request.getConversationId());
-            userCreditsService.verifyCredits(userJwtDT.getId(), model, new ExtraDataBO());
+            // 验证会话是否存在
+            verifyConversation(request.getConversationId(), callback);
+            
+            // 验证积分，如果不足会抛出异常，但会被SseExceptionHandlingUtil处理
+            userCreditsService.sseVerifyCredits(userJwtDT.getId(), model, new ExtraDataBO(), callback);
 
             // 业务逻辑：构建请求
             ChatgptRequest chatgptRequest = buildChatgptRequest(request, model);
@@ -180,9 +191,6 @@ public class ChatConversationServiceImpl implements ChatConversationService {
             final StringBuilder contents = new StringBuilder();
             AtomicInteger counter = new AtomicInteger(0);
             AtomicReference<Integer> messageIdRef = new AtomicReference<>();
-
-            // 新增标志：标记是否收到了stop信号
-            AtomicBoolean stopReceived = new AtomicBoolean(false);
 
             // 调用Manager层
             chatgptConversationManager.streamChat(chatgptRequest, model.getRequestToken(),
@@ -230,24 +238,26 @@ public class ChatConversationServiceImpl implements ChatConversationService {
                                             userModelConversation, userModelConversationMessage);
                                     messageIdRef.set(messageId);
                                 }
-                                if("stop".equals(choice.getFinishReason())) {
-                                    stopReceived.set(true);
-                                } else {
-                                    if(stopReceived.get()) {
-                                        stopReceived.set(false);
-                                        ChatgptResponse.Usage usage = response.getUsage();
-                                        log.info("token消耗: {}", usage);
-                                        // 完成事件处理
-                                        if (usage != null && usage.getPromptTokens() != null) {
-                                            String conversationId = recordsService.completed(messageIdRef.get(), contents.toString(),
-                                                    usage.getPromptTokens(), usage.getTotalTokens() - usage.getPromptTokens());
+//                                if("stop".equals(choice.getFinishReason())) {
+//                                    stopReceived.set(true);
+//                                } else {
+//                                    if(stopReceived.get()) {
+//                                        stopReceived.set(false);
 
-                                            Map<String, Object> eventData = new HashMap<>();
-                                            eventData.put("eventId", conversationId);
-                                            callback.onComplete(eventData);
-                                        }
-                                    }
-                                }
+//                                    }
+//                                }
+                            }
+
+                            ChatgptResponse.Usage usage = response.getUsage();
+                            // 完成事件处理
+                            if (usage != null && usage.getPromptTokens() != null) {
+                                log.info("token消耗: {}", usage);
+                                String conversationId = recordsService.completed(messageIdRef.get(), contents.toString(),
+                                        usage.getPromptTokens(), usage.getTotalTokens() - usage.getPromptTokens());
+
+                                Map<String, Object> eventData = new HashMap<>();
+                                eventData.put("eventId", conversationId);
+                                callback.onComplete(eventData);
                             }
 
                         }
@@ -274,11 +284,13 @@ public class ChatConversationServiceImpl implements ChatConversationService {
     public void processClaudeStream(ClaudeConversationDTO request, UserJwtDTO userJwtDT, SseCallback callback) {
         try {
             // 获取模型信息
-            Models model = modelsService.getModelByName(request.getModel());
+            Models model = modelsService.getSseModelByName(request.getModel(), callback);
 
-            // 业务逻辑：验证
-            verifyConversation(request.getConversationId());
-            userCreditsService.verifyCredits(userJwtDT.getId(), model, new ExtraDataBO());
+            // 验证会话是否存在
+            verifyConversation(request.getConversationId(), callback);
+            
+            // 验证积分，如果不足会抛出异常，但会被SseExceptionHandlingUtil处理
+            userCreditsService.sseVerifyCredits(userJwtDT.getId(), model, new ExtraDataBO(), callback);
 
             // 业务逻辑：构建请求
             ClaudeRequest claudeRequest = buildClaudeRequest(request, model);
@@ -341,9 +353,10 @@ public class ChatConversationServiceImpl implements ChatConversationService {
                                     }
 
                                     if (messageIdRef.get() != null) {
+                                        Integer inputTokens = messageDelta.getUsage().getInputTokens() != null ? messageDelta.getUsage().getInputTokens() : 100;
+                                        Integer outputTokens = messageDelta.getUsage().getOutputTokens() != null ? messageDelta.getUsage().getOutputTokens() : 100;
                                         String conversationId = recordsService.completed(messageIdRef.get(), contents.toString(),
-                                                messageDelta.getUsage().getInputTokens(),
-                                                messageDelta.getUsage().getOutputTokens());
+                                                inputTokens , outputTokens);
 
                                         Map<String, Object> eventData = new HashMap<>();
                                         eventData.put("eventId", conversationId);
@@ -383,11 +396,13 @@ public class ChatConversationServiceImpl implements ChatConversationService {
     public void processGeminiStream(GeminiConversationDTO request, UserJwtDTO userJwtDT, SseCallback callback) {
         try {
             // 获取模型信息
-            Models model = modelsService.getModelByName(request.getModel());
+            Models model = modelsService.getSseModelByName(request.getModel(), callback);
 
-            // 业务逻辑：验证
-            verifyConversation(request.getConversationId());
-            userCreditsService.verifyCredits(userJwtDT.getId(), model, new ExtraDataBO());
+            // 验证会话是否存在
+            verifyConversation(request.getConversationId(), callback);
+            
+            // 验证积分，如果不足会抛出异常，但会被SseExceptionHandlingUtil处理
+            userCreditsService.sseVerifyCredits(userJwtDT.getId(), model, new ExtraDataBO(), callback);
 
             // 业务逻辑：构建请求
             GeminiRequest geminiRequest = buildGeminiRequest(request, model);
@@ -491,7 +506,7 @@ public class ChatConversationServiceImpl implements ChatConversationService {
         request.setModel(model.getRequestName());
 
         DeepseekRequest.ThinkingConfig thinkingConfig = new DeepseekRequest.ThinkingConfig();
-        thinkingConfig.setType(deepseekConversationDTO.getEnableDeep() ? "enabled" : "disabled");
+        thinkingConfig.setType("enabled");
         request.setThinking(thinkingConfig);
 
         List<DeepseekRequest.Message> messages = new ArrayList<>();
@@ -511,7 +526,7 @@ public class ChatConversationServiceImpl implements ChatConversationService {
         if (deepseekConversationDTO.getFileUrls() != null && !deepseekConversationDTO.getFileUrls().isEmpty()) {
             for (String file : deepseekConversationDTO.getFileUrls()) {
                 if (!FileTypeUtil.isSupportedImage(file)) {
-                    fileContent.append("文件").append(fileCounter).append(TextContentReaderUtil.readContentFromUrl(file).getContent());
+                    fileContent.append("    FILE-").append(fileCounter).append("内容如下:").append(TextContentReaderUtil.readContentFromUrl(file).getContent());
                     fileCounter++;
                 }
             }
@@ -521,12 +536,13 @@ public class ChatConversationServiceImpl implements ChatConversationService {
         if (fileContent.toString().isEmpty()) {
             message = new DeepseekRequest.Message(
                     UserRoleEnum.USER.getDescription(),
-                    deepseekConversationDTO.getPrompt().concat(fileContent.toString())
+                    deepseekConversationDTO.getPrompt()
             );
+
         } else {
             message = new DeepseekRequest.Message(
                     UserRoleEnum.USER.getDescription(),
-                    deepseekConversationDTO.getPrompt()
+                    deepseekConversationDTO.getPrompt().concat(fileContent.toString())
             );
         }
         messages.add(message);
@@ -598,7 +614,7 @@ public class ChatConversationServiceImpl implements ChatConversationService {
                     imageContent.setImageUrl(imageUrl);
                     content.add(imageContent);
                 } else {
-                    fileContent.append("文件").append(fileCounter).append(TextContentReaderUtil.readContentFromUrl(file).getContent());
+                    fileContent.append("    FILE-").append(fileCounter).append("内容如下:").append(TextContentReaderUtil.readContentFromUrl(file).getContent());
                     fileCounter++;
                 }
             }
@@ -608,9 +624,9 @@ public class ChatConversationServiceImpl implements ChatConversationService {
         ChatgptRequest.ContentItem textContent = new ChatgptRequest.ContentItem();
         textContent.setType("text");
         if (fileContent.toString().isEmpty()) {
-            textContent.setText(chatgptConversationDTO.getPrompt().concat(fileContent.toString()));
-        } else {
             textContent.setText(chatgptConversationDTO.getPrompt());
+        } else {
+            textContent.setText(chatgptConversationDTO.getPrompt().concat(fileContent.toString()));
         }
         content.add(textContent);
 
@@ -690,7 +706,7 @@ public class ChatConversationServiceImpl implements ChatConversationService {
                     imageContent.setSource(imgSource);
                     content.add(imageContent);
                 } else {
-                    fileContent.append("文件").append(fileCounter).append(TextContentReaderUtil.readContentFromUrl(file).getContent());
+                    fileContent.append("    FILE-").append(fileCounter).append("内容如下:").append(TextContentReaderUtil.readContentFromUrl(file).getContent());
                     fileCounter++;
                 }
             }
@@ -699,9 +715,9 @@ public class ChatConversationServiceImpl implements ChatConversationService {
 
         textContent.setType("text");
         if (fileContent.toString().isEmpty()) {
-            textContent.setText(claudeConversationDTO.getPrompt().concat(fileContent.toString()));
-        } else {
             textContent.setText(claudeConversationDTO.getPrompt());
+        } else {
+            textContent.setText(claudeConversationDTO.getPrompt().concat(fileContent.toString()));
         }
         content.add(textContent);
 
@@ -779,7 +795,7 @@ public class ChatConversationServiceImpl implements ChatConversationService {
                     imageContent.setImageUrl(imageUrl);
                     content.add(imageContent);
                 } else {
-                    fileContent.append("文件").append(fileCounter).append(TextContentReaderUtil.readContentFromUrl(file).getContent());
+                    fileContent.append("    FILE-").append(fileCounter).append("内容如下:").append(TextContentReaderUtil.readContentFromUrl(file).getContent());
                     fileCounter++;
                 }
             }
@@ -787,9 +803,9 @@ public class ChatConversationServiceImpl implements ChatConversationService {
 
         textContent.setType("text");
         if (fileContent.toString().isEmpty()) {
-            textContent.setText(geminiConversationDTO.getPrompt().concat(fileContent.toString()));
-        } else {
             textContent.setText(geminiConversationDTO.getPrompt());
+        } else {
+            textContent.setText(geminiConversationDTO.getPrompt().concat(fileContent.toString()));
         }
         content.add(textContent);
 
@@ -812,11 +828,11 @@ public class ChatConversationServiceImpl implements ChatConversationService {
     /**
      * 验证会话ID是否存在（业务逻辑）
      */
-    private void verifyConversation(String ConversationId) {
+    private void verifyConversation(String ConversationId, SseCallback callback) {
         if (ConversationId != null && !ConversationId.isEmpty()) {
             UserModelConversation userModelConversation = userModelConversationManager.getDetailIdByUuId(ConversationId);
             if (userModelConversation == null) {
-                throw new BaseException(UserErrorType.USER_CLIENT_ERROR, "Conversation not exist");
+                SseBaseException.throwError(UserErrorType.USER_CLIENT_ERROR, "Conversation not exist", callback);
             }
         }
     }

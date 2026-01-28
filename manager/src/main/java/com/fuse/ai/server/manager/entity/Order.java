@@ -26,6 +26,8 @@ public class Order {
 
     private OrderTypeEnum type;
 
+    private Integer configId;
+
     private Integer couponId;
 
     @Builder.Default

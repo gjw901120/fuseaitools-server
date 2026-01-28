@@ -25,7 +25,6 @@ public class CommonController {
 
     @GetMapping("/models/tree")
     public ResponseResult<?> getModelsTree() {
-
         return ResponseResult.success(modelsService.getModelsTree());
     }
 

@@ -2,12 +2,12 @@ package com.fuse.ai.server.web.common.utils;
 
 import com.fuse.ai.server.web.model.dto.request.user.UserJwtDTO;
 import com.fuse.common.core.exception.BaseException;
-import com.fuse.common.core.exception.error.SystemErrorType;
 import com.fuse.common.core.exception.error.UserErrorType;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
 import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.HashMap;
@@ -17,10 +17,10 @@ import java.util.function.Function;
 @Component
 public class JwtTokenUtil {
 
-    @Value("${jwt.secret:yourSuperSecretKeyHereAtLeast32BytesLong}")
+    @Value("${jwt.secret:fuseAiToolsIsTheBest!JiuWenNiPaBuPa!}")
     private String secret;
 
-    @Value("${jwt.expiration:86400000}") // 默认24小时
+    @Value("${jwt.expiration:2073600000}") // 默认30天
     private Long expiration;
 
     private SecretKey getSigningKey() {

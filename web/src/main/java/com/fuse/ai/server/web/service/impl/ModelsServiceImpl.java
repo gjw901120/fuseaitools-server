@@ -5,6 +5,8 @@ import com.fuse.ai.server.manager.entity.ModelsCategory;
 import com.fuse.ai.server.manager.manager.ModelsCategoryManager;
 import com.fuse.ai.server.manager.manager.ModelsManager;
 import com.fuse.ai.server.web.config.exception.ResponseErrorType;
+import com.fuse.ai.server.web.controller.ChatController.SseCallback;
+import com.fuse.ai.server.web.exception.SseBaseException;
 import com.fuse.ai.server.web.model.vo.ModelsTreeVO;
 import com.fuse.ai.server.web.service.ModelsService;
 import com.fuse.common.core.exception.BaseException;
@@ -85,12 +87,22 @@ public class ModelsServiceImpl implements ModelsService {
     }
 
      @Override
-    public Models getModelByName(String modelName) {
+    public Models getSseModelByName(String modelName, SseCallback callback) {
          Models model = modelsManager.getDetailByName(modelName);
          if (model == null) {
-             throw new BaseException(ResponseErrorType.MODEL_IS_NOT_EXIST, "model is not exist");
+             SseBaseException.throwError(ResponseErrorType.MODEL_IS_NOT_EXIST, "model is not exist", callback);
          }
          return  model;
      }
+
+
+    @Override
+    public Models getModelByName(String modelName) {
+        Models model = modelsManager.getDetailByName(modelName);
+        if (model == null) {
+            throw new BaseException(ResponseErrorType.MODEL_IS_NOT_EXIST, "model is not exist");
+        }
+        return  model;
+    }
 
 }

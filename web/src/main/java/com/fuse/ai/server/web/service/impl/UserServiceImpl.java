@@ -112,6 +112,7 @@ public class UserServiceImpl implements UserService {
                     0,
                     0,
                     SubscriptionPackageEnum.NONE,
+                    "",
                     0
             );
             userManager.insert(user);
@@ -154,6 +155,7 @@ public class UserServiceImpl implements UserService {
                 0,
                 0,
                 SubscriptionPackageEnum.NONE,
+                "",
                 0
             );
             userManager.insert(newUser);

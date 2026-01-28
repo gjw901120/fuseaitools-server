@@ -269,28 +269,28 @@ public class RecordsServiceImpl implements RecordsService {
                 isSubscriptionCreditsEnough = true;
             } else {
                 userCreditType = UserCreditTypeEnum.RECHARGE_SUBSCRIPTION;
-                subscriptionDeductCredits = userSubscriptionCredits.getCredits();
+                subscriptionDeductCredits = subscriptionOriginCredits;
                 rechargeDeductCredits = deductCredits.subtract(subscriptionDeductCredits);
             }
             //如果是进行中的任务，冻结金额
             if(BillStatusEnum.PROGRESS.equals(billStatus)) {
                 userSubscriptionCredits.setBlockCredits(subscriptionDeductCredits);
             }
-            userSubscriptionCredits.setCredits(subscriptionDeductCredits);
+            userSubscriptionCredits.setCredits(subscriptionOriginCredits.subtract(subscriptionDeductCredits));
             userCreditsManager.updateById(userSubscriptionCredits);
         }
         if(!isSubscriptionCreditsEnough && userRechargeCredits != null && userRechargeCredits.getCredits().compareTo(BigDecimal.ZERO) > 0) {
             rechargeOriginCredits = userRechargeCredits.getCredits();
             if(rechargeDeductCredits.compareTo(BigDecimal.ZERO) > 0) {
-                rechargeDeductCredits = userRechargeCredits.getCredits().compareTo(rechargeDeductCredits) >= 0 ? rechargeDeductCredits : userRechargeCredits.getCredits();
+                rechargeDeductCredits = rechargeOriginCredits.compareTo(rechargeDeductCredits) >= 0 ? rechargeDeductCredits : rechargeOriginCredits;
             } else {
-                rechargeDeductCredits = userRechargeCredits.getCredits().compareTo(deductCredits) >= 0 ? deductCredits : userRechargeCredits.getCredits();
+                rechargeDeductCredits = rechargeOriginCredits.compareTo(deductCredits) >= 0 ? deductCredits : rechargeOriginCredits;
             }
             //如果是进行中的任务，冻结金额
             if(BillStatusEnum.PROGRESS.equals(billStatus)) {
-                userRechargeCredits.setBlockCredits(rechargeDeductCredits);
+                userRechargeCredits.setBlockCredits(rechargeOriginCredits.subtract(rechargeDeductCredits));
             }
-            userRechargeCredits.setCredits(rechargeDeductCredits);
+            userRechargeCredits.setCredits(rechargeOriginCredits.subtract(rechargeDeductCredits));
             userCreditsManager.updateById(userRechargeCredits);
         }
 
