@@ -18,6 +18,12 @@ RUN mvn clean package -DskipTests
 
 FROM openjdk:17.0.1-jdk
 WORKDIR /app
+
+# 创建日志目录并设置权限
+RUN mkdir -p /logs && \
+    chmod 755 /logs && \
+    chown -R 1000:1000 /logs
+
 COPY --from=builder /app/web/target/*.jar app.jar
 RUN mkdir -p /logs /app/upload
 EXPOSE 8080

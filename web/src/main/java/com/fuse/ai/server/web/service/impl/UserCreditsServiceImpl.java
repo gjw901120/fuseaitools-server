@@ -78,7 +78,7 @@ public class UserCreditsServiceImpl implements UserCreditsService {
                 ModelsPricingOnce modelsPricingOnce = modelsPricingOnceManager.getDetailById( pricingRules.getPricingId());
                 credits =  modelsPricingOnce.getCreadits();
             } else {
-                ModelsPricingOnce modelsPricingOnce = modelsPricingOnceManager.getDetailById( model.getId());
+                ModelsPricingOnce modelsPricingOnce = modelsPricingOnceManager.getDetailByModelId( model.getId());
                 credits =  modelsPricingOnce.getCreadits();
             }
         }
@@ -146,7 +146,7 @@ public class UserCreditsServiceImpl implements UserCreditsService {
                 ModelsPricingOnce modelsPricingOnce = modelsPricingOnceManager.getDetailById( pricingRules.getPricingId());
                 credits =  modelsPricingOnce.getCreadits();
             } else {
-                ModelsPricingOnce modelsPricingOnce = modelsPricingOnceManager.getDetailById( model.getId());
+                ModelsPricingOnce modelsPricingOnce = modelsPricingOnceManager.getDetailByModelId(model.getId());
                 credits =  modelsPricingOnce.getCreadits();
             }
         }

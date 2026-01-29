@@ -26,21 +26,23 @@ public class RequestLoggingFilter implements Filter {
 
         HttpServletRequest httpRequest = (HttpServletRequest) request;
 
+        // 检查是否为需要跳过的接口
+        if (shouldSkipLogging(httpRequest)) {
+            // 直接放行，不记录日志
+            chain.doFilter(request, response);
+            return;
+        }
+
         if ("POST".equalsIgnoreCase(httpRequest.getMethod()) &&
                 httpRequest.getRequestURI().startsWith("/api/")) {
 
-            // 包装请求以缓存内容，但如果已经是ContentCachingRequestWrapper则不需要重复包装
-            ContentCachingRequestWrapper wrappedRequest;
-            if (httpRequest instanceof ContentCachingRequestWrapper) {
-                wrappedRequest = (ContentCachingRequestWrapper) httpRequest;
-            } else {
-                wrappedRequest = new ContentCachingRequestWrapper(httpRequest);
-            }
+            // 关键：立即包装请求，确保在任何其他过滤器读取前就缓存请求体
+            ContentCachingRequestWrapper wrappedRequest = new ContentCachingRequestWrapper(httpRequest);
 
-            // 记录请求参数
+            // 立即读取并记录日志，这时请求体还在缓存中
             logRequestParameters(wrappedRequest);
 
-            // 继续执行过滤链
+            // 将包装后的请求传递给过滤器链
             chain.doFilter(wrappedRequest, response);
         } else {
             // 非目标请求直接放行
@@ -52,68 +54,24 @@ public class RequestLoggingFilter implements Filter {
         String uri = request.getRequestURI();
         String method = request.getMethod();
 
-        // 分别收集header、query和body参数
-        Map<String, String> headers = new HashMap<>();
-        Map<String, String> queries = new HashMap<>();
-        String body = null;
-
         // 收集请求Header
+        Map<String, String> headers = new HashMap<>();
         Enumeration<String> headerNames = request.getHeaderNames();
         while (headerNames.hasMoreElements()) {
             String headerName = headerNames.nextElement();
-            // 记录重要的认证和内容相关头部
             if (isImportantHeader(headerName)) {
                 headers.put(headerName, request.getHeader(headerName));
             }
         }
 
-        // 收集查询参数
-        String queryString = request.getQueryString();
-        if (queryString != null) {
-            String[] pairs = queryString.split("&");
-            for (String pair : pairs) {
-                String[] keyValue = pair.split("=");
-                if (keyValue.length == 2) {
-                    queries.put(decodeUrl(keyValue[0]), decodeUrl(keyValue[1]));
-                } else if (keyValue.length == 1) {
-                    queries.put(decodeUrl(keyValue[0]), "");
-                }
-            }
-        }
+        // 获取请求体内容
+        String body = getRequestBody(request);
 
-        // 确保请求体内容被缓存，然后再获取请求体参数
-        body = getRequestBody(request);
-
-        // 格式化并记录日志
-        StringBuilder logMessage = new StringBuilder();
-        logMessage.append("POST请求接口: ").append(method).append(" ").append(uri);
-
-        if (!headers.isEmpty()) {
-            logMessage.append(", Header参数: ").append(formatHeaders(headers));
-        }
-
-        if (!queries.isEmpty()) {
-            logMessage.append(", Query参数: ").append(formatParams(queries));
-        }
-
-        // 记录body信息，特别是针对已知有body的情况
-        if (body != null) {
-            if (!body.trim().isEmpty() && !body.equals("null")) {
-                logMessage.append(", Body参数: ").append(body);
-            } else if (body.equals("null")) {
-                logMessage.append(", Body参数: \"null\"");
-            } else {
-                logMessage.append(", Body参数: \"\"");
-            }
-        } else {
-            // 记录详细信息，便于调试
-            int contentLength = request.getContentLength();
-            String contentType = request.getContentType();
-            logMessage.append(", Body参数: null (Content-Type: ").append(contentType)
-                    .append(", Content-Length: ").append(contentLength).append(")");
-        }
-
-        log.info(logMessage.toString());
+        // 记录日志
+        log.info("POST请求接口: {} {}, Header参数: {}, Body参数: {}",
+                method, uri,
+                formatHeaders(headers),
+                body != null ? body : "[请求体已被其他过滤器读取]");
     }
 
     /**
@@ -146,17 +104,12 @@ public class RequestLoggingFilter implements Filter {
     }
 
     /**
-     * 格式化参数输出
+     * 判断是否应该跳过日志记录
      */
-    private String formatParams(Map<String, String> params) {
-        if (params.isEmpty()) {
-            return "{}";
-        }
-        try {
-            return objectMapper.writeValueAsString(params);
-        } catch (Exception e) {
-            return params.toString();
-        }
+    private boolean shouldSkipLogging(HttpServletRequest request) {
+        String uri = request.getRequestURI();
+        // 跳过 /batch-upload 接口的日志记录
+        return uri.endsWith("/batch-upload");
     }
 
     /**
@@ -164,25 +117,8 @@ public class RequestLoggingFilter implements Filter {
      */
     private String getRequestBody(ContentCachingRequestWrapper request) {
         try {
-            // 确保内容已经被缓存
-            // 首先尝试直接从缓存获取
+            // 直接从缓存获取字节数组，不调用getReader()或getInputStream()，以免影响后续的Controller读取
             byte[] contentAsByteArray = request.getContentAsByteArray();
-            
-            // 如果缓存为空，但Content-Length大于0，说明请求体存在但尚未被缓存
-            if ((contentAsByteArray == null || contentAsByteArray.length == 0) && request.getContentLength() > 0) {
-                // 尝试通过getReader()强制读取内容以触发缓存
-                try (java.io.BufferedReader reader = request.getReader()) {
-                    StringBuilder sb = new StringBuilder();
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        sb.append(line);
-                    }
-                    // 读取后，内容应该已经被缓存
-                    contentAsByteArray = request.getContentAsByteArray();
-                } catch (Exception e) {
-                    log.warn("通过getReader()读取请求体时失败: {}", e.getMessage());
-                }
-            }
             
             if (contentAsByteArray != null && contentAsByteArray.length > 0) {
                 String characterEncoding = request.getCharacterEncoding() != null ?
@@ -192,17 +128,10 @@ public class RequestLoggingFilter implements Filter {
         } catch (Exception e) {
             log.warn("读取请求体失败: {}", e.getMessage());
         }
-        return null;
-    }
-
-    /**
-     * URL解码
-     */
-    private String decodeUrl(String encodedUrl) {
-        try {
-            return java.net.URLDecoder.decode(encodedUrl, "UTF-8");
-        } catch (Exception e) {
-            return encodedUrl;
+        // 如果字节数组为空但Content-Length大于0，说明请求体可能已被其他过滤器读取
+        if (request.getContentLength() > 0) {
+            return "[请求体已被其他过滤器读取，Content-Length: " + request.getContentLength() + "]";
         }
+        return "[空请求体]";
     }
 }

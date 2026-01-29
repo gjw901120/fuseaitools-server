@@ -1,8 +1,5 @@
 package com.fuse.ai.server.web.config;
 
-import com.fuse.ai.server.web.filter.RequestLoggingFilter;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -15,18 +12,7 @@ import java.util.List;
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
 
-    @Bean
-    public FilterRegistrationBean<RequestLoggingFilter> requestLoggingFilter() {
-        FilterRegistrationBean<RequestLoggingFilter> registrationBean = new FilterRegistrationBean<>();
-        registrationBean.setFilter(new RequestLoggingFilter());
-        registrationBean.addUrlPatterns("/api/*");
-        registrationBean.setName("requestLoggingFilter");
-        registrationBean.setOrder(Integer.MIN_VALUE); // 最高优先级
-
-        return registrationBean;
-    }
-
-    @Override
+@Override
     public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
         configurer.mediaType("text:event-stream", MediaType.TEXT_EVENT_STREAM);
         configurer.favorPathExtension(false);

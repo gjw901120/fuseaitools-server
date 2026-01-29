@@ -59,10 +59,8 @@ public class Gpt4oImageServiceImpl implements Gpt4oImageService {
 
         List<String> inputUrls = new ArrayList<>(gpt4oImageGenerateDTO.getImageUrls());
 
-        request.setMaskUrl(gpt4oImageGenerateDTO.getMaskUrl());
         request.setFilesUrl(gpt4oImageGenerateDTO.getImageUrls());
         request.setCallBackUrl(callbackUrl.concat("/image/gpt4o-image"));
-        inputUrls.add(gpt4oImageGenerateDTO.getMaskUrl());
 
         ImageGenerateResponse response = imageManager.gpt4oImageGenerate(request, model.getRequestToken());
 

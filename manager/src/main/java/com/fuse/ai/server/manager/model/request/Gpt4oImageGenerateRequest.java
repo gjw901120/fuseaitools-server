@@ -1,7 +1,6 @@
 package com.fuse.ai.server.manager.model.request;
 
 import com.fuse.ai.server.manager.constant.Gpt4oImageConstant;
-import com.fuse.ai.server.manager.enums.Gpt4oImageImageSizeEnum;
 import com.fuse.ai.server.manager.enums.Gpt4oImageVariantsCountEnum;
 import lombok.Data;
 import org.hibernate.validator.constraints.URL;
@@ -25,19 +24,13 @@ public class Gpt4oImageGenerateRequest implements Serializable {
      * 图片尺寸比例
      */
     @NotNull(message = "图片尺寸不能为空")
-    private Gpt4oImageImageSizeEnum size;
+    private String size;
 
     /**
      * 文件URL（即将废弃）
      */
     @URL(message = "文件URL格式不正确")
     private String fileUrl;
-
-    /**
-     * 蒙版图片URL
-     */
-    @URL(message = "蒙版URL格式不正确")
-    private String maskUrl;
 
     /**
      * 文件URL列表
@@ -92,9 +85,6 @@ public class Gpt4oImageGenerateRequest implements Serializable {
         // 验证文件URL数量
         validateFilesUrlCount();
 
-        // 验证蒙版使用条件
-        validateMaskUsage();
-
         // 验证文件格式
         validateFileFormats();
 
@@ -125,28 +115,12 @@ public class Gpt4oImageGenerateRequest implements Serializable {
     }
 
     /**
-     * 验证蒙版使用条件
-     */
-    private void validateMaskUsage() {
-        if (maskUrl != null && !maskUrl.trim().isEmpty()) {
-            if (filesUrl != null && filesUrl.size() > 1) {
-                throw new IllegalArgumentException("当filesUrl包含超过1张图片时，不能使用蒙版");
-            }
-        }
-    }
-
-    /**
      * 验证文件格式
      */
     private void validateFileFormats() {
         // 验证fileUrl格式
         if (fileUrl != null && !fileUrl.trim().isEmpty()) {
             validateFileFormat(fileUrl, "fileUrl");
-        }
-
-        // 验证maskUrl格式
-        if (maskUrl != null && !maskUrl.trim().isEmpty()) {
-            validateFileFormat(maskUrl, "maskUrl");
         }
 
         // 验证filesUrl格式
@@ -189,7 +163,7 @@ public class Gpt4oImageGenerateRequest implements Serializable {
     /**
      * 构建文本生成图片请求
      */
-    public static Gpt4oImageGenerateRequest textToImage(String prompt, Gpt4oImageImageSizeEnum size, String callBackUrl) {
+    public static Gpt4oImageGenerateRequest textToImage(String prompt, String size, String callBackUrl) {
         Gpt4oImageGenerateRequest request = new Gpt4oImageGenerateRequest();
         request.setPrompt(prompt);
         request.setSize(size);
@@ -200,7 +174,7 @@ public class Gpt4oImageGenerateRequest implements Serializable {
     /**
      * 构建单图编辑请求
      */
-    public static Gpt4oImageGenerateRequest editImage(String fileUrl, String prompt, Gpt4oImageImageSizeEnum size, String callBackUrl) {
+    public static Gpt4oImageGenerateRequest editImage(String fileUrl, String prompt, String size, String callBackUrl) {
         Gpt4oImageGenerateRequest request = new Gpt4oImageGenerateRequest();
         request.setFileUrl(fileUrl);
         request.setPrompt(prompt);
@@ -213,10 +187,9 @@ public class Gpt4oImageGenerateRequest implements Serializable {
      * 构建带蒙版的图片编辑请求
      */
     public static Gpt4oImageGenerateRequest editImageWithMask(String fileUrl, String maskUrl, String prompt,
-                                                              Gpt4oImageImageSizeEnum size, String callBackUrl) {
+                                                              String size, String callBackUrl) {
         Gpt4oImageGenerateRequest request = new Gpt4oImageGenerateRequest();
         request.setFileUrl(fileUrl);
-        request.setMaskUrl(maskUrl);
         request.setPrompt(prompt);
         request.setSize(size);
         request.setCallBackUrl(callBackUrl);
@@ -227,7 +200,7 @@ public class Gpt4oImageGenerateRequest implements Serializable {
      * 构建多图生成请求
      */
     public static Gpt4oImageGenerateRequest generateFromMultipleImages(List<String> filesUrl, String prompt,
-                                                                       Gpt4oImageImageSizeEnum size, String callBackUrl) {
+                                                                       String size, String callBackUrl) {
         Gpt4oImageGenerateRequest request = new Gpt4oImageGenerateRequest();
         request.setFilesUrl(filesUrl);
         request.setPrompt(prompt);
@@ -239,7 +212,7 @@ public class Gpt4oImageGenerateRequest implements Serializable {
     /**
      * 构建高级请求
      */
-    public static Gpt4oImageGenerateRequest advancedRequest(Gpt4oImageImageSizeEnum size, List<String> filesUrl, String prompt,
+    public static Gpt4oImageGenerateRequest advancedRequest(String size, List<String> filesUrl, String prompt,
                                                             String callBackUrl, Boolean isEnhance, Gpt4oImageVariantsCountEnum nVariants) {
         Gpt4oImageGenerateRequest request = new Gpt4oImageGenerateRequest();
         request.setSize(size);

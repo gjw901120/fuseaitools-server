@@ -1,8 +1,8 @@
 package com.fuse.ai.server.web.model.dto.request.image;
 
-import org.springframework.web.multipart.MultipartFile;
-import javax.validation.constraints.*;
 import lombok.Data;
+
+import javax.validation.constraints.*;
 import java.util.List;
 
 /**
@@ -17,11 +17,6 @@ public class Gpt4oImageGenerateDTO {
     @NotBlank(message = "Size cannot be empty")
     @Pattern(regexp = "1:1|3:2|2:3", message = "Size must be 1:1, 3:2 or 2:3")
     private String size;
-
-    /**
-     * Mask image file
-     */
-    private String maskUrl;
 
     /**
      * Image files list

@@ -1,5 +1,8 @@
 package com.fuse.ai.server.manager.enums;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fuse.common.core.exception.BaseException;
+import com.fuse.common.core.exception.error.SystemErrorType;
 import lombok.Getter;
 
 @Getter
@@ -21,6 +24,18 @@ public enum ImageResponseCodeEnum {
     ImageResponseCodeEnum(Integer code, String message) {
         this.code = code;
         this.message = message;
+    }
+
+    @JsonCreator
+    public static ImageResponseCodeEnum deserialize(Integer code) {
+        for (ImageResponseCodeEnum value : values()) {
+            if (value.getCode().equals(code)) {
+                return value;
+            }
+        }
+        // 如果找不到对应的枚举值，可以选择返回一个默认值或抛出异常
+        // 这里返回一个特殊的UNKNOWN枚举值，或者您可以选择其他处理方式
+        throw new BaseException(SystemErrorType.SYSTEM_EXECUTION_ERROR, "Unknown code: " + code);
     }
 
     public static ImageResponseCodeEnum getByCode(Integer code) {
