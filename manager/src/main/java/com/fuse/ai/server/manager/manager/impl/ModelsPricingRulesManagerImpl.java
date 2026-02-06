@@ -7,7 +7,7 @@ import com.fuse.ai.server.manager.mapper.ModelsPricingRulesMapper;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.Map;
+import java.util.List;
 
 @Component
 public class ModelsPricingRulesManagerImpl implements ModelsPricingRulesManager {
@@ -51,6 +51,22 @@ public class ModelsPricingRulesManagerImpl implements ModelsPricingRulesManager 
         queryWrapper.eq(ModelsPricingRules::getQuality, quality);
         queryWrapper.eq(ModelsPricingRules::getIsDel, 0);
         return modelsPricingRulesMapper.selectOne(queryWrapper);
+    }
+
+    @Override
+    public ModelsPricingRules getDetailByModelIdAndSpeed(Integer modelId, String speed) {
+        LambdaQueryWrapper<ModelsPricingRules> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(ModelsPricingRules::getModelId, modelId);
+        queryWrapper.eq(ModelsPricingRules::getSpeed, speed);
+        queryWrapper.eq(ModelsPricingRules::getIsDel, 0);
+        return modelsPricingRulesMapper.selectOne(queryWrapper);
+    }
+
+    @Override
+    public List<ModelsPricingRules> getAll() {
+        LambdaQueryWrapper<ModelsPricingRules> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(ModelsPricingRules::getIsDel, 0);
+        return modelsPricingRulesMapper.selectList(queryWrapper);
     }
 
 }

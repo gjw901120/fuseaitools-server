@@ -8,4 +8,6 @@ public interface UserModelConversationManager {
 
     UserModelConversation getDetailIdByUuId(String Uuid);
 
+    UserModelConversation getDetailIdByRecordId(String recordId);
+
 }

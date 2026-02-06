@@ -26,34 +26,46 @@ public class MidjourneyController {
         return ResponseResult.success(midjourneyService.imagine(request, userJwtDTO));
     }
 
-    @PostMapping("/action")
-    public ResponseResult<?> action(@RequestBody @Valid MidjourneyActionDTO request,
-                                    @AuthenticationPrincipal UserJwtDTO userJwtDTO) {
-        return ResponseResult.success(midjourneyService.action(request, userJwtDTO));
+    @PostMapping("/upscale")
+    public ResponseResult<?> upscale(@RequestBody @Valid MidjourneyUpscaleDTO request,
+                                     @AuthenticationPrincipal UserJwtDTO userJwtDTO) {
+        return ResponseResult.success(midjourneyService.upscale(request, userJwtDTO));
     }
 
-    @PostMapping("/blend")
-    public ResponseResult<?> blend(@RequestBody @Valid MidjourneyBlendDTO request,
-                                   @AuthenticationPrincipal UserJwtDTO userJwtDTO) {
-        return ResponseResult.success(midjourneyService.blend(request, userJwtDTO));
+    @PostMapping("/vary")
+    public ResponseResult<?> vary(@RequestBody @Valid MidjourneyVaryDTO request,
+                                     @AuthenticationPrincipal UserJwtDTO userJwtDTO) {
+        return ResponseResult.success(midjourneyService.vary(request, userJwtDTO));
     }
 
-    @PostMapping("/describe")
-    public ResponseResult<?> describe(@RequestBody @Valid MidjourneyDescribeDTO request,
-                                      @AuthenticationPrincipal UserJwtDTO userJwtDTO) {
-        return ResponseResult.success(midjourneyService.describe(request, userJwtDTO));
-    }
-
-    @PostMapping("/modal")
-    public ResponseResult<?> modal(@RequestBody @Valid MidjourneyModalDTO request,
-                                   @AuthenticationPrincipal UserJwtDTO userJwtDTO) {
-        return ResponseResult.success(midjourneyService.modal(request, userJwtDTO));
-    }
-
-    @PostMapping("/swap-face")
-    public ResponseResult<?> swapFace(@RequestBody @Valid MidjourneySwapFaceDTO request,
-                                      @AuthenticationPrincipal UserJwtDTO userJwtDTO) {
-        return ResponseResult.success(midjourneyService.swapFace(request, userJwtDTO));
-    }
+//    @PostMapping("/action")
+//    public ResponseResult<?> action(@RequestBody @Valid MidjourneyActionDTO request,
+//                                    @AuthenticationPrincipal UserJwtDTO userJwtDTO) {
+//        return ResponseResult.success(midjourneyService.action(request, userJwtDTO));
+//    }
+//
+//    @PostMapping("/blend")
+//    public ResponseResult<?> blend(@RequestBody @Valid MidjourneyBlendDTO request,
+//                                   @AuthenticationPrincipal UserJwtDTO userJwtDTO) {
+//        return ResponseResult.success(midjourneyService.blend(request, userJwtDTO));
+//    }
+//
+//    @PostMapping("/describe")
+//    public ResponseResult<?> describe(@RequestBody @Valid MidjourneyDescribeDTO request,
+//                                      @AuthenticationPrincipal UserJwtDTO userJwtDTO) {
+//        return ResponseResult.success(midjourneyService.describe(request, userJwtDTO));
+//    }
+//
+//    @PostMapping("/modal")
+//    public ResponseResult<?> modal(@RequestBody @Valid MidjourneyModalDTO request,
+//                                   @AuthenticationPrincipal UserJwtDTO userJwtDTO) {
+//        return ResponseResult.success(midjourneyService.modal(request, userJwtDTO));
+//    }
+//
+//    @PostMapping("/swap-face")
+//    public ResponseResult<?> swapFace(@RequestBody @Valid MidjourneySwapFaceDTO request,
+//                                      @AuthenticationPrincipal UserJwtDTO userJwtDTO) {
+//        return ResponseResult.success(midjourneyService.swapFace(request, userJwtDTO));
+//    }
 
 }

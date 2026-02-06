@@ -1,13 +1,16 @@
 package com.fuse.ai.server.web.service.impl;
 
 import com.fuse.ai.server.manager.entity.*;
-import com.fuse.ai.server.manager.enums.BillStatusEnum;
-import com.fuse.ai.server.manager.enums.TaskStatusEnum;
-import com.fuse.ai.server.manager.enums.UserCreditTypeEnum;
-import com.fuse.ai.server.manager.enums.UserRoleEnum;
+import com.fuse.ai.server.manager.enums.*;
 import com.fuse.ai.server.manager.manager.*;
+import com.fuse.ai.server.web.config.exception.ResponseErrorType;
 import com.fuse.ai.server.web.model.bo.verifyCreditsBO;
+import com.fuse.ai.server.web.model.vo.RecordChatDetailVO;
+import com.fuse.ai.server.web.model.vo.RecordDetailVO;
+import com.fuse.ai.server.web.model.vo.RecordExtendVO;
+import com.fuse.ai.server.web.model.vo.RecordVO;
 import com.fuse.ai.server.web.service.RecordsService;
+import com.fuse.common.core.exception.BaseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,8 +19,8 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class RecordsServiceImpl implements RecordsService {
@@ -52,13 +55,16 @@ public class RecordsServiceImpl implements RecordsService {
     @Autowired
     private ModelsPricingTokenManager modelsPricingTokenManager;
 
+    @Autowired
+    private ModelsCategoryManager modelsCategoryManager;
+
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public String create(Models model, String title, UserModelTask userModelTask,  verifyCreditsBO verifyCreditsBO) {
+    public String create(Models model, String title, Object originalData, UserModelTask userModelTask,  verifyCreditsBO verifyCreditsBO) {
 
         String extractTitle = title.length() > 30 ? title.substring(0, 30).concat("...") : title;
 
-        UserModelRecords userModelRecords = UserModelRecords.create(userModelTask.getUserId(), model.getId(), extractTitle,0);
+        UserModelRecords userModelRecords = UserModelRecords.create(userModelTask.getUserId(), model.getId(), extractTitle, originalData, 0);
 
         //写入记录
         userModelRecordsManager.insert(userModelRecords);
@@ -82,7 +88,7 @@ public class RecordsServiceImpl implements RecordsService {
         //判断是第一次会话，还是续会话
         if("".equals(userModelConversationMessage.getConversationId())) {
             //根据模型名称获取id
-            UserModelRecords userModelRecords = UserModelRecords.create(userModelConversation.getUserId(), modelId, title, 0);
+            UserModelRecords userModelRecords = UserModelRecords.create(userModelConversation.getUserId(), modelId, title, new HashMap<>(), 0);
 
             //写入记录
             userModelRecordsManager.insert(userModelRecords);
@@ -105,11 +111,12 @@ public class RecordsServiceImpl implements RecordsService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void completed(String taskId, List<String> outputUrl, Object outputCallbackDetails) {
+    public void completed(String taskId, List<String> outputUrl, Object outputResult, Object outputCallbackDetails) {
 
         UserModelTask userModelTask = userModelTaskManager.getDetailIdByTaskId(taskId);
 
         userModelTask.setOutputUrls(outputUrl);
+        userModelTask.setOutputResult(outputResult);
         userModelTask.setOutputCallbackDetails(outputCallbackDetails);
         userModelTask.setStatus(TaskStatusEnum.SUCCESS.getCode());
 
@@ -118,8 +125,7 @@ public class RecordsServiceImpl implements RecordsService {
 
         UserModelRecords userModelRecords = userModelRecordsManager.getDetailIdByUuId(userModelTask.getRecordId());
         userModelRecords.setIsCompleted(1);
-        userModelRecords.setGmtCompleted(LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))));
-
+        userModelRecords.setGmtCompleted(LocalDateTime.now());
         userModelRecordsManager.updateById(userModelRecords);
 
         //去除冻结金额，更新状态
@@ -178,11 +184,11 @@ public class RecordsServiceImpl implements RecordsService {
         BigDecimal discount = subscriptionConfig == null ? BigDecimal.ONE :subscriptionConfig.getDiscount() ;
 
         BigDecimal promptCredits = BigDecimal.valueOf(promptTokens)
-                .multiply(modelsPricingToken.getPromptCreadits())
+                .multiply(modelsPricingToken.getPromptCredits())
                 .divide(BigDecimal.valueOf(modelsPricingToken.getPromptTokens()),4, RoundingMode.HALF_UP);
 
         BigDecimal completionCredits = BigDecimal.valueOf(completionTokens)
-                .multiply(modelsPricingToken.getCompletionCreadits())
+                .multiply(modelsPricingToken.getCompletionCredits())
                 .divide(BigDecimal.valueOf(modelsPricingToken.getCompletionTokens()),4, RoundingMode.HALF_UP);
 
         //应扣除积分
@@ -274,7 +280,7 @@ public class RecordsServiceImpl implements RecordsService {
             }
             //如果是进行中的任务，冻结金额
             if(BillStatusEnum.PROGRESS.equals(billStatus)) {
-                userSubscriptionCredits.setBlockCredits(subscriptionDeductCredits);
+                userSubscriptionCredits.setBlockCredits(userSubscriptionCredits.getBlockCredits().add(subscriptionDeductCredits));
             }
             userSubscriptionCredits.setCredits(subscriptionOriginCredits.subtract(subscriptionDeductCredits));
             userCreditsManager.updateById(userSubscriptionCredits);
@@ -288,7 +294,7 @@ public class RecordsServiceImpl implements RecordsService {
             }
             //如果是进行中的任务，冻结金额
             if(BillStatusEnum.PROGRESS.equals(billStatus)) {
-                userRechargeCredits.setBlockCredits(rechargeOriginCredits.subtract(rechargeDeductCredits));
+                userRechargeCredits.setBlockCredits(userRechargeCredits.getBlockCredits().add(rechargeDeductCredits));
             }
             userRechargeCredits.setCredits(rechargeOriginCredits.subtract(rechargeDeductCredits));
             userCreditsManager.updateById(userRechargeCredits);
@@ -312,6 +318,136 @@ public class RecordsServiceImpl implements RecordsService {
                         0
                 )
         );
+    }
+
+    @Override
+    public List<RecordVO> getList(Integer page, Integer size, Integer userId) {
+        User user = userManager.selectById(userId);
+        List<RecordVO> recordVOList = new ArrayList<>();
+        List<Models> modelsList = modelsManager.getAll();
+        Map<Integer, String> modelMap = modelsList.stream()
+                .collect(Collectors.toMap(Models::getId, Models::getName));
+        page = (page == null || page <= 0) ? 1 : page;
+        size = (size == null || size <= 0) ? 10 : size;
+        List<UserModelRecords> userModelRecordsList = userModelRecordsManager.getListByUserId(page, size, userId);
+        List<ModelsCategory> categoryList = modelsCategoryManager.getAll();
+        Map<Integer, String> modelsIdToCategoryNameMap = modelsList.stream()
+                .collect(Collectors.toMap(
+                        Models::getId,
+                        model -> {
+                            // 查找对应的分类名称
+                            return categoryList.stream()
+                                    .filter(category -> category.getId().equals(model.getCategoryId()))
+                                    .findFirst()
+                                    .map(ModelsCategory::getName)
+                                    .orElse("");
+                        },
+                        (oldValue, newValue) -> oldValue  // 处理重复键
+                ));
+        for (UserModelRecords userModelRecords : userModelRecordsList) {
+            RecordVO recordVO = new RecordVO();
+            recordVO.setRecordId(userModelRecords.getUuid());
+            recordVO.setModelId(userModelRecords.getModelId());
+            recordVO.setCategory(modelsIdToCategoryNameMap.get(userModelRecords.getModelId()));
+            recordVO.setModel(modelMap.get(userModelRecords.getModelId()) == null ? "" : modelMap.get(userModelRecords.getModelId()));
+            recordVO.setTitle(userModelRecords.getTitle());
+            recordVO.setGtmCreated(userModelRecords.getGmtCreate().plusHours(user.getTimeZoneOffset()).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+            recordVOList.add(recordVO);
+        }
+        return recordVOList;
+    }
+
+    @Override
+    public RecordDetailVO getDetail(String recordId, Integer userId) {
+        RecordDetailVO recordDetailVO = new RecordDetailVO();
+        UserModelRecords userModelRecords = userModelRecordsManager.getDetailIdByUuId(recordId);
+        if (userModelRecords == null) {
+            throw new BaseException(ResponseErrorType.RECORD_IS_NOT_EXIST, "Record is not exist");
+        }
+        UserModelTask userModelTask = userModelTaskManager.getDetailByRecordId(userModelRecords.getUuid());
+        Models model = modelsManager.getDetailById(userModelRecords.getModelId());
+        Bill bill = billManager.getDetailByRecordId(userModelRecords.getUuid());
+        recordDetailVO.setRecordId(userModelRecords.getUuid());
+        recordDetailVO.setModelId(userModelRecords.getModelId());
+        recordDetailVO.setModel(model.getName());
+        recordDetailVO.setStatus(userModelTask.getStatus());
+        recordDetailVO.setTitle(userModelRecords.getTitle());
+        recordDetailVO.setCredits(bill.getSubscriptionDeductCredits().add(bill.getRechargeDeductCredits()));
+        recordDetailVO.setOriginalData(userModelRecords.getOriginalData());
+        recordDetailVO.setOutputUrls(userModelTask.getOutputUrls());
+
+        return recordDetailVO;
+    }
+
+    @Override
+    public RecordChatDetailVO getChatDetail(String recordId, Integer userId) {
+        RecordChatDetailVO recordChatDetailVO = new RecordChatDetailVO();
+        UserModelRecords userModelRecords = userModelRecordsManager.getDetailIdByUuId(recordId);
+        if (userModelRecords == null) {
+            throw new BaseException(ResponseErrorType.RECORD_IS_NOT_EXIST, "Record is not exist");
+        }
+        UserModelConversation userModelConversation = userModelConversationManager.getDetailIdByRecordId(recordId);
+        List<UserModelConversationMessage> userModelConversationMessageList = userModelConversationMessageManager.selectByConversationId(userModelConversation.getUuid());
+        recordChatDetailVO.setRecordId(userModelRecords.getUuid());
+        recordChatDetailVO.setModelId(userModelRecords.getModelId());
+        recordChatDetailVO.setModel(modelsManager.getDetailById(userModelRecords.getModelId()).getName());
+        recordChatDetailVO.setConversionId(userModelConversation.getUuid());
+        List<RecordChatDetailVO.MessageItem> messageItemList = new ArrayList<>();
+        for (UserModelConversationMessage userModelConversationMessage : userModelConversationMessageList) {
+            RecordChatDetailVO.MessageItem messageItem = new RecordChatDetailVO.MessageItem();
+            messageItem.setMessage(userModelConversationMessage.getMessage());
+            messageItem.setRole(userModelConversationMessage.getRole().getDescription());
+            messageItem.setFileUrls(userModelConversationMessage.getFiles());
+            messageItemList.add(messageItem);
+        }
+        recordChatDetailVO.setMessageList(messageItemList);
+        return recordChatDetailVO;
+    }
+
+    @Override
+    public List<RecordExtendVO> getExtendList(String model, Integer userId) {
+
+        List<UserModelTask> userModelTaskList;
+        List<UserModelRecords> userModelRecordsList;
+
+        //处理veo3特殊逻辑
+        if("veo3".equals(model)) {
+            List<Models> modelsList = modelsManager.getDetailsByNames(Arrays.asList(VeoModelEnum.VEO3.getCode(), VeoModelEnum.VEO3_FAST.getCode()));
+            List<Integer> modelIds = modelsList.stream().map(Models::getId).toList();
+            userModelTaskList = userModelTaskManager.getListByModelIdsAndUserId(modelIds, userId);
+
+            userModelRecordsList = userModelRecordsManager.getListByModelIdsAndUserId(modelIds, userId);
+        } else {
+            Models models = modelsManager.getDetailByName(model);
+            if(models == null) {
+                throw new BaseException(ResponseErrorType.MODEL_IS_NOT_EXIST, "Model is not exist");
+            }
+            userModelTaskList = userModelTaskManager.getListByModelIdAndUserId(models.getId(), userId);
+
+            userModelRecordsList = userModelRecordsManager.getListByModelIdAndUserId(models.getId(), userId);
+        }
+        List<RecordExtendVO> recordExtendVOList = new ArrayList<>();
+        Map<String, String> recordIdToTitleMap = userModelRecordsList.stream()
+                .collect(Collectors.toMap(UserModelRecords::getUuid, UserModelRecords::getTitle));
+
+        for (UserModelTask userModelTask : userModelTaskList) {
+            RecordExtendVO recordExtendVO = new RecordExtendVO();
+            recordExtendVO.setTaskId(userModelTask.getThirdTaskId());
+            recordExtendVO.setRecordId(userModelTask.getRecordId());
+            recordExtendVO.setTitle(recordIdToTitleMap.get(userModelTask.getRecordId()));
+            recordExtendVO.setOutputUrls(userModelTask.getOutputUrls());
+            recordExtendVOList.add(recordExtendVO);
+        }
+
+        return recordExtendVOList;
+    }
+
+    @Override
+    public Boolean isCompleted(String taskId) {
+        if(taskId == null || taskId.isEmpty()) {
+            return true; // No task ID provided, consider it completed
+        }
+        return !userModelTaskManager.isExistByThirdTaskId(taskId); // Task ID does not exist, consider it completed
     }
 
 

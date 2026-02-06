@@ -8,14 +8,18 @@ public interface MidjourneyService {
 
     BaseResponse imagine(MidjourneyImagineDTO midjourneyImagineDTO, UserJwtDTO userJwtDTO);
 
-    BaseResponse action(MidjourneyActionDTO midjourneyActionDTO, UserJwtDTO userJwtDTO);
+    BaseResponse vary(MidjourneyVaryDTO midjourneyVaryDTO, UserJwtDTO userJwtDTO);
 
-    BaseResponse blend(MidjourneyBlendDTO midjourneyBlendDTO, UserJwtDTO userJwtDTO);
+    BaseResponse upscale(MidjourneyUpscaleDTO midjourneyUpscaleDTO, UserJwtDTO userJwtDTO);
 
-    BaseResponse describe(MidjourneyDescribeDTO midjourneyDescribeDTO, UserJwtDTO userJwtDTO);
-
-    BaseResponse modal(MidjourneyModalDTO midjourneyModalDTO, UserJwtDTO userJwtDTO);
-
-    BaseResponse swapFace(MidjourneySwapFaceDTO midjourneySwapFaceDTO, UserJwtDTO userJwtDTO);
+//    BaseResponse action(MidjourneyActionDTO midjourneyActionDTO, UserJwtDTO userJwtDTO);
+//
+//    BaseResponse blend(MidjourneyBlendDTO midjourneyBlendDTO, UserJwtDTO userJwtDTO);
+//
+//    BaseResponse describe(MidjourneyDescribeDTO midjourneyDescribeDTO, UserJwtDTO userJwtDTO);
+//
+//    BaseResponse modal(MidjourneyModalDTO midjourneyModalDTO, UserJwtDTO userJwtDTO);
+//
+//    BaseResponse swapFace(MidjourneySwapFaceDTO midjourneySwapFaceDTO, UserJwtDTO userJwtDTO);
 
 }

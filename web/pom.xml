@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.fuse</groupId>
@@ -9,7 +12,26 @@
 
     <artifactId>fuse-ai-server-web</artifactId>
 
+    <properties>
+        <!-- 统一AWS SDK版本 -->
+        <aws.sdk.version>2.21.0</aws.sdk.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- AWS SDK BOM -->
+            <dependency>
+                <groupId>software.amazon.awssdk</groupId>
+                <artifactId>bom</artifactId>
+                <version>${aws.sdk.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
+        <!-- ===== 项目内部模块 ===== -->
         <dependency>
             <groupId>com.fuse</groupId>
             <artifactId>fuse-common-cache</artifactId>
@@ -20,12 +42,14 @@
             <artifactId>fuse-ai-server-manager</artifactId>
             <version>1.0.0</version>
         </dependency>
-        <!--mvc-->
+
+        <!-- ===== Spring Boot 核心 ===== -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
+        <!-- ===== 数据库 ===== -->
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>druid-spring-boot-starter</artifactId>
@@ -35,30 +59,29 @@
             <artifactId>mysql-connector-java</artifactId>
         </dependency>
 
+        <!-- ===== 缓存 ===== -->
         <dependency>
             <groupId>redis.clients</groupId>
             <artifactId>jedis</artifactId>
         </dependency>
-
-        <!-- caffeine 本地缓存 -->
         <dependency>
             <groupId>com.github.ben-manes.caffeine</groupId>
             <artifactId>caffeine</artifactId>
         </dependency>
 
-        <!-- aop -->
+        <!-- ===== AOP ===== -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-aop</artifactId>
         </dependency>
 
-        <!-- mq -->
+        <!-- ===== 消息队列 ===== -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-amqp</artifactId>
         </dependency>
 
-        <!-- 文件处理依赖 -->
+        <!-- ===== 文件处理 ===== -->
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>
@@ -74,6 +97,7 @@
             <artifactId>poi-scratchpad</artifactId>
             <version>5.2.4</version>
         </dependency>
+
         <!-- PDF处理 -->
         <dependency>
             <groupId>org.apache.pdfbox</groupId>
@@ -95,13 +119,13 @@
             <version>2.9.0</version>
         </dependency>
 
-        <!-- Spring Security -->
+        <!-- ===== 安全认证 ===== -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
 
-        <!-- JWT库 (推荐jjwt) -->
+        <!-- JWT -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-api</artifactId>
@@ -120,39 +144,41 @@
             <scope>runtime</scope>
         </dependency>
 
+        <!-- Google API -->
         <dependency>
             <groupId>com.google.api-client</groupId>
             <artifactId>google-api-client</artifactId>
             <version>2.4.0</version>
         </dependency>
 
+        <!-- ===== AWS SDK (由BOM管理版本) ===== -->
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
-            <artifactId>ses</artifactId>
-            <version>2.20.0</version> <!-- 建议使用最新版本 -->
+            <artifactId>aws-core</artifactId>
         </dependency>
-        <dependency>
-            <groupId>software.amazon.awssdk</groupId>
-            <artifactId>sdk-core</artifactId>
-            <version>2.20.0</version>
-        </dependency>
-
-        <!-- AWS SDK -->
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>s3</artifactId>
-            <version>2.20.0</version>
         </dependency>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot</artifactId>
-            <version>2.6.11</version>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>apache-client</artifactId>
+            <version>2.21.0</version>
         </dependency>
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>sesv2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>s3-transfer-manager</artifactId>
+        </dependency>
+
+        <!-- ===== 工具 ===== -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
         </dependency>
-
     </dependencies>
 
     <build>
@@ -163,14 +189,12 @@
                 <configuration>
                     <mainClass>com.fuse.ai.server.web.WebApplication</mainClass>
                     <layout>ZIP</layout>
-                    <!-- 排除不需要的java包 -->
                     <excludes>
                         <exclude>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
                         </exclude>
                     </excludes>
-
                 </configuration>
                 <executions>
                     <execution>
@@ -180,6 +204,8 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <!-- 依赖分析插件 -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
@@ -194,7 +220,5 @@
                 </executions>
             </plugin>
         </plugins>
-
     </build>
-
 </project>

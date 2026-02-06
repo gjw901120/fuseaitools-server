@@ -4,10 +4,12 @@ import com.fuse.ai.server.manager.feign.client.ImageFeignClient;
 import com.fuse.ai.server.manager.manager.ImageManager;
 import com.fuse.ai.server.manager.model.request.*;
 import com.fuse.ai.server.manager.model.response.ImageGenerateResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 public class ImageManagerImpl implements ImageManager {
 
     @Autowired

@@ -3,6 +3,8 @@ package com.fuse.ai.server.manager.model.request;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fuse.ai.server.manager.constant.ElevenLabsConstant;
 import com.fuse.ai.server.manager.enums.ElevenLabsModelEnum;
+import com.fuse.common.core.exception.BaseException;
+import com.fuse.common.core.exception.error.SystemErrorType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.validator.constraints.URL;
@@ -34,7 +36,7 @@ public class ElevenLabsSTTRequest extends ElevenLabsBaseRequest implements Seria
      */
     public void validateBusinessRules() {
         if (input == null) {
-            throw new IllegalArgumentException("输入参数不能为空");
+            throw new BaseException(SystemErrorType.SYSTEM_EXECUTION_ERROR, "输入参数不能为空");
         }
 
         input.validateBusinessRules();
@@ -42,7 +44,7 @@ public class ElevenLabsSTTRequest extends ElevenLabsBaseRequest implements Seria
         // 验证模型支持
         ElevenLabsModelEnum modelEnum = getModelEnum();
         if (modelEnum != ElevenLabsModelEnum.SPEECH_TO_TEXT) {
-            throw new IllegalArgumentException("语音转文本只支持speech-to-text模型");
+            throw new BaseException(SystemErrorType.SYSTEM_EXECUTION_ERROR, "语音转文本只支持speech-to-text模型");
         }
     }
 
@@ -105,7 +107,7 @@ public class ElevenLabsSTTRequest extends ElevenLabsBaseRequest implements Seria
 
         private void validateTextLength(String text, int maxLength, String fieldName) {
             if (text != null && text.length() > maxLength) {
-                throw new IllegalArgumentException(fieldName + "长度不能超过" + maxLength + "个字符");
+                throw new BaseException(SystemErrorType.SYSTEM_EXECUTION_ERROR, fieldName + "长度不能超过" + maxLength + "个字符");
             }
         }
     }

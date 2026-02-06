@@ -3,6 +3,10 @@ spring:
     active: ${AI_PROJECT_ENV}
   application:
     name: fuse-ai-server-web
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB          # 单个文件最大大小
 
 app:
   defaultTokenAuth: false

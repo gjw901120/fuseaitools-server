@@ -7,10 +7,12 @@ import com.fuse.ai.server.manager.model.request.ElevenLabsSTTRequest;
 import com.fuse.ai.server.manager.model.request.ElevenLabsSoundEffectRequest;
 import com.fuse.ai.server.manager.model.request.ElevenLabsTTSRequest;
 import com.fuse.ai.server.manager.model.response.ElevenLabsResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 public class ElevenLabsManagerImpl implements ElevenLabsManager {
 
     @Autowired
@@ -21,6 +23,7 @@ public class ElevenLabsManagerImpl implements ElevenLabsManager {
      */
     @Override
     public ElevenLabsResponse textToSpeech(ElevenLabsTTSRequest request, String apiKey) {
+
         return elevenLabsFeignClient.textToSpeech(request, apiKey);
     }
 
@@ -45,6 +48,7 @@ public class ElevenLabsManagerImpl implements ElevenLabsManager {
      */
     @Override
     public ElevenLabsResponse isolateAudio(ElevenLabsAudioIsolationRequest request, String apiKey) {
+
         return elevenLabsFeignClient.isolateAudio(request, apiKey);
     }
 }

@@ -9,6 +9,8 @@ public enum ExtraDataEnum {
     DURATION_SIZE("duration_size", "时间 & 大小"),
     DURATION("duration", "时间"),
     QUALITY("quality", "质量"),
+
+    SPEED("speed", "速度"),
     ELE_DURATION("ele_duration", "ele 时间"),
     ELE_CHARACTER("ele_character", "ele 字符");
 

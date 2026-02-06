@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fuse.ai.server.manager.constant.ElevenLabsConstant;
 import com.fuse.ai.server.manager.enums.ElevenLabsModelEnum;
 import com.fuse.ai.server.manager.enums.ElevenLabsVoiceEnum;
+import com.fuse.common.core.exception.BaseException;
+import com.fuse.common.core.exception.error.SystemErrorType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -12,6 +14,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serial;
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 /**
  * 文本转语音请求参数
@@ -34,16 +37,14 @@ public class ElevenLabsTTSRequest extends ElevenLabsBaseRequest implements Seria
      */
     public void validateBusinessRules() {
         if (input == null) {
-            throw new IllegalArgumentException("输入参数不能为空");
+            throw new BaseException(SystemErrorType.SYSTEM_EXECUTION_ERROR, "输入参数不能为空");
         }
-
-        input.validateBusinessRules();
 
         // 验证模型支持
         ElevenLabsModelEnum modelEnum = getModelEnum();
         if (modelEnum != ElevenLabsModelEnum.TTS_MULTILINGUAL_V2 &&
                 modelEnum != ElevenLabsModelEnum.TTS_TURBO_2_5) {
-            throw new IllegalArgumentException("文本转语音只支持TTS模型");
+            throw new BaseException(SystemErrorType.SYSTEM_EXECUTION_ERROR, "文本转语音只支持TTS模型");
         }
     }
 
@@ -87,23 +88,23 @@ public class ElevenLabsTTSRequest extends ElevenLabsBaseRequest implements Seria
         /**
          * 语音稳定性 (0-1)
          */
-        private Double stability;
+        private BigDecimal stability;
 
         /**
          * 相似度提升 (0-1)
          */
         @JsonProperty("similarity_boost")
-        private Double similarityBoost;
+        private BigDecimal similarityBoost;
 
         /**
          * 风格夸张程度 (0-1)
          */
-        private Double style;
+        private BigDecimal style;
 
         /**
          * 语速 (0.7-1.2)
          */
-        private Double speed;
+        private BigDecimal speed;
 
         /**
          * 是否返回时间戳
@@ -131,38 +132,10 @@ public class ElevenLabsTTSRequest extends ElevenLabsBaseRequest implements Seria
         @JsonProperty("language_code")
         private String languageCode;
 
-        /**
-         * 业务参数校验
-         */
-        public void validateBusinessRules() {
-            validateRange(stability, ElevenLabsConstant.MIN_STABILITY, ElevenLabsConstant.MAX_STABILITY,
-                    "语音稳定性");
-            validateRange(similarityBoost, ElevenLabsConstant.MIN_SIMILARITY_BOOST, ElevenLabsConstant.MAX_SIMILARITY_BOOST,
-                    "相似度提升");
-            validateRange(style, ElevenLabsConstant.MIN_STYLE, ElevenLabsConstant.MAX_STYLE,
-                    "风格夸张程度");
-            validateRange(speed, ElevenLabsConstant.MIN_SPEED, ElevenLabsConstant.MAX_SPEED,
-                    "语速");
-
-            validateTextLength(previousText, ElevenLabsConstant.TEXT_MAX_LENGTH, "前文");
-            validateTextLength(nextText, ElevenLabsConstant.TEXT_MAX_LENGTH, "后文");
-            validateTextLength(languageCode, ElevenLabsConstant.LANGUAGE_CODE_MAX_LENGTH, "语言代码");
-        }
-
-        private void validateRange(Double value, Double min, Double max, String fieldName) {
-            if (value != null) {
-                if (value < min || value > max) {
-                    throw new IllegalArgumentException(fieldName + "必须在" + min + "到" + max + "之间");
-                }
-                if (Math.abs(value % (Double) ElevenLabsConstant.STEP_SMALL) > 0.001) {
-                    throw new IllegalArgumentException(fieldName + "必须是" + ElevenLabsConstant.STEP_SMALL + "的倍数");
-                }
-            }
-        }
 
         private void validateTextLength(String text, int maxLength, String fieldName) {
             if (text != null && text.length() > maxLength) {
-                throw new IllegalArgumentException(fieldName + "长度不能超过" + maxLength + "个字符");
+                throw new BaseException(SystemErrorType.SYSTEM_EXECUTION_ERROR, fieldName + "长度不能超过" + maxLength + "个字符");
             }
         }
     }

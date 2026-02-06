@@ -53,11 +53,11 @@ public class UserCreditsServiceImpl implements UserCreditsService {
         if(PricingTypeEnum.CHARACTER.equals(model.getPricingType())) {
             ModelsPricingCharacter  pricingCharacter = modelsPricingCharacterManager.getDetailByModelId(model.getId());
             credits = BigDecimal.valueOf((extraData.getEleCharacter() / pricingCharacter.getCharacter()))
-                    .multiply(pricingCharacter.getCreadits());
+                    .multiply(pricingCharacter.getCredits());
         } else if(PricingTypeEnum.DURATION.equals(model.getPricingType())) {
             ModelsPricingDuration  pricingDuration = modelsPricingDurationManager.getDetailByModelId(model.getId());
-            credits  = BigDecimal.valueOf((extraData.getDuration() / pricingDuration.getDuration()))
-                    .multiply(pricingDuration.getCreadits());
+            credits  = BigDecimal.valueOf((extraData.getEleDuration() / pricingDuration.getDuration()))
+                    .multiply(pricingDuration.getCredits());
         } else if(PricingTypeEnum.ONCE.equals(model.getPricingType())){
             if(model.getIsPricingRules()  == 1) {
                 ModelsPricingRules pricingRules = switch (extraData.getType()) {
@@ -69,6 +69,8 @@ public class UserCreditsServiceImpl implements UserCreditsService {
                             modelsPricingRulesManager.getDetailByModelIdAndDuration(model.getId(), extraData.getDuration());
                     case QUALITY ->
                             modelsPricingRulesManager.getDetailByModelIdAndQuality(model.getId(), extraData.getQuality());
+                    case SPEED ->
+                            modelsPricingRulesManager.getDetailByModelIdAndSpeed(model.getId(), extraData.getSpeed());
                     default -> new ModelsPricingRules();
                 };
                 if(pricingRules == null) {
@@ -76,10 +78,10 @@ public class UserCreditsServiceImpl implements UserCreditsService {
                 }
                 pricingRulesId =  pricingRules.getId();
                 ModelsPricingOnce modelsPricingOnce = modelsPricingOnceManager.getDetailById( pricingRules.getPricingId());
-                credits =  modelsPricingOnce.getCreadits();
+                credits =  modelsPricingOnce.getCredits();
             } else {
                 ModelsPricingOnce modelsPricingOnce = modelsPricingOnceManager.getDetailByModelId( model.getId());
-                credits =  modelsPricingOnce.getCreadits();
+                credits =  modelsPricingOnce.getCredits();
             }
         }
 
@@ -121,11 +123,11 @@ public class UserCreditsServiceImpl implements UserCreditsService {
         if(PricingTypeEnum.CHARACTER.equals(model.getPricingType())) {
             ModelsPricingCharacter  pricingCharacter = modelsPricingCharacterManager.getDetailByModelId(model.getId());
             credits = BigDecimal.valueOf((extraData.getEleCharacter() / pricingCharacter.getCharacter()))
-                    .multiply(pricingCharacter.getCreadits());
+                    .multiply(pricingCharacter.getCredits());
         } else if(PricingTypeEnum.DURATION.equals(model.getPricingType())) {
             ModelsPricingDuration  pricingDuration = modelsPricingDurationManager.getDetailByModelId(model.getId());
             credits  = BigDecimal.valueOf((extraData.getDuration() / pricingDuration.getDuration()))
-                    .multiply(pricingDuration.getCreadits());
+                    .multiply(pricingDuration.getCredits());
         } else if(PricingTypeEnum.ONCE.equals(model.getPricingType())){
             if(model.getIsPricingRules()  == 1) {
                 ModelsPricingRules pricingRules = switch (extraData.getType()) {
@@ -144,10 +146,10 @@ public class UserCreditsServiceImpl implements UserCreditsService {
                 }
                 pricingRulesId =  pricingRules.getId();
                 ModelsPricingOnce modelsPricingOnce = modelsPricingOnceManager.getDetailById( pricingRules.getPricingId());
-                credits =  modelsPricingOnce.getCreadits();
+                credits =  modelsPricingOnce.getCredits();
             } else {
                 ModelsPricingOnce modelsPricingOnce = modelsPricingOnceManager.getDetailByModelId(model.getId());
-                credits =  modelsPricingOnce.getCreadits();
+                credits =  modelsPricingOnce.getCredits();
             }
         }
 

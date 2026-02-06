@@ -1,5 +1,7 @@
 package com.fuse.ai.server.manager.enums;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 
 @Getter
@@ -20,7 +22,19 @@ public enum FluxKontextSafetyToleranceEnum {
         this.description = description;
     }
 
-    public static FluxKontextSafetyToleranceEnum getByLevel(Integer level) {
+    /**
+     * JSON序列化时，使用level字段的值
+     */
+    @JsonValue
+    public Integer getLevel() {
+        return level;
+    }
+
+    /**
+     * JSON反序列化时，从level数值转换为枚举
+     */
+    @JsonCreator
+    public static FluxKontextSafetyToleranceEnum fromLevel(Integer level) {
         for (FluxKontextSafetyToleranceEnum value : values()) {
             if (value.getLevel().equals(level)) {
                 return value;

@@ -34,12 +34,12 @@ public class Gpt4oImageGenerateDTO {
      */
     private Boolean isEnhance = false;
 
-    /**
-     * Number of image variants to generate
-     */
-    @Min(value = 1, message = "Number of variants must be 1, 2 or 4")
-    @Max(value = 4, message = "Number of variants must be 1, 2 or 4")
-    private Integer nVariants = 1;
+//    /**
+//     * Number of image variants to generate
+//     */
+//    @Min(value = 1, message = "Number of variants must be 1, 2 or 4")
+//    @Max(value = 4, message = "Number of variants must be 1, 2 or 4")
+//    private Integer nVariants = 1;
 
     /**
      * Custom validation: either prompt or files must be provided

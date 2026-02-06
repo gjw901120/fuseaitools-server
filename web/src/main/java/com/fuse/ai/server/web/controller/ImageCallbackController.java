@@ -78,4 +78,21 @@ public class ImageCallbackController {
             return "failed";
         }
     }
+
+    @PostMapping("/mj-generate")
+    public  String MjGenerateCallback(@Valid @RequestBody ImageMjGenerateCallbackRequest request) {
+        try {
+            String taskId = request.getData().getTaskId();
+            log.info("Received Nano Banana image callback: taskId={}", taskId);
+
+            imageCallbackService.processMjGenerateCallback(request);
+
+            return "success";
+
+        } catch (Exception e) {
+            log.error("Nano Banana image callback processing failed: taskId={}, error={}", request.getData().getTaskId(), e.getMessage(), e);
+
+            return "failed";
+        }
+    }
 }

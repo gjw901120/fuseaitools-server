@@ -1,6 +1,7 @@
 package com.fuse.ai.server.web.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fuse.ai.server.web.common.utils.S3UploadUtil;
 import com.fuse.ai.server.web.model.dto.request.callback.elevenlabs.*;
 import com.fuse.ai.server.web.common.enums.ElevenLabsModelEnum;
 import com.fuse.ai.server.web.service.ElevenLabsCallbackService;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -27,9 +29,14 @@ public class ElevenLabsCallbackServiceImpl implements ElevenLabsCallbackService 
     @Autowired
     private RecordsService recordsService;
 
+    @Autowired
+    private S3UploadUtil s3UploadUtil;
+
     @Override
     public void processCallback(ElevenLabsCallbackRequest request) {
         try {
+            //幂等性校验
+            if (recordsService.isCompleted(request.getData().getTaskId())) return;
 
             // 根据模型类型分发到不同的处理方法
             String model = request.getData().getModel();
@@ -63,6 +70,10 @@ public class ElevenLabsCallbackServiceImpl implements ElevenLabsCallbackService 
     public void processTextToSpeechCallback(ElevenLabsCallbackRequest request) {
         try {
             String taskId = request.getData().getTaskId();
+
+            //幂等性校验
+            if (recordsService.isCompleted(request.getData().getTaskId())) return;
+
             String state = request.getData().getState();
             String resultJson = request.getData().getResultJson();
 
@@ -76,7 +87,10 @@ public class ElevenLabsCallbackServiceImpl implements ElevenLabsCallbackService 
 
                 // 更新任务状态为成功
                 List<String> outputUrl = new ArrayList<>();
-                recordsService.completed(request.getData().getTaskId(), outputUrl, request);
+                for (String url : result.getResultUrls()) {
+                    outputUrl.add(s3UploadUtil.uploadFileFromUrl(url));
+                }
+                recordsService.completed(request.getData().getTaskId(), outputUrl, new HashMap<>(), request);
 
             } else if ("fail".equals(state)) {
                 // 处理失败情况
@@ -101,6 +115,8 @@ public class ElevenLabsCallbackServiceImpl implements ElevenLabsCallbackService 
     public void processSpeechToTextCallback(ElevenLabsCallbackRequest request) {
         try {
             String taskId = request.getData().getTaskId();
+            //幂等性校验
+            if (recordsService.isCompleted(request.getData().getTaskId())) return;
             String state = request.getData().getState();
             String resultJson = request.getData().getResultJson();
 
@@ -121,7 +137,7 @@ public class ElevenLabsCallbackServiceImpl implements ElevenLabsCallbackService 
 
                 // 更新任务状态为成功
                 List<String> outputUrl = new ArrayList<>();
-                recordsService.completed(request.getData().getTaskId(), outputUrl, request);
+                recordsService.completed(request.getData().getTaskId(), outputUrl, resultObject, request);
 
             } else if ("fail".equals(state)) {
                 log.error("STT task failed: taskId={}, failMsg={}",
@@ -142,6 +158,8 @@ public class ElevenLabsCallbackServiceImpl implements ElevenLabsCallbackService 
     public void processAudioIsolationCallback(ElevenLabsCallbackRequest request) {
         try {
             String taskId = request.getData().getTaskId();
+            //幂等性校验
+            if (recordsService.isCompleted(request.getData().getTaskId())) return;
             String state = request.getData().getState();
             String resultJson = request.getData().getResultJson();
 
@@ -153,7 +171,10 @@ public class ElevenLabsCallbackServiceImpl implements ElevenLabsCallbackService 
                         taskId, result.getResultUrls());
 
                 List<String> outputUrl = new ArrayList<>();
-                recordsService.completed(request.getData().getTaskId(), outputUrl, request);
+                for (String url : result.getResultUrls()) {
+                    outputUrl.add(s3UploadUtil.uploadFileFromUrl(url));
+                }
+                recordsService.completed(request.getData().getTaskId(), outputUrl, new HashMap<>(), request);
 
             } else if ("fail".equals(state)) {
                 log.error("Audio isolation task failed: taskId={}, failMsg={}",
@@ -174,6 +195,8 @@ public class ElevenLabsCallbackServiceImpl implements ElevenLabsCallbackService 
     public void processSoundEffectCallback(ElevenLabsCallbackRequest request) {
         try {
             String taskId = request.getData().getTaskId();
+            //幂等性校验
+            if (recordsService.isCompleted(request.getData().getTaskId())) return;
             String state = request.getData().getState();
             String resultJson = request.getData().getResultJson();
 
@@ -184,7 +207,10 @@ public class ElevenLabsCallbackServiceImpl implements ElevenLabsCallbackService 
                 log.info("Sound effect task completed: taskId={}, resultUrls={}",
                         taskId, result.getResultUrls());
                 List<String> outputUrl = new ArrayList<>();
-                recordsService.completed(request.getData().getTaskId(), outputUrl, request);
+                for (String url : result.getResultUrls()) {
+                    outputUrl.add(s3UploadUtil.uploadFileFromUrl(url));
+                }
+                recordsService.completed(request.getData().getTaskId(), outputUrl, new HashMap<>(), request);
 
             } else if ("fail".equals(state)) {
                 log.error("Sound effect task failed: taskId={}, failMsg={}",

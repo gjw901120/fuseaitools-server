@@ -15,9 +15,9 @@ public class ModelsPricingOnce {
 
     private Integer modelId;
 
-    private BigDecimal lossCreadits;
+    private BigDecimal lossCredits;
 
-    private BigDecimal creadits;
+    private BigDecimal Credits;
 
     private Integer isDel;
 

@@ -5,11 +5,13 @@ import com.fuse.ai.server.manager.feign.client.VideoFeignClient;
 import com.fuse.ai.server.manager.manager.VideoManager;
 import com.fuse.ai.server.manager.model.request.*;
 import com.fuse.ai.server.manager.model.response.VideoGenerateResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 
 @Service
+@Slf4j
 public class VideoManagerImpl implements VideoManager {
 
     @Autowired

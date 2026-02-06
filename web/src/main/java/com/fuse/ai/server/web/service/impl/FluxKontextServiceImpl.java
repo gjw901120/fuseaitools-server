@@ -72,7 +72,7 @@ public class FluxKontextServiceImpl implements FluxKontextService {
 
         //写入任务
         UserModelTask userModelTask = UserModelTask.create(
-                0,
+                userJwtDTO.getId(),
                 "",
                 0,
                 0,
@@ -81,12 +81,13 @@ public class FluxKontextServiceImpl implements FluxKontextService {
                 response.getData().getTaskId(),
                 inputUrls,
                 new ArrayList<>(),
+                new HashMap<>(),
                 request,
                 response,
                 new HashMap<>()
         );
 
-        return new BaseResponse(recordsService.create(model, request.getPrompt(), userModelTask, verifyCreditsBO));
+        return new BaseResponse(recordsService.create(model, request.getPrompt(), fluxKontextGenerateDTO, userModelTask, verifyCreditsBO));
 
     }
 }

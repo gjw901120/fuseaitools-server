@@ -7,6 +7,7 @@ import com.fuse.ai.server.manager.mapper.ModelsPricingOnceMapper;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 @Component
 public class ModelsPricingOnceManagerImpl implements ModelsPricingOnceManager {
@@ -28,6 +29,13 @@ public class ModelsPricingOnceManagerImpl implements ModelsPricingOnceManager {
         queryWrapper.eq(ModelsPricingOnce::getModelId, modelId);
         queryWrapper.eq(ModelsPricingOnce::getIsDel, 0);
         return modelsPricingOnceMapper.selectOne(queryWrapper);
+    }
+
+    @Override
+    public List<ModelsPricingOnce> getAll() {
+        LambdaQueryWrapper<ModelsPricingOnce> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(ModelsPricingOnce::getIsDel, 0);
+        return modelsPricingOnceMapper.selectList(queryWrapper);
     }
 
 }

@@ -1,6 +1,7 @@
 package com.fuse.ai.server.manager.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -30,6 +31,9 @@ public class UserModelRecords {
 
     private String title;
 
+    @TableField(value = "original_data", typeHandler = JacksonTypeHandler.class)
+    private Object originalData;
+
     @TableField("gmt_completed")
     private LocalDateTime gmtCompleted;
 
@@ -49,11 +53,12 @@ public class UserModelRecords {
     /**
      * 创建新记录的便捷方法
      */
-    public static UserModelRecords create(Integer userId, Integer modelId, String title, Integer isCompleted) {
+    public static UserModelRecords create(Integer userId, Integer modelId, String title, Object originalData, Integer isCompleted) {
         return UserModelRecords.builder()
                 .userId(userId)
                 .modelId(modelId)
                 .title(title)
+                .originalData(originalData)
                 .isCompleted(isCompleted)
                 .build();
     }

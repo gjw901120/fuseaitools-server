@@ -26,4 +26,9 @@ public enum RunwayAspectRatioEnum {
         }
         return null;
     }
+
+    @Override
+    public String toString() {
+        return ratio;
+    }
 }

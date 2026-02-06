@@ -2,7 +2,9 @@ package com.fuse.ai.server.web.service.impl;
 
 import com.fuse.ai.server.manager.entity.Models;
 import com.fuse.ai.server.manager.entity.UserModelTask;
+import com.fuse.ai.server.manager.enums.SunoModelEnum;
 import com.fuse.ai.server.manager.enums.SunoResponseCodeEnum;
+import com.fuse.ai.server.manager.enums.SunoVocalGenderEnum;
 import com.fuse.ai.server.manager.enums.TaskStatusEnum;
 import com.fuse.ai.server.manager.manager.SunoManger;
 import com.fuse.ai.server.manager.model.request.*;
@@ -18,6 +20,7 @@ import com.fuse.ai.server.web.service.SunoService;
 import com.fuse.ai.server.web.service.UserCreditsService;
 import com.fuse.common.core.exception.BaseException;
 import com.fuse.common.core.exception.error.ThirdpartyErrorType;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,6 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 
 @Service
+@Slf4j
 public class SunoServiceImpl implements SunoService {
 
     @Autowired
@@ -55,6 +59,9 @@ public class SunoServiceImpl implements SunoService {
         // 实现视频生成逻辑
         SunoGenerateRequest request = new SunoGenerateRequest();
 
+        request.setVocalGender(SunoVocalGenderEnum.fromCode(sunoGenerateDTO.getVocalGender().getCode()));
+        request.setModel(SunoModelEnum.fromCode(sunoGenerateDTO.getModel().getCode()));
+
         BeanUtils.copyProperties(sunoGenerateDTO, request);
 
         request.setCallBackUrl(callbackUrl.concat("/suno/generate"));
@@ -67,7 +74,7 @@ public class SunoServiceImpl implements SunoService {
 
         //写入任务
         UserModelTask userModelTask = UserModelTask.create(
-                0,
+                userJwtDTO.getId(),
                 "",
                 0,
                 0,
@@ -76,12 +83,13 @@ public class SunoServiceImpl implements SunoService {
                 response.getData().getTaskId(),
                 new ArrayList<>(),
                 new ArrayList<>(),
+                new HashMap<>(),
                 request,
                 response,
                 new HashMap<>()
         );
 
-        return new BaseResponse(recordsService.create(model, sunoGenerateDTO.getPrompt() , userModelTask, verifyCreditsBO));
+        return new BaseResponse(recordsService.create(model, sunoGenerateDTO.getPrompt(), sunoGenerateDTO, userModelTask, verifyCreditsBO));
 
     }
 
@@ -97,6 +105,9 @@ public class SunoServiceImpl implements SunoService {
 
         BeanUtils.copyProperties(sunoExtendDTO, request);
 
+        request.setVocalGender(SunoVocalGenderEnum.fromCode(sunoExtendDTO.getVocalGender().getCode()));
+        request.setModel(SunoModelEnum.fromCode(sunoExtendDTO.getModel().getCode()));
+
         request.setCallBackUrl(callbackUrl.concat("/suno/extend"));
 
         SunoMusicResponse response = sunoManger.extendMusic(request, model.getRequestToken());
@@ -107,7 +118,7 @@ public class SunoServiceImpl implements SunoService {
 
         //写入任务
         UserModelTask userModelTask = UserModelTask.create(
-                0,
+                userJwtDTO.getId(),
                 "",
                 0,
                 0,
@@ -116,12 +127,13 @@ public class SunoServiceImpl implements SunoService {
                 response.getData().getTaskId(),
                 new ArrayList<>(),
                 new ArrayList<>(),
+                new HashMap<>(),
                 request,
                 response,
                 new HashMap<>()
         );
 
-        return new BaseResponse(recordsService.create(model, sunoExtendDTO.getPrompt(), userModelTask, verifyCreditsBO));
+        return new BaseResponse(recordsService.create(model, sunoExtendDTO.getPrompt(), sunoExtendDTO, userModelTask, verifyCreditsBO));
 
     }
 
@@ -139,6 +151,9 @@ public class SunoServiceImpl implements SunoService {
 
         BeanUtils.copyProperties(sunoUploadCoverDTO, request);
 
+        request.setVocalGender(SunoVocalGenderEnum.fromCode(sunoUploadCoverDTO.getVocalGender().getCode()));
+        request.setModel(SunoModelEnum.fromCode(sunoUploadCoverDTO.getModel().getCode()));
+
         request.setCallBackUrl(callbackUrl.concat("/suno/upload-cover"));
 
         inputUrls.add(sunoUploadCoverDTO.getFileUrl());
@@ -153,7 +168,7 @@ public class SunoServiceImpl implements SunoService {
 
         //写入任务
         UserModelTask userModelTask = UserModelTask.create(
-                0,
+                userJwtDTO.getId(),
                 "",
                 0,
                 0,
@@ -162,12 +177,13 @@ public class SunoServiceImpl implements SunoService {
                 response.getData().getTaskId(),
                 inputUrls,
                 new ArrayList<>(),
+                new HashMap<>(),
                 request,
                 response,
                 new HashMap<>()
         );
 
-        return new BaseResponse(recordsService.create(model, sunoUploadCoverDTO.getPrompt() , userModelTask, verifyCreditsBO));
+        return new BaseResponse(recordsService.create(model, sunoUploadCoverDTO.getPrompt(), sunoUploadCoverDTO, userModelTask, verifyCreditsBO));
 
     }
 
@@ -181,17 +197,18 @@ public class SunoServiceImpl implements SunoService {
         // 实现视频生成逻辑
         SunoAddVocalsRequest request = new SunoAddVocalsRequest();
 
+        request.setVocalGender(SunoVocalGenderEnum.fromCode(sunoAddVocalsDTO.getVocalGender().getCode()));
+        request.setModel(SunoModelEnum.fromCode(sunoAddVocalsDTO.getModel().getCode()));
+
         List<String> inputUrls = new ArrayList<>();
 
         BeanUtils.copyProperties(sunoAddVocalsDTO, request);
 
         request.setCallBackUrl(callbackUrl.concat("/suno/add-vocals"));
 
-        String uploadUrl = "";
+        inputUrls.add(sunoAddVocalsDTO.getFileUrl());
 
-        inputUrls.add(uploadUrl);
-
-        request.setUploadUrl(uploadUrl);
+        request.setUploadUrl(sunoAddVocalsDTO.getFileUrl());
 
         SunoMusicResponse response = sunoManger.addVocals(request, model.getRequestToken());
 
@@ -201,7 +218,7 @@ public class SunoServiceImpl implements SunoService {
 
         //写入任务
         UserModelTask userModelTask = UserModelTask.create(
-                0,
+                userJwtDTO.getId(),
                 "",
                 0,
                 0,
@@ -210,12 +227,13 @@ public class SunoServiceImpl implements SunoService {
                 response.getData().getTaskId(),
                 inputUrls,
                 new ArrayList<>(),
+                new HashMap<>(),
                 request,
                 response,
                 new HashMap<>()
         );
 
-        return new BaseResponse(recordsService.create(model, sunoAddVocalsDTO.getPrompt(), userModelTask, verifyCreditsBO));
+        return new BaseResponse(recordsService.create(model, sunoAddVocalsDTO.getPrompt(), sunoAddVocalsDTO, userModelTask, verifyCreditsBO));
 
     }
 
@@ -228,6 +246,9 @@ public class SunoServiceImpl implements SunoService {
 
         // 实现视频生成逻辑
         SunoUploadExtendRequest request = new SunoUploadExtendRequest();
+
+        request.setVocalGender(SunoVocalGenderEnum.fromCode(sunoUploadExtendDTO.getVocalGender().getCode()));
+        request.setModel(SunoModelEnum.fromCode(sunoUploadExtendDTO.getModel().getCode()));
 
         BeanUtils.copyProperties(sunoUploadExtendDTO, request);
 
@@ -247,7 +268,7 @@ public class SunoServiceImpl implements SunoService {
 
         //写入任务
         UserModelTask userModelTask = UserModelTask.create(
-                0,
+                userJwtDTO.getId(),
                 "",
                 0,
                 0,
@@ -256,12 +277,13 @@ public class SunoServiceImpl implements SunoService {
                 response.getData().getTaskId(),
                 inputUrls,
                 new ArrayList<>(),
+                new HashMap<>(),
                 request,
                 response,
                 new HashMap<>()
         );
 
-        return new BaseResponse(recordsService.create(model, sunoUploadExtendDTO.getPrompt(), userModelTask, verifyCreditsBO));
+        return new BaseResponse(recordsService.create(model, sunoUploadExtendDTO.getPrompt(), sunoUploadExtendDTO, userModelTask, verifyCreditsBO));
 
     }
 
@@ -276,6 +298,9 @@ public class SunoServiceImpl implements SunoService {
         SunoAddInstrumentalRequest request = new SunoAddInstrumentalRequest();
 
         BeanUtils.copyProperties(sunoAddInstrumentalDTO, request);
+
+        request.setVocalGender(SunoVocalGenderEnum.fromCode(sunoAddInstrumentalDTO.getVocalGender().getCode()));
+        request.setModel(SunoModelEnum.fromCode(sunoAddInstrumentalDTO.getModel().getCode()));
 
         List<String> inputUrls = new ArrayList<>();
 
@@ -293,7 +318,7 @@ public class SunoServiceImpl implements SunoService {
 
         //写入任务
         UserModelTask userModelTask = UserModelTask.create(
-                0,
+                userJwtDTO.getId(),
                 "",
                 0,
                 0,
@@ -302,12 +327,13 @@ public class SunoServiceImpl implements SunoService {
                 response.getData().getTaskId(),
                 inputUrls,
                 new ArrayList<>(),
+                new HashMap<>(),
                 request,
                 response,
                 new HashMap<>()
         );
 
-        return new BaseResponse(recordsService.create(model, sunoAddInstrumentalDTO.getTitle(), userModelTask, verifyCreditsBO));
+        return new BaseResponse(recordsService.create(model, sunoAddInstrumentalDTO.getTitle(), sunoAddInstrumentalDTO, userModelTask, verifyCreditsBO));
 
     }
 

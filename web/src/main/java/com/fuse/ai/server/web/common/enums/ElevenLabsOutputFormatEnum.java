@@ -1,5 +1,7 @@
 package com.fuse.ai.server.web.common.enums;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 
 /**
@@ -36,12 +38,25 @@ public enum ElevenLabsOutputFormatEnum {
         this.description = description;
     }
 
+    @JsonValue
+    public String getCode() {
+        return code;
+    }
+
+    /**
+     * 反序列化时使用 code 字段查找枚举
+     */
+    @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     public static ElevenLabsOutputFormatEnum getByCode(String code) {
+        if (code == null || code.trim().isEmpty()) {
+            return MP3_44100_128; // 返回默认值
+        }
         for (ElevenLabsOutputFormatEnum format : values()) {
             if (format.getCode().equals(code)) {
                 return format;
             }
         }
-        return MP3_44100_128;
+        return MP3_44100_128; // 返回默认值
     }
+
 }

@@ -14,7 +14,7 @@ import java.util.List;
 
 @Data
 @Builder
-@TableName("user_model_conversation_message")
+@TableName(value = "user_model_conversation_message", autoResultMap = true)
 @NoArgsConstructor  // 必须添加：无参构造函数
 @AllArgsConstructor // 必须添加：全参构造函数
 @Accessors(chain = true)

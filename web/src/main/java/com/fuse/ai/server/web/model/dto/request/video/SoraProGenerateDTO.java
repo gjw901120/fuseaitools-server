@@ -1,8 +1,9 @@
 package com.fuse.ai.server.web.model.dto.request.video;
 
-import javax.validation.constraints.*;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
+import javax.validation.constraints.*;
 import java.util.List;
 
 /**
@@ -40,7 +41,9 @@ public class SoraProGenerateDTO {
     /**
      * The number of frames to be generated
      */
+    @NotNull(message = "Number of frames cannot be null")
     @Pattern(regexp = "10|15", message = "Number of frames must be 10 or 15")
+    @JsonProperty("nFrames")
     private String nFrames;
 
     /**
@@ -59,7 +62,7 @@ public class SoraProGenerateDTO {
      */
     @AssertTrue(message = "Image URLs are required for sora-2-pro-image-to-video model")
     public boolean isImageUrlsValid() {
-        if ("sora-2-pro-text-to-video".equals(model)) {
+        if ("sora-2-pro-image-to-video".equals(model)) {
             return getImageUrls() != null && !getImageUrls().isEmpty();
         }
         return true;

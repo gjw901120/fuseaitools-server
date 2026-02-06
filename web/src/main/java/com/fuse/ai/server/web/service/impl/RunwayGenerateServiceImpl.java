@@ -2,8 +2,7 @@ package com.fuse.ai.server.web.service.impl;
 
 import com.fuse.ai.server.manager.entity.Models;
 import com.fuse.ai.server.manager.entity.UserModelTask;
-import com.fuse.ai.server.manager.enums.ResponseCodeEnum;
-import com.fuse.ai.server.manager.enums.TaskStatusEnum;
+import com.fuse.ai.server.manager.enums.*;
 import com.fuse.ai.server.manager.manager.VideoManager;
 import com.fuse.ai.server.manager.model.request.RunwayAlephGenerateRequest;
 import com.fuse.ai.server.manager.model.request.RunwayExtendRequest;
@@ -72,6 +71,9 @@ public class RunwayGenerateServiceImpl implements RunwayGenerateService {
 
         request.setImageUrl(runwayGenerateDTO.getImageUrl());
 
+        request.setAspectRatio(RunwayAspectRatioEnum.getByRatio(runwayGenerateDTO.getAspectRatio()));
+        request.setQuality(RunwayVideoQualityEnum.fromQuality(runwayGenerateDTO.getQuality()));
+
         request.setCallBackUrl(callbackUrl.concat("/video/runway"));
 
         inputUrls.add(runwayGenerateDTO.getImageUrl());
@@ -83,7 +85,7 @@ public class RunwayGenerateServiceImpl implements RunwayGenerateService {
         }
 
         UserModelTask userModelTask = UserModelTask.create(
-                0,
+                userJwtDTO.getId(),
                 "",
                 0,
                 verifyCreditsBO.getPricingRulesId(),
@@ -92,12 +94,13 @@ public class RunwayGenerateServiceImpl implements RunwayGenerateService {
                 response.getData().getTaskId(),
                 inputUrls,
                 new ArrayList<>(),
+                new HashMap<>(),
                 request,
                 response,
                 new HashMap<>()
         );
 
-        return new BaseResponse(recordsService.create(model, request.getPrompt(), userModelTask, verifyCreditsBO));
+        return new BaseResponse(recordsService.create(model, request.getPrompt(), runwayGenerateDTO, userModelTask, verifyCreditsBO));
 
     }
 
@@ -113,6 +116,8 @@ public class RunwayGenerateServiceImpl implements RunwayGenerateService {
 
         BeanUtils.copyProperties(runwayExtendDTO, request);
 
+        request.setQuality(RunwayVideoQualityEnum.fromQuality(runwayExtendDTO.getQuality()));
+
         request.setCallBackUrl(callbackUrl.concat("/video/runway"));
 
         VideoGenerateResponse response = videoManager.runwayExtend(request, model.getRequestToken());
@@ -122,7 +127,7 @@ public class RunwayGenerateServiceImpl implements RunwayGenerateService {
         }
 
         UserModelTask userModelTask = UserModelTask.create(
-                0,
+                userJwtDTO.getId(),
                 "",
                 0,
                 0,
@@ -131,12 +136,13 @@ public class RunwayGenerateServiceImpl implements RunwayGenerateService {
                 response.getData().getTaskId(),
                 new ArrayList<>(),
                 new ArrayList<>(),
+                new HashMap<>(),
                 request,
                 new HashMap<>(),
                 new HashMap<>()
         );
 
-        return new BaseResponse(recordsService.create(model, request.getPrompt(), userModelTask, verifyCreditsBO));
+        return new BaseResponse(recordsService.create(model, request.getPrompt(), runwayExtendDTO, userModelTask, verifyCreditsBO));
 
     }
 
@@ -152,23 +158,25 @@ public class RunwayGenerateServiceImpl implements RunwayGenerateService {
 
         BeanUtils.copyProperties(runwayAlephDTO, request);
 
-        VideoGenerateResponse response = videoManager.runwayAlephGenerate(request, model.getRequestToken());
+        request.setAspectRatio(RunwayAlephAspectRatioEnum.fromRatio(runwayAlephDTO.getAspectRatio()));
 
         List<String> inputUrls = new ArrayList<>();
 
-        request.setVideoUrl(runwayAlephDTO.getVideoUrl());
+        request.setReferenceImage(runwayAlephDTO.getReferenceImageUrl());
 
         request.setCallBackUrl(callbackUrl.concat("/video/runway-aleph"));
 
         inputUrls.add(runwayAlephDTO.getVideoUrl());
         inputUrls.add(runwayAlephDTO.getReferenceImageUrl());
 
+        VideoGenerateResponse response = videoManager.runwayAlephGenerate(request, model.getRequestToken());
+
         if(!ResponseCodeEnum.SUCCESS.equals(response.getCode())) {
             throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, response.getMsg());
         }
 
         UserModelTask userModelTask = UserModelTask.create(
-                0,
+                userJwtDTO.getId(),
                 "",
                 0,
                 0,
@@ -177,12 +185,13 @@ public class RunwayGenerateServiceImpl implements RunwayGenerateService {
                 response.getData().getTaskId(),
                 inputUrls,
                 new ArrayList<>(),
+                new HashMap<>(),
                 request,
                 new HashMap<>(),
                 new HashMap<>()
         );
 
-        return new BaseResponse(recordsService.create(model, request.getPrompt(), userModelTask, verifyCreditsBO));
+        return new BaseResponse(recordsService.create(model, request.getPrompt(), runwayAlephDTO, userModelTask, verifyCreditsBO));
 
     }
 

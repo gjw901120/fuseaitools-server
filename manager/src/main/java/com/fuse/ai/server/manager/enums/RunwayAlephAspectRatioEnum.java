@@ -1,5 +1,7 @@
 package com.fuse.ai.server.manager.enums;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 
 @Getter
@@ -19,12 +21,33 @@ public enum RunwayAlephAspectRatioEnum {
         this.description = description;
     }
 
-    public static RunwayAlephAspectRatioEnum getByRatio(String ratio) {
+    /**
+     * JSON序列化时，使用ratio字段的值
+     */
+    @JsonValue
+    public String getRatio() {
+        return ratio;
+    }
+
+    /**
+     * JSON反序列化时，从ratio字符串转换为枚举
+     */
+    @JsonCreator
+    public static RunwayAlephAspectRatioEnum fromRatio(String ratio) {
         for (RunwayAlephAspectRatioEnum value : values()) {
             if (value.getRatio().equals(ratio)) {
                 return value;
             }
         }
         return null;
+    }
+
+    /**
+     * 重写 toString() 方法，返回ratio
+     * 这样在打印日志或调用 toString() 时显示小写
+     */
+    @Override
+    public String toString() {
+        return ratio;
     }
 }

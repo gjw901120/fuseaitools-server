@@ -24,7 +24,7 @@ public class ModelsPricingRules {
 
     private Integer batchSize;
 
-    private Integer speed;
+    private String speed;
 
     private String scene;
 

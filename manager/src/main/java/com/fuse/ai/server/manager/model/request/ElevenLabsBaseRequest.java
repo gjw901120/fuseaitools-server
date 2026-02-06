@@ -1,6 +1,8 @@
 package com.fuse.ai.server.manager.model.request;
 
 import com.fuse.ai.server.manager.enums.ElevenLabsModelEnum;
+import com.fuse.common.core.exception.BaseException;
+import com.fuse.common.core.exception.error.SystemErrorType;
 import lombok.Data;
 import org.hibernate.validator.constraints.URL;
 
@@ -35,10 +37,10 @@ public class ElevenLabsBaseRequest implements Serializable {
     protected void validateRange(Double value, Double min, Double max, Double step, String fieldName) {
         if (value != null) {
             if (value < min || value > max) {
-                throw new IllegalArgumentException(fieldName + "必须在" + min + "到" + max + "之间");
+                throw new BaseException(SystemErrorType.SYSTEM_EXECUTION_ERROR, fieldName + "必须在" + min + "到" + max + "之间");
             }
             if (step != null && Math.abs(value % step) > 0.001) {
-                throw new IllegalArgumentException(fieldName + "必须是" + step + "的倍数");
+                throw new BaseException(SystemErrorType.SYSTEM_EXECUTION_ERROR,fieldName + "必须是" + step + "的倍数");
             }
         }
     }
@@ -48,7 +50,7 @@ public class ElevenLabsBaseRequest implements Serializable {
      */
     protected void validateTextLength(String text, int maxLength, String fieldName) {
         if (text != null && text.length() > maxLength) {
-            throw new IllegalArgumentException(fieldName + "长度不能超过" + maxLength + "个字符");
+            throw new BaseException(SystemErrorType.SYSTEM_EXECUTION_ERROR,fieldName + "长度不能超过" + maxLength + "个字符");
         }
     }
 

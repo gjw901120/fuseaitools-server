@@ -40,18 +40,18 @@ public interface ImageFeignClient {
     /**
      * 生成图像
      */
-    @PostMapping("/api/v1/nano-banana/generate")
+    @PostMapping("/api/v1/jobs/createTask")
     @Headers("Content-Type: application/json")
     ImageGenerateResponse nanoBananaGenerate(@Valid @RequestBody NanoBananaGenerateRequest request, @RequestParam("apiKey") String apiKey);
 
-    @PostMapping("/api/v1/nano-banana-pro/generate")
+    @PostMapping("/api/v1/jobs/createTask")
     @Headers("Content-Type: application/json")
     ImageGenerateResponse nanoBananaProGenerate(@Valid @RequestBody NanoBananaProGenerateRequest request, @RequestParam("apiKey") String apiKey);
 
     /**
      * 编辑图像
      */
-    @PostMapping("/api/v1/nano-banana/edit")
+    @PostMapping("/api/v1/jobs/createTask")
     @Headers("Content-Type: application/json")
     ImageGenerateResponse nanoBananaEdit(@Valid @RequestBody NanoBananaEditRequest request, @RequestParam("apiKey") String apiKey);
 }

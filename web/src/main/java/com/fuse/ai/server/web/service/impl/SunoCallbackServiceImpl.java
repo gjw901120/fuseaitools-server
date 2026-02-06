@@ -1,11 +1,7 @@
 package com.fuse.ai.server.web.service.impl;
 
-import com.fuse.ai.server.web.model.dto.request.callback.suno.SunoExtendRequest;
-import com.fuse.ai.server.web.model.dto.request.callback.suno.SunoGenerateRequest;
-import com.fuse.ai.server.web.model.dto.request.callback.suno.SunoUploadCoverRequest;
-import com.fuse.ai.server.web.model.dto.request.callback.suno.SunoUploadExtendRequest;
-import com.fuse.ai.server.web.model.dto.request.callback.suno.SunoAddInstrumentalRequest;
-import com.fuse.ai.server.web.model.dto.request.callback.suno.SunoAddVocalsRequest;
+import com.fuse.ai.server.web.common.utils.S3UploadUtil;
+import com.fuse.ai.server.web.model.dto.request.callback.suno.*;
 import com.fuse.ai.server.web.service.RecordsService;
 import com.fuse.ai.server.web.service.SunoCallbackService;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 @Slf4j
@@ -24,9 +21,15 @@ public class SunoCallbackServiceImpl implements SunoCallbackService {
     @Autowired
     private RecordsService recordsService;
 
+    @Autowired
+    private S3UploadUtil s3UploadUtil;
+
     @Override
     public void generateCallback(SunoGenerateRequest request) {
         log.info("处理生成音乐回调: code={}, msg={}", request.getCode(), request.getMsg());
+
+        //幂等性校验
+        if (recordsService.isCompleted(request.getData().getTaskId())) return;
 
         if (!request.isSuccess()) {
             recordsService.failed(request.getData().getTaskId(), request);
@@ -35,14 +38,16 @@ public class SunoCallbackServiceImpl implements SunoCallbackService {
         }
 
         SunoGenerateRequest.GenerateData data = request.getData();
-        if (data != null && data.getData() != null) {
+        List<String> outputUrl = new ArrayList<>();
+        if (data != null && "complete".equals(data.getCallbackType())  && data.getData() != null) {
             data.getData().forEach(audio -> {
-                log.info("生成音乐数据: id={}, title={}, duration={}s",
-                        audio.getId(), audio.getTitle(), audio.getDuration());
+                log.info("生成音乐数据: audio {}", audio);
                 // 处理生成音乐的业务逻辑
+                outputUrl.add(s3UploadUtil.uploadFileFromUrl(audio.getImageUrl()));
+                outputUrl.add(s3UploadUtil.uploadFileFromUrl(audio.getAudioUrl()));
             });
-            List<String> outputUrl = new ArrayList<>();
-            recordsService.completed(request.getData().getTaskId(), outputUrl, request);
+
+            recordsService.completed(request.getData().getTaskId(), outputUrl, new HashMap<>(), request);
         }
     }
 
@@ -50,6 +55,8 @@ public class SunoCallbackServiceImpl implements SunoCallbackService {
     public void extendCallback(SunoExtendRequest request) {
         log.info("处理延长音乐回调: code={}, msg={}", request.getCode(), request.getMsg());
 
+        //幂等性校验
+        if (recordsService.isCompleted(request.getData().getTaskId())) return;
         if (!request.isSuccess()) {
             recordsService.failed(request.getData().getTaskId(), request);
             log.error("延长音乐失败: code={}, msg={}", request.getCode(), request.getMsg());
@@ -57,20 +64,24 @@ public class SunoCallbackServiceImpl implements SunoCallbackService {
         }
 
         SunoExtendRequest.ExtendData data = request.getData();
+        List<String> outputUrl = new ArrayList<>();
         if (data != null && data.getData() != null) {
             data.getData().forEach(audio -> {
-                log.info("延长音乐数据: id={}, title={}, duration={}s",
-                        audio.getId(), audio.getTitle(), audio.getDuration());
+                log.info("延长音乐数据: audio {}", audio);
                 // 处理延长音乐的业务逻辑
+                outputUrl.add(s3UploadUtil.uploadFileFromUrl(audio.getImageUrl()));
+                outputUrl.add(s3UploadUtil.uploadFileFromUrl(audio.getAudioUrl()));
             });
-            List<String> outputUrl = new ArrayList<>();
-            recordsService.completed(request.getData().getTaskId(), outputUrl, request);
+            recordsService.completed(request.getData().getTaskId(), outputUrl, new HashMap<>(), request);
         }
     }
 
     @Override
     public void uploadCoverCallback(SunoUploadCoverRequest request) {
         log.info("处理上传翻唱回调: code={}, msg={}", request.getCode(), request.getMsg());
+
+        //幂等性校验
+        if (recordsService.isCompleted(request.getData().getTaskId())) return;
 
         if (!request.isSuccess()) {
             recordsService.failed(request.getData().getTaskId(), request);
@@ -79,14 +90,17 @@ public class SunoCallbackServiceImpl implements SunoCallbackService {
         }
 
         SunoUploadCoverRequest.UploadCoverData data = request.getData();
+        List<String> outputUrl = new ArrayList<>();
         if (data != null && data.getData() != null) {
             data.getData().forEach(audio -> {
-                log.info("上传翻唱数据: id={}, title={}, sourceAudio={}",
-                        audio.getId(), audio.getTitle(), audio.getSourceAudioUrl());
+                log.info("上传翻唱数据: audio {}", audio);
                 // 处理上传翻唱的业务逻辑
+                outputUrl.add(s3UploadUtil.uploadFileFromUrl(audio.getImageUrl()));
+                outputUrl.add(s3UploadUtil.uploadFileFromUrl(audio.getAudioUrl()));
+                outputUrl.add(s3UploadUtil.uploadFileFromUrl(audio.getSourceAudioUrl()));
             });
-            List<String> outputUrl = new ArrayList<>();
-            recordsService.completed(request.getData().getTaskId(), outputUrl, request);
+
+            recordsService.completed(request.getData().getTaskId(), outputUrl, new HashMap<>(), request);
         }
     }
 
@@ -94,6 +108,8 @@ public class SunoCallbackServiceImpl implements SunoCallbackService {
     public void uploadExtendCallback(SunoUploadExtendRequest request) {
         log.info("处理上传扩展回调: code={}, msg={}", request.getCode(), request.getMsg());
 
+        //幂等性校验
+        if (recordsService.isCompleted(request.getData().getTaskId())) return;
         if (!request.isSuccess()) {
             recordsService.failed(request.getData().getTaskId(), request);
             log.error("上传扩展失败: code={}, msg={}", request.getCode(), request.getMsg());
@@ -101,14 +117,16 @@ public class SunoCallbackServiceImpl implements SunoCallbackService {
         }
 
         SunoUploadExtendRequest.UploadExtendData data = request.getData();
+        List<String> outputUrl = new ArrayList<>();
         if (data != null && data.getData() != null) {
             data.getData().forEach(audio -> {
-                log.info("上传扩展数据: id={}, title={}, sourceAudio={}",
-                        audio.getId(), audio.getTitle(), audio.getSourceAudioUrl());
+                log.info("上传扩展数据: audio {}", audio);
                 // 处理上传扩展的业务逻辑
+                outputUrl.add(s3UploadUtil.uploadFileFromUrl(audio.getImageUrl()));
+                outputUrl.add(s3UploadUtil.uploadFileFromUrl(audio.getAudioUrl()));
+                outputUrl.add(s3UploadUtil.uploadFileFromUrl(audio.getSourceAudioUrl()));
             });
-            List<String> outputUrl = new ArrayList<>();
-            recordsService.completed(request.getData().getTaskId(), outputUrl, request);
+            recordsService.completed(request.getData().getTaskId(), outputUrl, new HashMap<>(), request);
         }
     }
 
@@ -116,6 +134,8 @@ public class SunoCallbackServiceImpl implements SunoCallbackService {
     public void addInstrumentalCallback(SunoAddInstrumentalRequest request) {
         log.info("处理添加伴奏回调: code={}, msg={}", request.getCode(), request.getMsg());
 
+        //幂等性校验
+        if (recordsService.isCompleted(request.getData().getTaskId())) return;
         if (!request.isSuccess()) {
             recordsService.failed(request.getData().getTaskId(), request);
             log.error("添加伴奏失败: code={}, msg={}", request.getCode(), request.getMsg());
@@ -123,14 +143,16 @@ public class SunoCallbackServiceImpl implements SunoCallbackService {
         }
 
         SunoAddInstrumentalRequest.AddInstrumentalData data = request.getData();
+        List<String> outputUrl = new ArrayList<>();
         if (data != null && data.getData() != null) {
             data.getData().forEach(audio -> {
-                log.info("添加伴奏数据: id={}, title={}, duration={}s",
-                        audio.getId(), audio.getTitle(), audio.getDuration());
+                log.info("添加伴奏数据: audio {}", audio);
                 // 处理添加伴奏的业务逻辑
+                outputUrl.add(s3UploadUtil.uploadFileFromUrl(audio.getImageUrl()));
+                outputUrl.add(s3UploadUtil.uploadFileFromUrl(audio.getAudioUrl()));
             });
-            List<String> outputUrl = new ArrayList<>();
-            recordsService.completed(request.getData().getTaskId(), outputUrl, request);
+
+            recordsService.completed(request.getData().getTaskId(), outputUrl, new HashMap<>(), request);
         }
     }
 
@@ -138,6 +160,8 @@ public class SunoCallbackServiceImpl implements SunoCallbackService {
     public void addVocalsCallback(SunoAddVocalsRequest request) {
         log.info("处理添加人声回调: code={}, msg={}", request.getCode(), request.getMsg());
 
+        //幂等性校验
+        if (recordsService.isCompleted(request.getData().getTaskId())) return;
         if (!request.isSuccess()) {
             recordsService.failed(request.getData().getTaskId(), request);
             log.error("添加人声失败: code={}, msg={}", request.getCode(), request.getMsg());
@@ -145,14 +169,16 @@ public class SunoCallbackServiceImpl implements SunoCallbackService {
         }
 
         SunoAddVocalsRequest.AddVocalsData data = request.getData();
+        List<String> outputUrl = new ArrayList<>();
         if (data != null && data.getData() != null) {
             data.getData().forEach(audio -> {
-                log.info("添加人声数据: id={}, title={}, duration={}s",
-                        audio.getId(), audio.getTitle(), audio.getDuration());
+                log.info("添加人声数据: audio {}", audio);
                 // 处理添加人声的业务逻辑
+                outputUrl.add(s3UploadUtil.uploadFileFromUrl(audio.getImageUrl()));
+                outputUrl.add(s3UploadUtil.uploadFileFromUrl(audio.getAudioUrl()));
             });
-            List<String> outputUrl = new ArrayList<>();
-            recordsService.completed(request.getData().getTaskId(), outputUrl, request);
+
+            recordsService.completed(request.getData().getTaskId(), outputUrl, new HashMap<>(), request);
         }
     }
 }

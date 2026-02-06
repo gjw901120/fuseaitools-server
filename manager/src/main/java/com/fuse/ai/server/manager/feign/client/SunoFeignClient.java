@@ -27,42 +27,42 @@ public interface SunoFeignClient {
     /**
      * 生成音乐
      */
-    @PostMapping("/api/v1/suno/generate")
+    @PostMapping("/api/v1/generate")
     @Headers("Content-Type: application/json")
     SunoMusicResponse generateMusic(@Valid @RequestBody SunoGenerateRequest request, @RequestParam("apiKey") String apiKey);
 
     /**
      * 延长音乐
      */
-    @PostMapping("/api/v1/suno/generate/extend")
+    @PostMapping("/api/v1/generate/extend")
     @Headers("Content-Type: application/json")
     SunoMusicResponse extendMusic(@Valid @RequestBody SunoExtendRequest request, @RequestParam("apiKey") String apiKey);
 
     /**
      * 上传并翻唱音乐
      */
-    @PostMapping("/api/v1/suno/generate/upload-cover")
+    @PostMapping("/api/v1/generate/upload-cover")
     @Headers("Content-Type: application/json")
     SunoMusicResponse uploadCover(@Valid @RequestBody SunoUploadCoverRequest request, @RequestParam("apiKey") String apiKey);
 
     /**
      * 上传并扩展音乐
      */
-    @PostMapping("/api/v1/suno/generate/upload-extend")
+    @PostMapping("/api/v1/generate/upload-extend")
     @Headers("Content-Type: application/json")
     SunoMusicResponse uploadExtend(@Valid @RequestBody SunoUploadExtendRequest request, @RequestParam("apiKey") String apiKey);
 
     /**
      * 添加伴奏生成音乐
      */
-    @PostMapping("/api/v1/suno/generate/add-instrumental")
+    @PostMapping("/api/v1/generate/add-instrumental")
     @Headers("Content-Type: application/json")
     SunoMusicResponse addInstrumental(@Valid @RequestBody SunoAddInstrumentalRequest request, @RequestParam("apiKey") String apiKey);
 
     /**
      * 添加人声生成音乐
      */
-    @PostMapping("/api/v1/suno/generate/add-vocals")
+    @PostMapping("/api/v1/generate/add-vocals")
     @Headers("Content-Type: application/json")
     SunoMusicResponse addVocals(@Valid @RequestBody SunoAddVocalsRequest request, @RequestParam("apiKey") String apiKey);
 }

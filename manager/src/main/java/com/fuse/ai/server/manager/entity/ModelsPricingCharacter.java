@@ -18,9 +18,9 @@ public class ModelsPricingCharacter {
     @TableField("`character`")
     private Integer character;
 
-    private BigDecimal lossCreadits;
+    private BigDecimal lossCredits;
 
-    private BigDecimal creadits;
+    private BigDecimal Credits;
 
     private Integer isDel;
 

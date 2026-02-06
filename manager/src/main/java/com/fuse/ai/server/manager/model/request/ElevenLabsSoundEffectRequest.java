@@ -3,6 +3,8 @@ package com.fuse.ai.server.manager.model.request;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fuse.ai.server.manager.constant.ElevenLabsConstant;
 import com.fuse.ai.server.manager.enums.ElevenLabsModelEnum;
+import com.fuse.common.core.exception.BaseException;
+import com.fuse.common.core.exception.error.SystemErrorType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -33,15 +35,13 @@ public class ElevenLabsSoundEffectRequest extends ElevenLabsBaseRequest implemen
      */
     public void validateBusinessRules() {
         if (input == null) {
-            throw new IllegalArgumentException("输入参数不能为空");
+            throw new BaseException(SystemErrorType.SYSTEM_EXECUTION_ERROR, "输入参数不能为空");
         }
-
-        input.validateBusinessRules();
 
         // 验证模型支持
         ElevenLabsModelEnum modelEnum = getModelEnum();
         if (modelEnum != ElevenLabsModelEnum.SOUND_EFFECT_V2) {
-            throw new IllegalArgumentException("音效生成只支持sound-effect-v2模型");
+            throw new BaseException(SystemErrorType.SYSTEM_EXECUTION_ERROR,"音效生成只支持sound-effect-v2模型");
         }
     }
 
@@ -102,20 +102,14 @@ public class ElevenLabsSoundEffectRequest extends ElevenLabsBaseRequest implemen
         /**
          * 业务参数校验
          */
-        public void validateBusinessRules() {
-            validateRange(durationSeconds, ElevenLabsConstant.MIN_DURATION, ElevenLabsConstant.MAX_DURATION,
-                    ElevenLabsConstant.STEP_DURATION, "持续时间");
-            validateRange(promptInfluence, ElevenLabsConstant.MIN_PROMPT_INFLUENCE, ElevenLabsConstant.MAX_PROMPT_INFLUENCE,
-                    ElevenLabsConstant.STEP_SMALL, "提示词影响力");
-        }
 
         private void validateRange(Double value, Double min, Double max, Double step, String fieldName) {
             if (value != null) {
                 if (value < min || value > max) {
-                    throw new IllegalArgumentException(fieldName + "必须在" + min + "到" + max + "之间");
+                    throw new BaseException(SystemErrorType.SYSTEM_EXECUTION_ERROR, fieldName + "必须在" + min + "到" + max + "之间");
                 }
                 if (step != null && Math.abs(value % step) > 0.001) {
-                    throw new IllegalArgumentException(fieldName + "必须是" + step + "的倍数");
+                    throw new BaseException(SystemErrorType.SYSTEM_EXECUTION_ERROR, fieldName + "必须是" + step + "的倍数");
                 }
             }
         }

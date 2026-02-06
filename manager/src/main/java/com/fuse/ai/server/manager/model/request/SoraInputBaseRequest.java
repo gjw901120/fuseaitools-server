@@ -2,7 +2,6 @@ package com.fuse.ai.server.manager.model.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fuse.ai.server.manager.enums.SoraAspectRatioEnum;
-import com.fuse.ai.server.manager.enums.SoraFramesEnum;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
@@ -19,7 +18,7 @@ public class SoraInputBaseRequest {
     private SoraAspectRatioEnum aspectRatio;
 
     @JsonProperty("n_frames")
-    private SoraFramesEnum nFrames;
+    private String nFrames;
 
     @JsonProperty("remove_watermark")
     private Boolean removeWatermark;

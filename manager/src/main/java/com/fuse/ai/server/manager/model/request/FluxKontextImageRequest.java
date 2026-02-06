@@ -1,11 +1,11 @@
-// FluxKontextImageRequest.java
 package com.fuse.ai.server.manager.model.request;
 
 import com.fuse.ai.server.manager.constant.FluxKontextConstant;
 import com.fuse.ai.server.manager.enums.FluxKontextAspectRatioEnum;
 import com.fuse.ai.server.manager.enums.FluxKontextModelEnum;
 import com.fuse.ai.server.manager.enums.FluxKontextOutputFormatEnum;
-import com.fuse.ai.server.manager.enums.FluxKontextSafetyToleranceEnum;
+import com.fuse.common.core.exception.BaseException;
+import com.fuse.common.core.exception.error.SystemErrorType;
 import lombok.Data;
 import org.hibernate.validator.constraints.URL;
 
@@ -80,7 +80,7 @@ public class FluxKontextImageRequest implements Serializable {
      * 安全容忍度
      */
     @NotNull(message = "安全容忍度不能为空")
-    private FluxKontextSafetyToleranceEnum safetyTolerance = FluxKontextSafetyToleranceEnum.LEVEL_2;
+    private Integer safetyTolerance;
 
     /**
      * 水印标识符
@@ -111,7 +111,7 @@ public class FluxKontextImageRequest implements Serializable {
             if (Boolean.FALSE.equals(enableTranslation)) {
                 // 简单检查是否包含中文字符
                 if (prompt.matches(".*[\\u4e00-\\u9fa5]+.*")) {
-                    throw new IllegalArgumentException("禁用翻译时提示词必须为英文");
+                    throw new BaseException(SystemErrorType.SYSTEM_EXECUTION_ERROR, "The prompt message for disabling translation must be in English.");
                 }
             }
         }
@@ -126,10 +126,10 @@ public class FluxKontextImageRequest implements Serializable {
                     FluxKontextConstant.SAFETY_TOLERANCE_MAX_EDIT :
                     FluxKontextConstant.SAFETY_TOLERANCE_MAX_GENERATE;
 
-            if (safetyTolerance.getLevel() < FluxKontextConstant.SAFETY_TOLERANCE_MIN ||
-                    safetyTolerance.getLevel() > maxLevel) {
-                throw new IllegalArgumentException(
-                        String.format("安全容忍度必须在%d到%d之间",
+            if (safetyTolerance < FluxKontextConstant.SAFETY_TOLERANCE_MIN ||
+                    safetyTolerance > maxLevel) {
+                throw new BaseException(SystemErrorType.SYSTEM_EXECUTION_ERROR,
+                        String.format("The safety tolerance must be within the range of %d to %d.",
                                 FluxKontextConstant.SAFETY_TOLERANCE_MIN, maxLevel)
                 );
             }
@@ -141,7 +141,7 @@ public class FluxKontextImageRequest implements Serializable {
      */
     private void validateInputImageForEditMode() {
         if (isEditMode() && (inputImage == null || inputImage.trim().isEmpty())) {
-            throw new IllegalArgumentException("编辑模式必须提供输入图像URL");
+            throw new BaseException(SystemErrorType.SYSTEM_EXECUTION_ERROR, "The editing mode must provide the URL of the input image.");
         }
     }
 
@@ -186,7 +186,7 @@ public class FluxKontextImageRequest implements Serializable {
      * 构建高级生成请求
      */
     public static FluxKontextImageRequest advancedGenerate(String prompt, FluxKontextAspectRatioEnum aspectRatio,
-                                                           FluxKontextModelEnum model, FluxKontextSafetyToleranceEnum safetyTolerance,
+                                                           FluxKontextModelEnum model, Integer safetyTolerance,
                                                            String callBackUrl) {
         FluxKontextImageRequest request = new FluxKontextImageRequest();
         request.setPrompt(prompt);
@@ -201,7 +201,7 @@ public class FluxKontextImageRequest implements Serializable {
      * 构建高级编辑请求
      */
     public static FluxKontextImageRequest advancedEdit(String prompt, String inputImage, FluxKontextAspectRatioEnum aspectRatio,
-                                                       FluxKontextModelEnum model, FluxKontextSafetyToleranceEnum safetyTolerance,
+                                                       FluxKontextModelEnum model, Integer safetyTolerance,
                                                        String callBackUrl) {
         FluxKontextImageRequest request = new FluxKontextImageRequest();
         request.setPrompt(prompt);

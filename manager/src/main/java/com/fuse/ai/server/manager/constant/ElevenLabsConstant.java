@@ -1,5 +1,7 @@
 package com.fuse.ai.server.manager.constant;
 
+import java.math.BigDecimal;
+
 /**
  * ElevenLabs语音相关常量
  */
@@ -23,22 +25,22 @@ public final class ElevenLabsConstant {
     public static final long AUDIO_MAX_SIZE_AUDIO_ISOLATION = 10 * 1024 * 1024; // 10MB
 
     // 数值范围
-    public static final double MIN_STABILITY = 0.0;
-    public static final double MAX_STABILITY = 1.0;
-    public static final double MIN_SIMILARITY_BOOST = 0.0;
-    public static final double MAX_SIMILARITY_BOOST = 1.0;
-    public static final double MIN_STYLE = 0.0;
-    public static final double MAX_STYLE = 1.0;
-    public static final double MIN_SPEED = 0.7;
-    public static final double MAX_SPEED = 1.2;
-    public static final double MIN_DURATION = 0.5;
-    public static final double MAX_DURATION = 22.0;
-    public static final double MIN_PROMPT_INFLUENCE = 0.0;
-    public static final double MAX_PROMPT_INFLUENCE = 1.0;
+    public static final BigDecimal MIN_STABILITY = BigDecimal.valueOf(0.0);
+    public static final BigDecimal MAX_STABILITY = BigDecimal.valueOf(1.0);
+    public static final BigDecimal MIN_SIMILARITY_BOOST = BigDecimal.valueOf(0.0);
+    public static final BigDecimal MAX_SIMILARITY_BOOST = BigDecimal.valueOf(1.0);
+    public static final BigDecimal MIN_STYLE = BigDecimal.valueOf(0.0);
+    public static final BigDecimal MAX_STYLE = BigDecimal.valueOf(1.0);
+    public static final BigDecimal MIN_SPEED = BigDecimal.valueOf(0.7);
+    public static final BigDecimal MAX_SPEED = BigDecimal.valueOf(1.2);
+    public static final BigDecimal MIN_DURATION = BigDecimal.valueOf(0.5);
+    public static final BigDecimal MAX_DURATION = BigDecimal.valueOf(22.0);
+    public static final BigDecimal MIN_PROMPT_INFLUENCE = BigDecimal.valueOf(0.0);
+    public static final BigDecimal MAX_PROMPT_INFLUENCE = BigDecimal.valueOf(1.0);
 
     // 步长
-    public static final double STEP_SMALL = 0.01;
-    public static final double STEP_DURATION = 0.1;
+    public static final BigDecimal STEP_SMALL = BigDecimal.valueOf(0.01);
+    public static final BigDecimal STEP_DURATION = BigDecimal.valueOf(0.1);
 
     // 响应码
     public static final int CODE_SUCCESS = 200;

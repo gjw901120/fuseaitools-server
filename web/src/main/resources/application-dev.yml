@@ -57,7 +57,7 @@ feign:
     image:
       url: https://api.kie.ai
     midjourney:
-      url: https://www.towerfun.net/v1
+      url: https://api.kie.ai
     sora:
       url: https://api.kie.ai
     suno:

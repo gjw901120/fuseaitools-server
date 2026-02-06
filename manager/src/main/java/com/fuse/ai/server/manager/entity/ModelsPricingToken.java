@@ -15,13 +15,13 @@ public class ModelsPricingToken {
 
     private Integer modelId;
 
-    private BigDecimal lossPromptCreadits;
+    private BigDecimal lossPromptCredits;
 
-    private BigDecimal promptCreadits;
+    private BigDecimal promptCredits;
 
-    private BigDecimal lossCompletionCreadits;
+    private BigDecimal lossCompletionCredits;
 
-    private BigDecimal completionCreadits;
+    private BigDecimal completionCredits;
 
     private Integer promptTokens;
 

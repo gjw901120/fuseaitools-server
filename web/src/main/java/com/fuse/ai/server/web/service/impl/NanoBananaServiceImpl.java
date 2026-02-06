@@ -62,9 +62,9 @@ public class NanoBananaServiceImpl implements NanoBananaService {
         NanoBananaGenerateRequest.Input input = new NanoBananaGenerateRequest.Input();
 
         request.setModel(model.getRequestName());
-        input.setOutputFormat(NanoBananaOutputFormatEnum.getByFormat(nanoBananaGenerateDTO.getOutputFormat()));
+        input.setOutputFormat(NanoBananaOutputFormatEnum.fromFormat(nanoBananaGenerateDTO.getOutputFormat()));
         input.setPrompt(nanoBananaGenerateDTO.getPrompt());
-        input.setImageSize(NanoBananaAspectRatioEnum.getByRatio(nanoBananaGenerateDTO.getImageSize()));
+        input.setImageSize(NanoBananaAspectRatioEnum.fromRatio(nanoBananaGenerateDTO.getImageSize()));
         request.setCallBackUrl(callbackUrl.concat("/image/nano-banana"));
         request.setInput(input);
 
@@ -76,7 +76,7 @@ public class NanoBananaServiceImpl implements NanoBananaService {
 
         //写入任务
         UserModelTask userModelTask = UserModelTask.create(
-                0,
+                userJwtDTO.getId(),
                 "",
                 0,
                 0,
@@ -85,12 +85,13 @@ public class NanoBananaServiceImpl implements NanoBananaService {
                 response.getData().getTaskId(),
                 new ArrayList<>(),
                 new ArrayList<>(),
+                new HashMap<>(),
                 request,
                 new HashMap<>(),
                 new HashMap<>()
         );
 
-        return new BaseResponse(recordsService.create(model, nanoBananaGenerateDTO.getPrompt(), userModelTask, verifyCreditsBO));
+        return new BaseResponse(recordsService.create(model, nanoBananaGenerateDTO.getPrompt(), nanoBananaGenerateDTO, userModelTask, verifyCreditsBO));
 
     }
 
@@ -106,9 +107,9 @@ public class NanoBananaServiceImpl implements NanoBananaService {
         NanoBananaEditRequest.Input  input = new NanoBananaEditRequest.Input();
 
         request.setModel(model.getRequestName());
-        input.setImageSize(NanoBananaAspectRatioEnum.getByRatio(nanoBananaEditDTO.getImageSize()));
+        input.setImageSize(NanoBananaAspectRatioEnum.fromRatio(nanoBananaEditDTO.getImageSize()));
         input.setImageUrls(nanoBananaEditDTO.getImageUrls());
-        input.setOutputFormat(NanoBananaOutputFormatEnum.getByFormat(nanoBananaEditDTO.getOutputFormat()));
+        input.setOutputFormat(NanoBananaOutputFormatEnum.fromFormat(nanoBananaEditDTO.getOutputFormat()));
         input.setPrompt(nanoBananaEditDTO.getPrompt());
         request.setCallBackUrl(callbackUrl.concat("/image/nano-banana"));
 
@@ -122,7 +123,7 @@ public class NanoBananaServiceImpl implements NanoBananaService {
 
         //写入任务
         UserModelTask userModelTask = UserModelTask.create(
-                0,
+                userJwtDTO.getId(),
                 "",
                 0,
                 0,
@@ -131,12 +132,13 @@ public class NanoBananaServiceImpl implements NanoBananaService {
                 response.getData().getTaskId(),
                 nanoBananaEditDTO.getImageUrls(),
                 new ArrayList<>(),
+                new HashMap<>(),
                 request,
                 new HashMap<>(),
                 new HashMap<>()
         );
 
-        return new BaseResponse(recordsService.create(model, nanoBananaEditDTO.getPrompt(), userModelTask, verifyCreditsBO));
+        return new BaseResponse(recordsService.create(model, nanoBananaEditDTO.getPrompt(), nanoBananaEditDTO, userModelTask, verifyCreditsBO));
 
     }
 
@@ -156,9 +158,9 @@ public class NanoBananaServiceImpl implements NanoBananaService {
         NanoBananaProGenerateRequest.Input  input = new NanoBananaProGenerateRequest.Input();
 
         request.setModel(model.getRequestName());
-        input.setImageSize(NanoBananaAspectRatioEnum.getByRatio(nanoBananaProGenerateDTO.getImageSize()));
+        input.setImageSize(NanoBananaAspectRatioEnum.fromRatio(nanoBananaProGenerateDTO.getImageSize()));
         input.setImageInput(nanoBananaProGenerateDTO.getImageInput());
-        input.setOutputFormat(NanoBananaOutputFormatEnum.getByFormat(nanoBananaProGenerateDTO.getOutputFormat()));
+        input.setOutputFormat(NanoBananaOutputFormatEnum.fromFormat(nanoBananaProGenerateDTO.getOutputFormat()));
         input.setPrompt(nanoBananaProGenerateDTO.getPrompt());
         input.setResolution(nanoBananaProGenerateDTO.getResolution());
         request.setCallBackUrl(callbackUrl.concat("/image/nano-banana"));
@@ -173,7 +175,7 @@ public class NanoBananaServiceImpl implements NanoBananaService {
 
         //写入任务
         UserModelTask userModelTask = UserModelTask.create(
-                0,
+                userJwtDTO.getId(),
                 "",
                 0,
                 verifyCreditsBO.getPricingRulesId(),
@@ -182,12 +184,13 @@ public class NanoBananaServiceImpl implements NanoBananaService {
                 response.getData().getTaskId(),
                 nanoBananaProGenerateDTO.getImageInput(),
                 new ArrayList<>(),
+                new HashMap<>(),
                 request,
                 new HashMap<>(),
                 new HashMap<>()
         );
 
-        return new BaseResponse(recordsService.create(model, nanoBananaProGenerateDTO.getPrompt(), userModelTask, verifyCreditsBO));
+        return new BaseResponse(recordsService.create(model, nanoBananaProGenerateDTO.getPrompt(), nanoBananaProGenerateDTO, userModelTask, verifyCreditsBO));
 
     }
 

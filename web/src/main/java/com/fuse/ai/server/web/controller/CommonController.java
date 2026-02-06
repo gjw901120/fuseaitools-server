@@ -28,6 +28,11 @@ public class CommonController {
         return ResponseResult.success(modelsService.getModelsTree());
     }
 
+    @GetMapping("/models/price")
+    public ResponseResult<?> getModelsPrice() {
+        return ResponseResult.success(modelsService.getModelsPrice());
+    }
+
     @PostMapping("/batch-upload")
     public ResponseResult<?> uploadFiles(@RequestParam("file") MultipartFile[] files, @AuthenticationPrincipal UserJwtDTO userJwtDTO) {
         return ResponseResult.success(commonService.uploadFile(files, userJwtDTO));

@@ -1,10 +1,14 @@
 package com.fuse.ai.server.manager.enums;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 
 @Getter
 public enum FluxKontextModelEnum {
+
     FLUX_KONTEXT_PRO("flux-kontext-pro", "性能平衡的标准模型"),
+
     FLUX_KONTEXT_MAX("flux-kontext-max", "具有高级功能的增强模型");
 
     private final String code;
@@ -15,12 +19,44 @@ public enum FluxKontextModelEnum {
         this.description = description;
     }
 
-    public static FluxKontextModelEnum getByCode(String code) {
+    /**
+     * JSON序列化时，使用code字段的值
+     */
+    @JsonValue
+    public String getCode() {
+        return code;
+    }
+
+    /**
+     * JSON反序列化时，从code字符串转换为枚举
+     * 注意：方法名必须是 fromCode 或 valueOf
+     */
+    @JsonCreator(mode = JsonCreator.Mode.DELEGATING)  // 添加 mode 参数
+    public static FluxKontextModelEnum fromCode(String code) {
+        if (code == null || code.trim().isEmpty()) {
+            return null;
+        }
         for (FluxKontextModelEnum value : values()) {
-            if (value.getCode().equals(code)) {
+            if (value.getCode().equalsIgnoreCase(code.trim())) {
                 return value;
             }
         }
         return null;
+    }
+
+    /**
+     * 添加静态工厂方法，兼容更多情况
+     */
+    public static FluxKontextModelEnum fromString(String str) {
+        return fromCode(str);
+    }
+
+    /**
+     * 重写 toString() 方法，返回小写的 code
+     * 这样在打印日志或调用 toString() 时显示小写
+     */
+    @Override
+    public String toString() {
+        return code;
     }
 }

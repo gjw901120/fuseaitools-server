@@ -4,10 +4,12 @@ import com.fuse.ai.server.manager.feign.client.SunoFeignClient;
 import com.fuse.ai.server.manager.manager.SunoManger;
 import com.fuse.ai.server.manager.model.request.*;
 import com.fuse.ai.server.manager.model.response.SunoMusicResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 public class SunoManagerImpl implements SunoManger {
 
     @Autowired

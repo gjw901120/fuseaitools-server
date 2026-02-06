@@ -20,7 +20,7 @@ public class ExtraDataBO {
 
     private Integer batchSize;
 
-    private Integer speed;
+    private String speed;
 
     private String scene;
 

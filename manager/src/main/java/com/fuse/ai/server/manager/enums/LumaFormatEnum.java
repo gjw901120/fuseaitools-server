@@ -28,4 +28,13 @@ public enum LumaFormatEnum {
     public static boolean isSupported(String format) {
         return getByFormat(format) != null;
     }
+
+    /**
+     * 重写 toString() 方法，返回小写的 code
+     * 这样在打印日志或调用 toString() 时显示小写
+     */
+    @Override
+    public String toString() {
+        return format;
+    }
 }

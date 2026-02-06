@@ -21,6 +21,7 @@ import com.fuse.ai.server.web.service.SoraGenerateService;
 import com.fuse.ai.server.web.service.UserCreditsService;
 import com.fuse.common.core.exception.BaseException;
 import com.fuse.common.core.exception.error.ThirdpartyErrorType;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,6 +32,7 @@ import java.util.HashMap;
 import java.util.List;
 
 @Service
+@Slf4j
 public class SoraGenerateServiceImpl implements SoraGenerateService {
 
     @Autowired
@@ -57,29 +59,28 @@ public class SoraGenerateServiceImpl implements SoraGenerateService {
 
         // 实现视频生成逻辑
         SoraGenerateRequest request = new SoraGenerateRequest();
-        request.setModel(SoraModelEnum.getByCode(soraGenerateDTO.getModel()));
+        request.setModel(SoraModelEnum.fromCode(soraGenerateDTO.getModel()));
         request.setCallBackUrl(callbackUrl.concat("/video/sora"));
 
         List<String> inputUrls = new ArrayList<>();
 
         if(soraGenerateDTO.getModel().equals(SoraModelEnum.SORA_2_TEXT_TO_VIDEO.getCode())) {
             SoraTextToVideoRequest soraRequest = new SoraTextToVideoRequest();
-            soraRequest.setAspectRatio(SoraAspectRatioEnum.getByCode(soraGenerateDTO.getAspectRatio()));
+            soraRequest.setAspectRatio(SoraAspectRatioEnum.fromCode(soraGenerateDTO.getAspectRatio()));
             soraRequest.setPrompt(soraGenerateDTO.getPrompt());
-            soraRequest.setNFrames(SoraFramesEnum.getByCode(soraGenerateDTO.getNFrames()));
+            soraRequest.setNFrames(soraGenerateDTO.getNFrames());
             soraRequest.setRemoveWatermark(soraGenerateDTO.getRemoveWatermark());
             request.setInput(soraRequest);
         } else {
             SoraImageToVideoRequestRequest soraRequest = new SoraImageToVideoRequestRequest();
-            soraRequest.setAspectRatio(SoraAspectRatioEnum.getByCode(soraGenerateDTO.getAspectRatio()));
+            soraRequest.setAspectRatio(SoraAspectRatioEnum.fromCode(soraGenerateDTO.getAspectRatio()));
             soraRequest.setPrompt(soraGenerateDTO.getPrompt());
-            soraRequest.setNFrames(SoraFramesEnum.getByCode(soraGenerateDTO.getNFrames()));
+            soraRequest.setNFrames(soraGenerateDTO.getNFrames());
             soraRequest.setRemoveWatermark(soraGenerateDTO.getRemoveWatermark());
             soraRequest.setImageUrls(soraGenerateDTO.getImageUrls());
             inputUrls.addAll(soraRequest.getImageUrls());
             request.setInput(soraRequest);
         }
-
         VideoGenerateResponse response = soraManager.generateVideo(request, model.getRequestToken());
 
         if(!ResponseCodeEnum.SUCCESS.equals(response.getCode())) {
@@ -87,7 +88,7 @@ public class SoraGenerateServiceImpl implements SoraGenerateService {
         }
 
         UserModelTask userModelTask = UserModelTask.create(
-                0,
+                userJwtDTO.getId(),
                 "",
                 0,
                 0,
@@ -96,12 +97,13 @@ public class SoraGenerateServiceImpl implements SoraGenerateService {
                 response.getData().getTaskId(),
                 inputUrls,
                 new ArrayList<>(),
+                new HashMap<>(),
                 request,
                 response,
                 new HashMap<>()
         );
 
-        return new BaseResponse(recordsService.create(model, soraGenerateDTO.getPrompt(), userModelTask, verifyCreditsBO));
+        return new BaseResponse(recordsService.create(model, soraGenerateDTO.getPrompt(), soraGenerateDTO, userModelTask, verifyCreditsBO));
 
     }
 
@@ -120,39 +122,38 @@ public class SoraGenerateServiceImpl implements SoraGenerateService {
 
         // 实现视频生成逻辑
         SoraGenerateRequest request = new SoraGenerateRequest();
-        request.setModel(SoraModelEnum.getByCode(soraProGenerateDTO.getModel()));
+        request.setModel(SoraModelEnum.fromCode(soraProGenerateDTO.getModel()));
         request.setCallBackUrl(callbackUrl.concat("/video/sora"));
 
         List<String> inputUrls = new ArrayList<>();
 
         if(soraProGenerateDTO.getModel().equals(SoraModelEnum.SORA_2_PRO_TEXT_TO_VIDEO.getCode())) {
             SoraProTextToVideoRequestRequest soraRequest = new SoraProTextToVideoRequestRequest();
-            soraRequest.setAspectRatio(SoraAspectRatioEnum.getByCode(soraProGenerateDTO.getAspectRatio()));
+            soraRequest.setAspectRatio(SoraAspectRatioEnum.fromCode(soraProGenerateDTO.getAspectRatio()));
             soraRequest.setPrompt(soraProGenerateDTO.getPrompt());
-            soraRequest.setNFrames(SoraFramesEnum.getByCode(soraProGenerateDTO.getNFrames()));
+            soraRequest.setNFrames(soraProGenerateDTO.getNFrames());
             soraRequest.setRemoveWatermark(soraProGenerateDTO.getRemoveWatermark());
-            soraRequest.setSize(SoraSizeEnum.getByCode(soraProGenerateDTO.getSize()));
+            soraRequest.setSize(SoraSizeEnum.fromCode(soraProGenerateDTO.getSize()));
             request.setInput(soraRequest);
         } else {
             SoraProImageToVideoRequestRequest soraRequest = new SoraProImageToVideoRequestRequest();
-            soraRequest.setAspectRatio(SoraAspectRatioEnum.getByCode(soraProGenerateDTO.getAspectRatio()));
+            soraRequest.setAspectRatio(SoraAspectRatioEnum.fromCode(soraProGenerateDTO.getAspectRatio()));
             soraRequest.setPrompt(soraProGenerateDTO.getPrompt());
-            soraRequest.setNFrames(SoraFramesEnum.getByCode(soraProGenerateDTO.getNFrames()));
+            soraRequest.setNFrames(soraProGenerateDTO.getNFrames());
             soraRequest.setRemoveWatermark(soraProGenerateDTO.getRemoveWatermark());
-            soraRequest.setSize(SoraSizeEnum.getByCode(soraProGenerateDTO.getSize()));
+            soraRequest.setSize(SoraSizeEnum.fromCode(soraProGenerateDTO.getSize()));
             soraRequest.setImageUrls(soraProGenerateDTO.getImageUrls());
             inputUrls.addAll(soraRequest.getImageUrls());
             request.setInput(soraRequest);
         }
 
         VideoGenerateResponse response = soraManager.generateVideo(request, model.getRequestToken());
-
         if(!ResponseCodeEnum.SUCCESS.equals(response.getCode())) {
             throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, response.getMsg());
         }
 
         UserModelTask userModelTask = UserModelTask.create(
-                0,
+                userJwtDTO.getId(),
                 "",
                 0,
                 verifyCreditsBO.getPricingRulesId(),
@@ -161,12 +162,13 @@ public class SoraGenerateServiceImpl implements SoraGenerateService {
                 response.getData().getTaskId(),
                 inputUrls,
                 new ArrayList<>(),
+                new HashMap<>(),
                 request,
                 response,
                 new HashMap<>()
         );
 
-        return new BaseResponse(recordsService.create(model, soraProGenerateDTO.getPrompt(), userModelTask, verifyCreditsBO));
+        return new BaseResponse(recordsService.create(model, soraProGenerateDTO.getPrompt(), soraProGenerateDTO, userModelTask, verifyCreditsBO));
 
     }
 
@@ -185,7 +187,7 @@ public class SoraGenerateServiceImpl implements SoraGenerateService {
 
         List<String> inputUrls = new ArrayList<>();
 
-        request.setModel(SoraModelEnum.getByCode(soraWatermarkRemoverDTO.getModel()));
+        request.setModel(SoraModelEnum.fromCode(soraWatermarkRemoverDTO.getModel()));
         request.setCallBackUrl(callbackUrl.concat("/video/sora"));
 
         soraRequest.setVideoUrl(soraWatermarkRemoverDTO.getVideoUrl());
@@ -198,9 +200,8 @@ public class SoraGenerateServiceImpl implements SoraGenerateService {
         if(!ResponseCodeEnum.SUCCESS.equals(response.getCode())) {
             throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, response.getMsg());
         }
-
         UserModelTask userModelTask = UserModelTask.create(
-                0,
+                userJwtDTO.getId(),
                 "",
                 0,
                 0,
@@ -209,12 +210,13 @@ public class SoraGenerateServiceImpl implements SoraGenerateService {
                 response.getData().getTaskId(),
                 inputUrls,
                 new ArrayList<>(),
+                new HashMap<>(),
                 request,
                 response,
                 new HashMap<>()
         );
 
-        return new BaseResponse(recordsService.create(model, "watermark remover", userModelTask, verifyCreditsBO));
+        return new BaseResponse(recordsService.create(model, "watermark remover", soraWatermarkRemoverDTO, userModelTask, verifyCreditsBO));
 
     }
 
@@ -235,10 +237,11 @@ public class SoraGenerateServiceImpl implements SoraGenerateService {
 
         SoraStoryboardRequest soraRequest = new SoraStoryboardRequest();
 
-        List<String> inputUrls = new ArrayList<>(soraRequest.getImageUrls());
+        List<String> inputUrls = new ArrayList<>();
+        inputUrls.add(soraProStoryboardDTO.getImageUrls().get(0));
 
-        soraRequest.setAspectRatio(SoraAspectRatioEnum.getByCode(soraProStoryboardDTO.getAspectRatio()));
-        soraRequest.setNFrames(SoraFramesEnum.getByCode(soraProStoryboardDTO.getNFrames()));
+        soraRequest.setAspectRatio(SoraAspectRatioEnum.fromCode(soraProStoryboardDTO.getAspectRatio()));
+        soraRequest.setNFrames(soraProStoryboardDTO.getNFrames());
 
         soraRequest.setImageUrls(soraProStoryboardDTO.getImageUrls());
 
@@ -246,9 +249,16 @@ public class SoraGenerateServiceImpl implements SoraGenerateService {
 
         BeanUtils.copyProperties(shots, soraProStoryboardDTO.getShots());
 
+        for (SoraProStoryboardDTO.Shot shot : soraProStoryboardDTO.getShots()) {
+            SoraStoryboardSceneRequest shotRequest = new SoraStoryboardSceneRequest();
+            shotRequest.setDuration(shot.getDuration());
+            shotRequest.setScene(shot.getScene());
+            shots.add(shotRequest);
+        }
+
         soraRequest.setShots(shots);
 
-        request.setModel(SoraModelEnum.getByCode(soraProStoryboardDTO.getModel()));
+        request.setModel(SoraModelEnum.fromCode(soraProStoryboardDTO.getModel()));
         request.setCallBackUrl(callbackUrl.concat("/video/sora"));
 
         request.setInput(soraRequest);
@@ -260,7 +270,7 @@ public class SoraGenerateServiceImpl implements SoraGenerateService {
         }
 
         UserModelTask userModelTask = UserModelTask.create(
-                0,
+                userJwtDTO.getId(),
                 "",
                 0,
                 verifyCreditsBO.getPricingRulesId(),
@@ -269,12 +279,13 @@ public class SoraGenerateServiceImpl implements SoraGenerateService {
                 response.getData().getTaskId(),
                 inputUrls,
                 new ArrayList<>(),
+                new HashMap<>(),
                 request,
                 response,
                 new HashMap<>()
         );
 
-        return new BaseResponse(recordsService.create(model, "Storyboard mode", userModelTask, verifyCreditsBO));
+        return new BaseResponse(recordsService.create(model, "Storyboard mode", soraProStoryboardDTO, userModelTask, verifyCreditsBO));
 
     }
 }

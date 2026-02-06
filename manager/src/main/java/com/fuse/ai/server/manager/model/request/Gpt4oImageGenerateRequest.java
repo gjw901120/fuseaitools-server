@@ -1,7 +1,6 @@
 package com.fuse.ai.server.manager.model.request;
 
 import com.fuse.ai.server.manager.constant.Gpt4oImageConstant;
-import com.fuse.ai.server.manager.enums.Gpt4oImageVariantsCountEnum;
 import lombok.Data;
 import org.hibernate.validator.constraints.URL;
 
@@ -60,10 +59,10 @@ public class Gpt4oImageGenerateRequest implements Serializable {
      */
     private Boolean uploadCn = false;
 
-    /**
-     * 生成图片的变体数量
-     */
-    private Gpt4oImageVariantsCountEnum nVariants = Gpt4oImageVariantsCountEnum.ONE;
+//    /**
+//     * 生成图片的变体数量
+//     */
+//    private Integer nVariants ;
 
     /**
      * 是否启用托底机制
@@ -206,21 +205,6 @@ public class Gpt4oImageGenerateRequest implements Serializable {
         request.setPrompt(prompt);
         request.setSize(size);
         request.setCallBackUrl(callBackUrl);
-        return request;
-    }
-
-    /**
-     * 构建高级请求
-     */
-    public static Gpt4oImageGenerateRequest advancedRequest(String size, List<String> filesUrl, String prompt,
-                                                            String callBackUrl, Boolean isEnhance, Gpt4oImageVariantsCountEnum nVariants) {
-        Gpt4oImageGenerateRequest request = new Gpt4oImageGenerateRequest();
-        request.setSize(size);
-        request.setFilesUrl(filesUrl);
-        request.setPrompt(prompt);
-        request.setCallBackUrl(callBackUrl);
-        request.setIsEnhance(isEnhance);
-        request.setNVariants(nVariants);
         return request;
     }
 }

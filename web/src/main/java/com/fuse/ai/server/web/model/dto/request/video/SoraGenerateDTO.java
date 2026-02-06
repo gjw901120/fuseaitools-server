@@ -1,7 +1,12 @@
 package com.fuse.ai.server.web.model.dto.request.video;
 
-import javax.validation.constraints.*;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 import java.util.List;
 
 /**
@@ -39,7 +44,9 @@ public class SoraGenerateDTO {
     /**
      * The number of frames to be generated
      */
+    @NotNull(message = "Number of frames cannot be null")
     @Pattern(regexp = "10|15", message = "Number of frames must be 10 or 15")
+    @JsonProperty("nFrames")
     private String nFrames;
 
     /**

@@ -42,7 +42,7 @@ public class ImageController {
         return ResponseResult.success(fluxKontextService.fluxKontextGenerate(request, userJwtDTO));
     }
 
-    @PostMapping("nano-banana/generate")
+    @PostMapping("/nano-banana/generate")
     public ResponseResult<?> nanoBananaGenerate(@Valid @RequestBody NanoBananaGenerateDTO request,
                                                 @AuthenticationPrincipal UserJwtDTO userJwtDTO) {
 
@@ -56,7 +56,7 @@ public class ImageController {
         return ResponseResult.success(nanoBananaService.nanoBananaEdit(request, userJwtDTO));
     }
 
-    @PostMapping("nano-banana-pro/generate")
+    @PostMapping("/nano-banana-pro/generate")
     public ResponseResult<?> nanoBananaProGenerate(@Valid @RequestBody NanoBananaProGenerateDTO request,
                                                    @AuthenticationPrincipal UserJwtDTO userJwtDTO) {
 

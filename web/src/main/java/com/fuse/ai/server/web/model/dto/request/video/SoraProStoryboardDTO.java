@@ -1,7 +1,9 @@
 package com.fuse.ai.server.web.model.dto.request.video;
 
-import javax.validation.constraints.*;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+
+import javax.validation.constraints.*;
 import java.util.List;
 
 /**
@@ -26,8 +28,9 @@ public class SoraProStoryboardDTO {
     /**
      * Total length of the video
      */
-    @NotBlank(message = "Number of frames cannot be empty")
-    @Pattern(regexp = "10|15|25", message = "Number of frames must be 10, 15 or 25")
+    @NotNull(message = "Number of frames cannot be null")
+    @Pattern(regexp = "10|15|25", message = "Number of frames must be 10 or 15 or 25")
+    @JsonProperty("nFrames")
     private String nFrames;
 
     /**

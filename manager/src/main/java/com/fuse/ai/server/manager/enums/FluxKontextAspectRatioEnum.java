@@ -1,5 +1,7 @@
 package com.fuse.ai.server.manager.enums;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 
 @Getter
@@ -21,12 +23,27 @@ public enum FluxKontextAspectRatioEnum {
         this.usage = usage;
     }
 
-    public static FluxKontextAspectRatioEnum getByRatio(String ratio) {
+    @JsonValue  // 序列化时使用
+    public String getRatio() {
+        return ratio;
+    }
+
+    @JsonCreator  // 反序列化时使用
+    public static FluxKontextAspectRatioEnum fromRatio(String ratio) {
         for (FluxKontextAspectRatioEnum value : values()) {
             if (value.getRatio().equals(ratio)) {
                 return value;
             }
         }
         return null;
+    }
+
+    /**
+     * 重写 toString() 方法，返回 ratio
+     * 这样在打印日志或调用 toString() 时显示 ratio
+     */
+    @Override
+    public String toString() {
+        return ratio;
     }
 }

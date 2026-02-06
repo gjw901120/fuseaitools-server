@@ -3,8 +3,10 @@ package com.fuse.ai.server.manager.entity;
 import com.baomidou.mybatisplus.annotation.*;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import com.fuse.ai.server.manager.enums.TaskStatusEnum;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import java.time.LocalDateTime;
@@ -12,6 +14,8 @@ import java.util.List;
 
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @TableName(value = "user_model_task", autoResultMap = true)
 @Accessors(chain = true)
 public class UserModelTask {
@@ -40,6 +44,9 @@ public class UserModelTask {
 
     @TableField(value = "output_urls", typeHandler = JacksonTypeHandler.class)
     private List<String> outputUrls;
+
+    @TableField(value = "output_result", typeHandler = JacksonTypeHandler.class)
+    private Object outputResult;
 
     @TableField(value = "input_details", typeHandler = JacksonTypeHandler.class)
     private Object inputDetails;
@@ -79,7 +86,7 @@ public class UserModelTask {
     public static UserModelTask create(Integer userId, String recordId, Integer modelId,
                                        Integer pricingId, TaskStatusEnum status, String failedReason,
                                        String thirdTaskId, List<String> inputUrls, List<String> outputUrls,
-                                       Object inputDetails, Object outputDetails,
+                                       Object outputResult,Object inputDetails, Object outputDetails,
                                        Object outputCallbackDetails) {
         return UserModelTask.builder()
                 .userId(userId)
@@ -91,6 +98,7 @@ public class UserModelTask {
                 .thirdTaskId(thirdTaskId)
                 .inputUrls(inputUrls)
                 .outputUrls(outputUrls)
+                .outputResult(outputResult)
                 .inputDetails(inputDetails)
                 .outputDetails(outputDetails)
                 .outputCallbackDetails(outputCallbackDetails)

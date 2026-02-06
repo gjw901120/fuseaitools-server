@@ -48,6 +48,13 @@ public class ModelsManagerImpl implements ModelsManager {
     }
 
     @Override
+    public List<Models> getDetailsByNames(List<String> modelNames) {
+        return modelsMapper.selectList(new LambdaQueryWrapper<Models>()
+                .in(Models::getName, modelNames)
+                .eq(Models::getIsDel, 0));
+    }
+
+    @Override
     public Models getDetailById(Integer  id) {
         return modelsMapper.selectById(id);
     }

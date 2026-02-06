@@ -1,5 +1,7 @@
 package com.fuse.ai.server.manager.enums;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 
 @Getter
@@ -26,7 +28,24 @@ public enum NanoBananaAspectRatioEnum {
         this.usage = usage;
     }
 
-    public static NanoBananaAspectRatioEnum getByRatio(String ratio) {
+    @Override
+    public String toString() {
+        return ratio;
+    }
+
+    /**
+     * JSON序列化时，使用ratio字段的值
+     */
+    @JsonValue
+    public String getRatio() {
+        return ratio;
+    }
+
+    /**
+     * JSON反序列化时，从ratio字符串转换为枚举
+     */
+    @JsonCreator
+    public static NanoBananaAspectRatioEnum fromRatio(String ratio) {
         for (NanoBananaAspectRatioEnum value : values()) {
             if (value.getRatio().equals(ratio)) {
                 return value;

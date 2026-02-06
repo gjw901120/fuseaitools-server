@@ -26,7 +26,7 @@ import com.fuse.ai.server.web.service.RecordsService;
 import com.fuse.ai.server.web.service.UserCreditsService;
 import com.fuse.common.core.exception.BaseException;
 import com.fuse.common.core.exception.error.ThirdpartyErrorType;
-import org.springframework.beans.BeanUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -36,9 +36,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
+@Slf4j
 public class ElevenlabsServiceImpl implements ElevenlabsService {
 
     @Autowired
@@ -74,7 +74,16 @@ public class ElevenlabsServiceImpl implements ElevenlabsService {
 
         request.setModel(model.getRequestName());
 
-        BeanUtils.copyProperties(elevenlabsTTSDTO, input);
+        input.setText(elevenlabsTTSDTO.getText().trim());
+        input.setVoice(elevenlabsTTSDTO.getVoice().getCode());
+        input.setStability(elevenlabsTTSDTO.getStability());
+        input.setSimilarityBoost(elevenlabsTTSDTO.getSimilarityBoost());
+        input.setStyle(elevenlabsTTSDTO.getStyle());
+        input.setSpeed(elevenlabsTTSDTO.getSpeed());
+        input.setTimestamps(elevenlabsTTSDTO.getTimestamps());
+        input.setLanguageCode(elevenlabsTTSDTO.getLanguageCode());
+        input.setPreviousText(elevenlabsTTSDTO.getPreviousText());
+        input.setNextText(elevenlabsTTSDTO.getNextText());
 
         request.setInput(input);
 
@@ -88,7 +97,7 @@ public class ElevenlabsServiceImpl implements ElevenlabsService {
 
         //写入任务
         UserModelTask userModelTask = UserModelTask.create(
-                0,
+                userJwtDTO.getId(),
                 "",
                 0,
                 0,
@@ -97,12 +106,13 @@ public class ElevenlabsServiceImpl implements ElevenlabsService {
                 response.getData().getTaskId(),
                 new ArrayList<>(),
                 new ArrayList<>(),
+                new HashMap<>(),
                 request,
                 response,
                 new HashMap<>()
         );
 
-        return new BaseResponse(recordsService.create(model, elevenlabsTTSDTO.getText(), userModelTask, verifyCreditsBO));
+        return new BaseResponse(recordsService.create(model, elevenlabsTTSDTO.getText(), elevenlabsTTSDTO, userModelTask, verifyCreditsBO));
 
     }
 
@@ -126,13 +136,16 @@ public class ElevenlabsServiceImpl implements ElevenlabsService {
 
         request.setModel(model.getRequestName());
 
-        BeanUtils.copyProperties(elevenlabsSTTDTO, input);
-
         List<String> inputUrls = new ArrayList<>();
 
         inputUrls.add(elevenlabsSTTDTO.getAudioUrl());
 
         input.setAudioUrl(elevenlabsSTTDTO.getAudioUrl());
+
+        input.setLanguageCode(elevenlabsSTTDTO.getLanguageCode());
+        input.setTagAudioEvents(elevenlabsSTTDTO.getTagAudioEvents());
+        input.setDiarize(elevenlabsSTTDTO.getDiarize());
+
 
         request.setInput(input);
 
@@ -146,7 +159,7 @@ public class ElevenlabsServiceImpl implements ElevenlabsService {
 
         //写入任务
         UserModelTask userModelTask = UserModelTask.create(
-                0,
+                userJwtDTO.getId(),
                 "",
                 0,
                 0,
@@ -155,12 +168,13 @@ public class ElevenlabsServiceImpl implements ElevenlabsService {
                 response.getData().getTaskId(),
                 inputUrls,
                 new ArrayList<>(),
+                new HashMap<>(),
                 request,
                 response,
                 new HashMap<>()
         );
 
-        return new BaseResponse(recordsService.create(model, "speech to text", userModelTask, verifyCreditsBO));
+        return new BaseResponse(recordsService.create(model, "speech to text", elevenlabsSTTDTO, userModelTask, verifyCreditsBO));
 
     }
 
@@ -184,8 +198,6 @@ public class ElevenlabsServiceImpl implements ElevenlabsService {
 
         request.setModel(model.getRequestName());
 
-        BeanUtils.copyProperties(elevenlabsAudioIsolationDTO, input);
-
         List<String> inputUrls = new ArrayList<>();
 
         inputUrls.add(elevenlabsAudioIsolationDTO.getAudioUrl());
@@ -204,7 +216,7 @@ public class ElevenlabsServiceImpl implements ElevenlabsService {
 
         //写入任务
         UserModelTask userModelTask = UserModelTask.create(
-                0,
+                userJwtDTO.getId(),
                 "",
                 0,
                 0,
@@ -213,12 +225,13 @@ public class ElevenlabsServiceImpl implements ElevenlabsService {
                 response.getData().getTaskId(),
                 inputUrls,
                 new ArrayList<>(),
+                new HashMap<>(),
                 request,
                 response,
                 new HashMap<>()
         );
 
-        return new BaseResponse(recordsService.create(model, "audio isolation", userModelTask, verifyCreditsBO));
+        return new BaseResponse(recordsService.create(model, "audio isolation", elevenlabsAudioIsolationDTO, userModelTask, verifyCreditsBO));
 
     }
 
@@ -240,7 +253,11 @@ public class ElevenlabsServiceImpl implements ElevenlabsService {
 
         request.setModel(model.getRequestName());
 
-        BeanUtils.copyProperties(elevenlabsSoundEffectDTO, input);
+        input.setText(elevenlabsSoundEffectDTO.getText());
+        input.setLoop(elevenlabsSoundEffectDTO.getLoop());
+        input.setDurationSeconds(elevenlabsSoundEffectDTO.getDurationSeconds().setScale(0, RoundingMode.HALF_UP).doubleValue());
+        input.setPromptInfluence(elevenlabsSoundEffectDTO.getPromptInfluence().setScale(1, RoundingMode.HALF_UP).doubleValue());
+        input.setOutputFormat(elevenlabsSoundEffectDTO.getOutputFormat().getCode());
 
         request.setInput(input);
 
@@ -254,7 +271,7 @@ public class ElevenlabsServiceImpl implements ElevenlabsService {
 
         //写入任务
         UserModelTask userModelTask = UserModelTask.create(
-                0,
+                userJwtDTO.getId(),
                 "",
                 0,
                 0,
@@ -263,12 +280,13 @@ public class ElevenlabsServiceImpl implements ElevenlabsService {
                 response.getData().getTaskId(),
                 new ArrayList<>(),
                 new ArrayList<>(),
+                new HashMap<>(),
                 request,
                 response,
                 new HashMap<>()
         );
 
-        return new BaseResponse(recordsService.create(model, elevenlabsSoundEffectDTO.getText(), userModelTask, verifyCreditsBO));
+        return new BaseResponse(recordsService.create(model, elevenlabsSoundEffectDTO.getText(), elevenlabsSoundEffectDTO, userModelTask, verifyCreditsBO));
 
     }
 

@@ -4,18 +4,25 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fuse.ai.server.web.common.utils.FeishuMessageUtil;
 import com.fuse.common.core.exception.BaseException;
 import com.fuse.common.core.exception.error.SystemErrorType;
+import com.fuse.common.core.exception.error.UserErrorType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
+import org.springframework.validation.BindException;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 @Slf4j
@@ -110,13 +117,15 @@ public class GlobalExceptionHandlerAdvice {
         response.setStatus(HttpServletResponse.SC_OK); // SSE保持200状态码
 
         Map<String, Object> errorData = new LinkedHashMap<>();
-        errorData.put("errorMessage", e.getMessage());
+
         
         // 根据异常类型设置不同的错误码
         if (e instanceof BaseException baseEx) {
+            errorData.put("errorMessage", e.getMessage());
             errorData.put("errorCode", baseEx.getErrorType().getCode());
             errorData.put("type", "business_error");
         } else {
+            errorData.put("errorMessage", "Service is busy");
             errorData.put("errorCode", SystemErrorType.SYSTEM_EXECUTION_ERROR.getCode());
             errorData.put("type", "system_error");
         }
@@ -137,13 +146,15 @@ public class GlobalExceptionHandlerAdvice {
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());
 
         Map<String, Object> body = new LinkedHashMap<>();
-        body.put("errorMessage", e.getMessage());
+
         
         // 根据异常类型设置不同的错误码
         if (e instanceof BaseException baseEx) {
+            body.put("errorMessage", e.getMessage());
             body.put("errorCode", baseEx.getErrorType().getCode());
             body.put("type", "business_error");
         } else {
+            body.put("errorMessage", "Service is busy");
             body.put("errorCode", SystemErrorType.SYSTEM_EXECUTION_ERROR.getCode());
             body.put("type", "system_error");
         }
@@ -151,5 +162,55 @@ public class GlobalExceptionHandlerAdvice {
         body.put("data", new Object());
 
         response.getWriter().write(objectMapper.writeValueAsString(body));
+    }
+
+    /**
+     * 处理 @RequestBody 参数验证异常
+     */
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public void handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
+                                             HttpServletRequest request,
+                                             HttpServletResponse response) throws IOException {
+        String errorMessage = ex.getBindingResult().getFieldErrors().stream()
+                .map(error -> error.getField() + ": " + error.getDefaultMessage())
+                .collect(Collectors.joining("; "));
+
+        log.warn("参数验证失败: {}", errorMessage);
+
+        // 直接创建 BaseException 并调用 handleException 处理
+        BaseException baseException = new BaseException(UserErrorType.USER_CLIENT_ERROR, errorMessage);
+        handleException(baseException, request, response);
+    }
+
+    /**
+     * 处理 @ModelAttribute 参数验证异常
+     */
+    @ExceptionHandler(BindException.class)
+    public void handleBindException(BindException ex,
+                                    HttpServletRequest request,
+                                    HttpServletResponse response) throws IOException {
+        String errorMessage = ex.getFieldErrors().stream()
+                .map(FieldError::getDefaultMessage)
+                .collect(Collectors.joining("; "));
+
+        log.warn("绑定参数失败: {}", errorMessage);
+        BaseException baseException = new BaseException(UserErrorType.USER_CLIENT_ERROR, errorMessage);
+        handleException(baseException, request, response);
+    }
+
+    /**
+     * 处理 @RequestParam/@PathVariable 参数验证异常
+     */
+    @ExceptionHandler(ConstraintViolationException.class)
+    public void handleConstraintViolation(ConstraintViolationException ex,
+                                          HttpServletRequest request,
+                                          HttpServletResponse response) throws IOException {
+        String errorMessage = ex.getConstraintViolations().stream()
+                .map(ConstraintViolation::getMessage)
+                .collect(Collectors.joining("; "));
+
+        log.warn("约束验证失败: {}", errorMessage);
+        BaseException baseException = new BaseException(UserErrorType.USER_CLIENT_ERROR, errorMessage);
+        handleException(baseException, request, response);
     }
 }

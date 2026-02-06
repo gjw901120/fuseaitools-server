@@ -4,11 +4,12 @@ import com.fuse.ai.server.manager.entity.Models;
 import com.fuse.ai.server.manager.entity.UserModelTask;
 import com.fuse.ai.server.manager.enums.ResponseCodeEnum;
 import com.fuse.ai.server.manager.enums.TaskStatusEnum;
-import com.fuse.ai.server.manager.manager.VideoManager;
-import com.fuse.ai.server.manager.model.response.VideoGenerateResponse;
-import com.fuse.ai.server.manager.model.request.VeoGenerateRequest;
-import com.fuse.ai.server.manager.model.request.VeoExtendRequest;
+import com.fuse.ai.server.manager.enums.VeoGenerationTypeEnum;
 import com.fuse.ai.server.manager.enums.VeoModelEnum;
+import com.fuse.ai.server.manager.manager.VideoManager;
+import com.fuse.ai.server.manager.model.request.VeoExtendRequest;
+import com.fuse.ai.server.manager.model.request.VeoGenerateRequest;
+import com.fuse.ai.server.manager.model.response.VideoGenerateResponse;
 import com.fuse.ai.server.web.model.bo.ExtraDataBO;
 import com.fuse.ai.server.web.model.bo.verifyCreditsBO;
 import com.fuse.ai.server.web.model.dto.request.user.UserJwtDTO;
@@ -26,7 +27,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 
 /**
@@ -64,7 +66,9 @@ public class VeoGenerateServiceImpl implements VeoGenerateService {
 
         request.setImageUrls(veoGenerateDTO.getImageUrls());
 
-        request.setModel(VeoModelEnum.getByCode(model.getRequestName()));
+        request.setModel(VeoModelEnum.fromCode(model.getRequestName()));
+
+        request.setGenerationType(VeoGenerationTypeEnum.fromCode(veoGenerateDTO.getGenerationType()));
 
         request.setCallBackUrl(callbackUrl.concat("video/veo"));
 
@@ -76,7 +80,7 @@ public class VeoGenerateServiceImpl implements VeoGenerateService {
 
         //写入任务
         UserModelTask userModelTask = UserModelTask.create(
-                0,
+                userJwtDTO.getId(),
                 "",
                 0,
                 0,
@@ -85,12 +89,13 @@ public class VeoGenerateServiceImpl implements VeoGenerateService {
                 response.getData().getTaskId(),
                 veoGenerateDTO.getImageUrls(),
                 new ArrayList<>(),
+                new HashMap<>(),
                 request,
                 response,
                 new HashMap<>()
         );
 
-        return new BaseResponse(recordsService.create(model, request.getPrompt(), userModelTask, verifyCreditsBO));
+        return new BaseResponse(recordsService.create(model, request.getPrompt(), veoGenerateDTO, userModelTask, verifyCreditsBO));
 
     }
 
@@ -115,7 +120,7 @@ public class VeoGenerateServiceImpl implements VeoGenerateService {
 
         //写入任务
         UserModelTask userModelTask = UserModelTask.create(
-                0,
+                userJwtDTO.getId(),
                 "",
                 0,
                 0,
@@ -124,12 +129,13 @@ public class VeoGenerateServiceImpl implements VeoGenerateService {
                 response.getData().getTaskId(),
                 new ArrayList<>(),
                 new ArrayList<>(),
+                new HashMap<>(),
                 request,
                 response,
                 new HashMap<>()
         );
 
-        return new BaseResponse(recordsService.create(model, request.getPrompt(), userModelTask, verifyCreditsBO));
+        return new BaseResponse(recordsService.create(model, request.getPrompt(), veoExtendDTO, userModelTask, verifyCreditsBO));
 
     }
 

@@ -21,4 +21,6 @@ public interface ImageCallbackService {
      * 处理Nano Banana图像生成回调
      */
     void processNanoBananaCallback(ImageNanoBananaCallbackRequest request);
+
+    void processMjGenerateCallback(ImageMjGenerateCallbackRequest request);
 }

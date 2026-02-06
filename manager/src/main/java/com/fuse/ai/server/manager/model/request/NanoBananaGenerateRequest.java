@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fuse.ai.server.manager.constant.NanoBananaConstant;
 import com.fuse.ai.server.manager.enums.NanoBananaAspectRatioEnum;
 import com.fuse.ai.server.manager.enums.NanoBananaOutputFormatEnum;
+import com.fuse.common.core.exception.BaseException;
+import com.fuse.common.core.exception.error.SystemErrorType;
 import lombok.Data;
 import org.hibernate.validator.constraints.URL;
 
@@ -103,7 +105,7 @@ public class NanoBananaGenerateRequest implements Serializable {
         if (input != null && input.getPrompt() != null) {
             // 验证提示词长度
             if (input.getPrompt().length() > NanoBananaConstant.PROMPT_MAX_LENGTH) {
-                throw new IllegalArgumentException("提示词长度超过限制");
+                throw new BaseException(SystemErrorType.SYSTEM_EXECUTION_ERROR, "The prompt word length exceeds the limit.");
             }
         }
     }

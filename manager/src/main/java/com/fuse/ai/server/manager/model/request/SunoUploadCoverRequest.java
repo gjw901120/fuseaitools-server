@@ -1,12 +1,15 @@
 package com.fuse.ai.server.manager.model.request;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fuse.ai.server.manager.enums.SunoModelEnum;
 import com.fuse.ai.server.manager.enums.SunoVocalGenderEnum;
 import lombok.Data;
 import org.hibernate.validator.constraints.URL;
 
 import javax.validation.constraints.*;
+import java.io.Serial;
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 /**
  * 上传并翻唱音乐请求参数
@@ -14,6 +17,7 @@ import java.io.Serializable;
 @Data
 public class SunoUploadCoverRequest implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**
@@ -74,6 +78,7 @@ public class SunoUploadCoverRequest implements Serializable {
     /**
      * 人声性别偏好
      */
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private SunoVocalGenderEnum vocalGender;
 
     /**
@@ -82,7 +87,7 @@ public class SunoUploadCoverRequest implements Serializable {
     @DecimalMin(value = "0.0", message = "风格权重不能小于0")
     @DecimalMax(value = "1.0", message = "风格权重不能大于1")
     @Digits(integer = 1, fraction = 2, message = "风格权重最多保留两位小数")
-    private Double styleWeight;
+    private BigDecimal styleWeight;
 
     /**
      * 实验性偏离程度控制
@@ -90,7 +95,7 @@ public class SunoUploadCoverRequest implements Serializable {
     @DecimalMin(value = "0.0", message = "创意偏离度不能小于0")
     @DecimalMax(value = "1.0", message = "创意偏离度不能大于1")
     @Digits(integer = 1, fraction = 2, message = "创意偏离度最多保留两位小数")
-    private Double weirdnessConstraint;
+    private BigDecimal weirdnessConstraint;
 
     /**
      * 音频要素相对权重
@@ -98,7 +103,7 @@ public class SunoUploadCoverRequest implements Serializable {
     @DecimalMin(value = "0.0", message = "音频权重不能小于0")
     @DecimalMax(value = "1.0", message = "音频权重不能大于1")
     @Digits(integer = 1, fraction = 2, message = "音频权重最多保留两位小数")
-    private Double audioWeight;
+    private BigDecimal audioWeight;
 
     /**
      * 人格ID

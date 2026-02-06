@@ -29,4 +29,13 @@ public class UserModelConversationManagerImpl implements UserModelConversationMa
         return userModelConversationMapper.selectOne(queryWrapper);
     }
 
+    @Override
+    public UserModelConversation getDetailIdByRecordId(String recordId) {
+        LambdaQueryWrapper<UserModelConversation> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper
+                .eq(UserModelConversation::getRecordId, recordId)
+                .eq(UserModelConversation::getIsDel, 0);
+        return userModelConversationMapper.selectOne(queryWrapper);
+    }
+
 }

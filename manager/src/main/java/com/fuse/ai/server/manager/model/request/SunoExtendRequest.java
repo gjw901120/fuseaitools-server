@@ -1,5 +1,6 @@
 package com.fuse.ai.server.manager.model.request;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fuse.ai.server.manager.enums.SunoModelEnum;
 import com.fuse.ai.server.manager.enums.SunoVocalGenderEnum;
 import lombok.Data;
@@ -8,6 +9,7 @@ import org.hibernate.validator.constraints.URL;
 import javax.validation.constraints.*;
 import java.io.Serial;
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 /**
  * 延长音乐请求参数
@@ -52,7 +54,7 @@ public class SunoExtendRequest implements Serializable {
      * 开始扩展的时间点（秒）
      */
     @Min(value = 1, message = "开始时间必须大于0")
-    private Double continueAt;
+    private BigDecimal continueAt;
 
     /**
      * 用于生成的AI模型版本
@@ -75,6 +77,7 @@ public class SunoExtendRequest implements Serializable {
     /**
      * 人声性别偏好
      */
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private SunoVocalGenderEnum vocalGender;
 
     /**
@@ -83,7 +86,7 @@ public class SunoExtendRequest implements Serializable {
     @DecimalMin(value = "0.0", message = "风格权重不能小于0")
     @DecimalMax(value = "1.0", message = "风格权重不能大于1")
     @Digits(integer = 1, fraction = 2, message = "风格权重最多保留两位小数")
-    private Double styleWeight;
+    private BigDecimal styleWeight;
 
     /**
      * 实验性偏离程度控制
@@ -91,7 +94,7 @@ public class SunoExtendRequest implements Serializable {
     @DecimalMin(value = "0.0", message = "创意偏离度不能小于0")
     @DecimalMax(value = "1.0", message = "创意偏离度不能大于1")
     @Digits(integer = 1, fraction = 2, message = "创意偏离度最多保留两位小数")
-    private Double weirdnessConstraint;
+    private BigDecimal weirdnessConstraint;
 
     /**
      * 音频要素相对权重
@@ -99,7 +102,7 @@ public class SunoExtendRequest implements Serializable {
     @DecimalMin(value = "0.0", message = "音频权重不能小于0")
     @DecimalMax(value = "1.0", message = "音频权重不能大于1")
     @Digits(integer = 1, fraction = 2, message = "音频权重最多保留两位小数")
-    private Double audioWeight;
+    private BigDecimal audioWeight;
 
     /**
      * 人格ID
@@ -124,7 +127,7 @@ public class SunoExtendRequest implements Serializable {
      */
     public static SunoExtendRequest buildFull(String audioId, Boolean defaultParamFlag,
                                               String prompt, String style, String title,
-                                              Double continueAt, SunoModelEnum model, String callBackUrl) {
+                                              BigDecimal continueAt, SunoModelEnum model, String callBackUrl) {
         SunoExtendRequest request = build(audioId, defaultParamFlag, model, callBackUrl);
         request.setPrompt(prompt);
         request.setStyle(style);
@@ -148,7 +151,7 @@ public class SunoExtendRequest implements Serializable {
             if (title == null || title.trim().isEmpty()) {
                 throw new IllegalArgumentException("自定义参数模式下标题不能为空");
             }
-            if (continueAt == null || continueAt <= 0) {
+            if (continueAt == null || continueAt.compareTo(BigDecimal.ZERO) <= 0) {
                 throw new IllegalArgumentException("自定义参数模式下开始时间必须大于0");
             }
         }

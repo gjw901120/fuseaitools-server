@@ -1,5 +1,7 @@
 package com.fuse.ai.server.web.common.enums;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 
 /**
@@ -19,12 +21,32 @@ public enum FluxKontextModelEnum {
         this.description = description;
     }
 
-    public static FluxKontextModelEnum getByCode(String code) {
-        for (FluxKontextModelEnum model : values()) {
-            if (model.getCode().equals(code)) {
-                return model;
+    /**
+     * JSON序列化时，使用code字段的值
+     */
+    @JsonValue
+    public String getCode() {
+        return code;
+    }
+
+    /**
+     * JSON反序列化时，从code字符串转换为枚举
+     * 注意：方法名必须是 fromCode 或 valueOf
+     */
+    @JsonCreator(mode = JsonCreator.Mode.DELEGATING)  // 添加 mode 参数
+    public static FluxKontextModelEnum fromCode(String code) {
+        if (code == null || code.trim().isEmpty()) {
+            return null;
+        }
+        for (FluxKontextModelEnum value : values()) {
+            if (value.getCode().equalsIgnoreCase(code.trim())) {
+                return value;
             }
         }
-        return FLUX_KONTEXT_PRO;
+        return null;
+    }
+
+    public static FluxKontextModelEnum fromString(String str) {
+        return fromCode(str);
     }
 }

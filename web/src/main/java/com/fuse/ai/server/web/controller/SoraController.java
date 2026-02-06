@@ -7,6 +7,7 @@ import com.fuse.ai.server.web.model.dto.request.video.SoraProGenerateDTO;
 import com.fuse.ai.server.web.model.dto.request.video.SoraProStoryboardDTO;
 import com.fuse.ai.server.web.model.dto.request.video.SoraWatermarkRemoverDTO;
 import com.fuse.ai.server.web.service.SoraGenerateService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,6 +21,7 @@ import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/api/video")
+@Slf4j
 public class SoraController {
 
     @Autowired

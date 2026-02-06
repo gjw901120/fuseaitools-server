@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fuse.ai.server.manager.constant.NanoBananaConstant;
 import com.fuse.ai.server.manager.enums.NanoBananaAspectRatioEnum;
 import com.fuse.ai.server.manager.enums.NanoBananaOutputFormatEnum;
+import com.fuse.common.core.exception.BaseException;
+import com.fuse.common.core.exception.error.SystemErrorType;
 import lombok.Data;
 import org.hibernate.validator.constraints.URL;
 
@@ -115,16 +117,16 @@ public class NanoBananaEditRequest implements Serializable {
         if (input != null) {
             // 验证提示词长度
             if (input.getPrompt() != null && input.getPrompt().length() > NanoBananaConstant.PROMPT_MAX_LENGTH) {
-                throw new IllegalArgumentException("提示词长度超过限制");
+                throw new BaseException(SystemErrorType.SYSTEM_EXECUTION_ERROR, "The prompt word length exceeds the limit.");
             }
 
             // 验证图像数量
             if (input.getImageUrls() != null) {
                 if (input.getImageUrls().size() > NanoBananaConstant.MAX_IMAGES_EDIT) {
-                    throw new IllegalArgumentException("输入图像数量超过限制");
+                    throw new BaseException(SystemErrorType.SYSTEM_EXECUTION_ERROR, "The number of input images exceeds the limit.");
                 }
                 if (input.getImageUrls().isEmpty()) {
-                    throw new IllegalArgumentException("至少需要提供一个输入图像");
+                    throw new BaseException(SystemErrorType.SYSTEM_EXECUTION_ERROR, "At least one input image needs to be provided.");
                 }
             }
         }

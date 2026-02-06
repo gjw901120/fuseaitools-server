@@ -1,6 +1,7 @@
 package com.fuse.ai.server.web.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fuse.ai.server.web.common.utils.S3UploadUtil;
 import com.fuse.ai.server.web.model.dto.request.callback.image.*;
 import com.fuse.ai.server.web.service.ImageCallbackService;
 import com.fuse.ai.server.web.service.RecordsService;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -26,11 +28,17 @@ public class ImageCallbackServiceImpl implements ImageCallbackService {
     @Autowired
     private RecordsService recordsService;
 
+    @Autowired
+    private S3UploadUtil s3UploadUtil;
+
     @Override
     public void processGpt4oCallback(ImageGpt4oCallbackRequest request) {
 
         String taskId = request.getData().getTaskId();
         Integer code = request.getCode();
+
+        //幂等性校验
+        if (recordsService.isCompleted(taskId)) return;
 
         log.info("Processing GPT-4O image callback: taskId={}, code={}", taskId, code);
 
@@ -40,12 +48,15 @@ public class ImageCallbackServiceImpl implements ImageCallbackService {
             log.info("GPT-4O image generation completed: taskId={}, resultUrls={}", taskId, resultUrls);
 
             List<String> outputUrl = new ArrayList<>();
-            recordsService.completed(request.getData().getTaskId(), outputUrl, request);
+            for (String url : resultUrls) {
+                outputUrl.add(s3UploadUtil.uploadFileFromUrl(url));
+            }
+            recordsService.completed(taskId, outputUrl, new HashMap<>(), request);
 
         } else {
 
-            recordsService.failed(request.getData().getTaskId(), request);
-            log.info("Failed to process GPT-4O callback: taskId={}, info={}", request.getData().getTaskId(), request);
+            recordsService.failed(taskId, request);
+            log.info("Failed to process GPT-4O callback: taskId={}, info={}", taskId, request);
 
         }
 
@@ -57,6 +68,9 @@ public class ImageCallbackServiceImpl implements ImageCallbackService {
         String taskId = request.getData().getTaskId();
         Integer code = request.getCode();
 
+        //幂等性校验
+        if (recordsService.isCompleted(taskId)) return;
+
         log.info("Processing Flux Kontext image callback: taskId={}, code={}", taskId, code);
 
         if (code == 200) {
@@ -67,12 +81,13 @@ public class ImageCallbackServiceImpl implements ImageCallbackService {
             log.info("Flux Kontext image generation completed: taskId={}, originUrl={}, resultUrl={}", taskId, originImageUrl, resultImageUrl);
 
             List<String> outputUrl = new ArrayList<>();
-            recordsService.completed(request.getData().getTaskId(), outputUrl, request);
+            outputUrl.add(s3UploadUtil.uploadFileFromUrl(resultImageUrl));
+            recordsService.completed(taskId, outputUrl, new HashMap<>(), request);
 
         } else {
 
-            recordsService.failed(request.getData().getTaskId(), request);
-            log.info("Failed to process Flux Kontext callback: taskId={}, info={}", request.getData().getTaskId(), request);
+            recordsService.failed(taskId, request);
+            log.info("Failed to process Flux Kontext callback: taskId={}, info={}", taskId, request);
 
         }
 
@@ -85,6 +100,9 @@ public class ImageCallbackServiceImpl implements ImageCallbackService {
             String state = request.getData().getState();
             String resultJson = request.getData().getResultJson();
 
+            //幂等性校验
+            if (recordsService.isCompleted(request.getData().getTaskId())) return;
+
             log.info("Processing Nano Banana image callback: taskId={}, state={}", taskId, state);
 
             if ("success".equals(state)) {
@@ -95,7 +113,10 @@ public class ImageCallbackServiceImpl implements ImageCallbackService {
                 log.info("Nano Banana image generation completed: taskId={}, resultUrls={}", taskId, result.getResultUrls());
 
                 List<String> outputUrl = new ArrayList<>();
-                recordsService.completed(request.getData().getTaskId(), outputUrl, request);
+                for (String url : result.getResultUrls()) {
+                    outputUrl.add(s3UploadUtil.uploadFileFromUrl(url));
+                }
+                recordsService.completed(request.getData().getTaskId(), outputUrl, new HashMap<>(), request);
 
             } else if ("fail".equals(state)) {
                 log.info("Nano Banana image generation failed: taskId={}, info={}", taskId, request);
@@ -106,6 +127,30 @@ public class ImageCallbackServiceImpl implements ImageCallbackService {
         } catch (Exception e) {
             recordsService.failed(request.getData().getTaskId(), request);
             log.error("Failed to process Nano Banana callback: taskId={}, error={}", request.getData().getTaskId(), e);
+        }
+    }
+
+    @Override
+    public void processMjGenerateCallback(ImageMjGenerateCallbackRequest request) {
+        String taskId = request.getData().getTaskId();
+        Integer code = request.getCode();
+
+        //幂等性校验
+        if (recordsService.isCompleted(request.getData().getTaskId())) return;
+
+        log.info("Processing Mj Generate image callback: taskId={}, code={}", taskId, code);
+        if (code == 200) {
+            // 成功处理;
+            log.info("Mj Generate image generation completed: taskId={}, resultUrl={}", taskId, request.getData().getResultUrls());
+
+            List<String> outputUrl = new ArrayList<>();
+            for (String url : request.getData().getResultUrls())
+                outputUrl.add(s3UploadUtil.uploadFileFromUrl(url));
+            recordsService.completed(request.getData().getTaskId(), outputUrl, new HashMap<>(), request);
+
+        } else {
+            recordsService.failed(request.getData().getTaskId(), request);
+            log.info("Failed to process Mj Generate callback: taskId={}, info={}", request.getData().getTaskId(), request);
         }
     }
 

@@ -1,12 +1,18 @@
 package com.fuse.ai.server.web.service.impl;
 
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.fuse.ai.server.manager.entity.Models;
 import com.fuse.ai.server.manager.entity.ModelsCategory;
+import com.fuse.ai.server.manager.entity.ModelsPricingOnce;
+import com.fuse.ai.server.manager.entity.ModelsPricingRules;
 import com.fuse.ai.server.manager.manager.ModelsCategoryManager;
 import com.fuse.ai.server.manager.manager.ModelsManager;
+import com.fuse.ai.server.manager.manager.ModelsPricingOnceManager;
+import com.fuse.ai.server.manager.manager.ModelsPricingRulesManager;
 import com.fuse.ai.server.web.config.exception.ResponseErrorType;
 import com.fuse.ai.server.web.controller.ChatController.SseCallback;
 import com.fuse.ai.server.web.exception.SseBaseException;
+import com.fuse.ai.server.web.model.vo.ModelPricingDetailVO;
 import com.fuse.ai.server.web.model.vo.ModelsTreeVO;
 import com.fuse.ai.server.web.service.ModelsService;
 import com.fuse.common.core.exception.BaseException;
@@ -14,7 +20,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -29,6 +37,12 @@ public class ModelsServiceImpl implements ModelsService {
 
     @Autowired
     private ModelsCategoryManager modelsCategoryManager;
+
+    @Autowired
+    private ModelsPricingRulesManager modelsPricingRulesManager;
+
+    @Autowired
+    private ModelsPricingOnceManager modelsPricingOnceManager;
 
     @Override
     public ModelsTreeVO getModelsTree() {
@@ -84,6 +98,105 @@ public class ModelsServiceImpl implements ModelsService {
         modelsTreeVO.setCategoryList(categoryDetailVOList);
 
         return modelsTreeVO;
+    }
+
+
+    public Map<String, ModelPricingDetailVO> getModelsPrice() {
+        List<Models> models = modelsManager.getAll();
+        List<ModelsPricingRules> rules = modelsPricingRulesManager.getAll();
+        List<ModelsPricingOnce> onceList = modelsPricingOnceManager.getAll();
+
+        Map<String, ModelPricingDetailVO> result = new HashMap<>();
+
+        // 构建映射关系
+        // 1. 一个modelId对应多个once记录
+        Map<Integer, List<ModelsPricingOnce>> onceMapByModelId = onceList.stream()
+                .filter(once -> once.getIsDel() == 0)
+                .collect(Collectors.groupingBy(ModelsPricingOnce::getModelId));
+
+        // 2. 一个pricingId（once.id）对应一个rule记录
+        Map<Integer, ModelsPricingRules> ruleMapByPricingId = rules.stream()
+                .filter(rule -> rule.getIsDel() == 0)
+                .collect(Collectors.toMap(
+                        ModelsPricingRules::getPricingId,
+                        rule -> rule,
+                        (existing, replacement) -> existing));
+
+        // 遍历所有模型
+        for (Models model : models) {
+
+            String modelName = model.getName();
+            Integer modelId = model.getId();
+            Integer isPricingRules = model.getIsPricingRules();
+
+            // 获取该模型的所有once记录
+            List<ModelsPricingOnce> modelOnceList = onceMapByModelId.get(modelId);
+            if (CollectionUtils.isEmpty(modelOnceList)) {
+                continue;
+            }
+
+            // 创建定价信息对象
+            ModelPricingDetailVO pricingVO = new ModelPricingDetailVO();
+
+            if (isPricingRules == 0) {
+                // 场景1：一次性定价
+                pricingVO.setType("ONCE");
+
+                List<ModelPricingDetailVO.OncePricing> oncePricingList = modelOnceList.stream()
+                        .map(once -> new ModelPricingDetailVO.OncePricing(once.getCredits())).toList();
+
+                pricingVO.setOnce(oncePricingList.get(0));
+
+            } else if (isPricingRules == 1) {
+                // 场景2：规则定价
+                List<ModelPricingDetailVO.RulePricing> rulePricingList = new ArrayList<>();
+
+                // 遍历该模型的所有once记录
+                for (ModelsPricingOnce once : modelOnceList) {
+                    Integer pricingId = once.getId();
+                    BigDecimal credits = once.getCredits();
+
+                    // 查找对应的rule记录
+                    ModelsPricingRules rule = ruleMapByPricingId.get(pricingId);
+                    if (rule != null) {
+                        ModelPricingDetailVO.RulePricing rulePricing = new ModelPricingDetailVO.RulePricing(
+                                credits,
+                                rule.getDuration(),
+                                rule.getQuality(),
+                                rule.getSize(),
+                                rule.getBatchSize(),
+                                rule.getSpeed(),
+                                rule.getScene()
+                        );
+                        rulePricingList.add(rulePricing);
+                    } else {
+                        log.warn("定价ID:{} 没有对应的规则信息，模型:{}", pricingId, modelName);
+                    }
+                }
+
+                if (CollectionUtils.isEmpty(rulePricingList)) {
+                    // 如果没有找到规则，降级为一次性定价
+                    log.warn("模型 {} (ID:{}) 启用规则定价，但未找到规则，降级为一次性定价",
+                            modelName, modelId);
+                    pricingVO.setType("ONCE");
+                    List<ModelPricingDetailVO.OncePricing> oncePricingList = modelOnceList.stream()
+                            .map(once -> new ModelPricingDetailVO.OncePricing(once.getCredits())).toList();
+                    pricingVO.setOnce(oncePricingList.get(0));
+                } else {
+                    pricingVO.setType("RULE");
+                    pricingVO.setRules(rulePricingList);
+                }
+            } else {
+                log.error("模型 {} (ID:{}) 的 isPricingRules 字段值非法: {}",
+                        modelName, modelId, isPricingRules);
+                continue;
+            }
+
+            result.put(modelName, pricingVO);
+        }
+
+        return result;
+
     }
 
      @Override

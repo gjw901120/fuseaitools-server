@@ -2,20 +2,21 @@ package com.fuse.ai.server.web.common.utils;
 
 import com.fuse.common.core.exception.BaseException;
 import com.fuse.common.core.exception.error.ThirdpartyErrorType;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.services.ses.SesClient;
-import software.amazon.awssdk.services.ses.model.*;
+import software.amazon.awssdk.services.sesv2.SesV2Client;
+import software.amazon.awssdk.services.sesv2.model.*;
 
 import javax.annotation.PostConstruct;
 
+@Slf4j
 @Component
 public class EmailSenderUtil {
 
-    // 直接从YAML注入，仅此而已
     @Value("${aws.ses.region}")
     private String region;
 
@@ -28,45 +29,73 @@ public class EmailSenderUtil {
     @Value("${aws.email.default-from}")
     private String from;
 
-    @Value("${aws.email.default-charset:UTF-8}")
-    private String charset;
-
-    private SesClient client;
+    private SesV2Client client;
 
     @PostConstruct
     private void initClient() {
-        // 构建客户端：凭证100%来自YAML配置
-        this.client = SesClient.builder()
-                .region(Region.of(this.region))
-                .credentialsProvider(StaticCredentialsProvider.create(
-                        AwsBasicCredentials.create(this.accessKey, this.secretKey)
-                ))
-                .build();
+        try {
+            this.client = SesV2Client.builder()
+                    .region(Region.of(this.region))
+                    .credentialsProvider(StaticCredentialsProvider.create(
+                            AwsBasicCredentials.create(this.accessKey, this.secretKey)
+                    ))
+                    .build();
+            log.info("SES v2客户端初始化成功，区域: {}", region);
+        } catch (Exception e) {
+            log.error("SES客户端初始化失败", e);
+            throw new BaseException(ThirdpartyErrorType.EMAIL_NOTIFICATION_SERVER_ERROR,
+                    "SES客户端初始化失败: " + e.getMessage());
+        }
     }
 
-    /**
-     * 发送邮件
-     * @param to 收件邮箱
-     * @param subject 邮件主题
-     * @param content 邮件正文
-     * @return 消息ID
-     */
-    public String sendEmail(String to, String subject, String content) {
+    public String sendEmail(String to, String subject, String textContent) {
+        return sendEmail(to, subject, textContent, null);
+    }
+
+    public String sendEmail(String to, String subject, String textContent, String htmlContent) {
         try {
+            // 构建邮件内容
+            Body.Builder bodyBuilder = Body.builder();
+
+            if (textContent != null && !textContent.trim().isEmpty()) {
+                bodyBuilder.text(Content.builder()
+                        .data(textContent)
+                        .charset("UTF-8")
+                        .build());
+            }
+
+            if (htmlContent != null && !htmlContent.trim().isEmpty()) {
+                bodyBuilder.html(Content.builder()
+                        .data(htmlContent)
+                        .charset("UTF-8")
+                        .build());
+            }
+
             SendEmailRequest request = SendEmailRequest.builder()
-                    .source(this.from)
-                    .destination(Destination.builder().toAddresses(to).build())
-                    .message(Message.builder()
-                            .subject(Content.builder().charset(this.charset).data(subject).build())
-                            .body(Body.builder()
-                                    .text(Content.builder().charset(this.charset).data(content).build())
+                    .fromEmailAddress(this.from)
+                    .destination(Destination.builder()
+                            .toAddresses(to)
+                            .build())
+                    .content(EmailContent.builder()
+                            .simple(Message.builder()
+                                    .subject(Content.builder()
+                                            .data(subject)
+                                            .charset("UTF-8")
+                                            .build())
+                                    .body(bodyBuilder.build())
                                     .build())
                             .build())
                     .build();
 
-            return this.client.sendEmail(request).messageId();
+            SendEmailResponse response = this.client.sendEmail(request);
+            log.info("邮件发送成功: messageId={}, to={}", response.messageId(), to);
+
+            return response.messageId();
+
         } catch (Exception e) {
-            throw new BaseException(ThirdpartyErrorType.EMAIL_NOTIFICATION_SERVER_ERROR, e.getMessage());
+            log.error("邮件发送失败: to={}, subject={}", to, subject, e);
+            throw new BaseException(ThirdpartyErrorType.EMAIL_NOTIFICATION_SERVER_ERROR,
+                    "邮件发送失败: " + e.getMessage());
         }
     }
 }

@@ -36,7 +36,9 @@ public enum ResponseErrorType implements ErrorType {
 
 
     MODEL_IS_NOT_EXIST("M0001", "MODEL_IS_NOT_EXIST"),
-    MODEL_IS_NOT_SUPPORT("M0002", "MODEL_IS_NOT_SUPPORT");
+    MODEL_IS_NOT_SUPPORT("M0002", "MODEL_IS_NOT_SUPPORT"),
+
+    RECORD_IS_NOT_EXIST("R0001", "RECORD_IS_NOT_EXIST");
 
 
     private String code;

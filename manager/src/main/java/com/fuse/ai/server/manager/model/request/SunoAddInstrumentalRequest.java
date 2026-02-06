@@ -5,8 +5,13 @@ import com.fuse.ai.server.manager.enums.SunoVocalGenderEnum;
 import lombok.Data;
 import org.hibernate.validator.constraints.URL;
 
-import javax.validation.constraints.*;
+import javax.validation.constraints.DecimalMax;
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Digits;
+import javax.validation.constraints.NotBlank;
+import java.io.Serial;
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 /**
  * 添加伴奏生成音乐请求参数
@@ -14,6 +19,7 @@ import java.io.Serializable;
 @Data
 public class SunoAddInstrumentalRequest implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**
@@ -64,7 +70,7 @@ public class SunoAddInstrumentalRequest implements Serializable {
     @DecimalMin(value = "0.0", message = "风格权重不能小于0")
     @DecimalMax(value = "1.0", message = "风格权重不能大于1")
     @Digits(integer = 1, fraction = 2, message = "风格权重最多保留两位小数")
-    private Double styleWeight;
+    private BigDecimal styleWeight;
 
     /**
      * 实验性偏离程度控制
@@ -72,7 +78,7 @@ public class SunoAddInstrumentalRequest implements Serializable {
     @DecimalMin(value = "0.0", message = "创意偏离度不能小于0")
     @DecimalMax(value = "1.0", message = "创意偏离度不能大于1")
     @Digits(integer = 1, fraction = 2, message = "创意偏离度最多保留两位小数")
-    private Double weirdnessConstraint;
+    private BigDecimal weirdnessConstraint;
 
     /**
      * 音频要素相对权重
@@ -80,7 +86,7 @@ public class SunoAddInstrumentalRequest implements Serializable {
     @DecimalMin(value = "0.0", message = "音频权重不能小于0")
     @DecimalMax(value = "1.0", message = "音频权重不能大于1")
     @Digits(integer = 1, fraction = 2, message = "音频权重最多保留两位小数")
-    private Double audioWeight;
+    private BigDecimal audioWeight;
 
     /**
      * 构建添加伴奏请求

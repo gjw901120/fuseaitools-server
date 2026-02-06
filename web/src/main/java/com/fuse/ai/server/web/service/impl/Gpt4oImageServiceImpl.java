@@ -70,7 +70,7 @@ public class Gpt4oImageServiceImpl implements Gpt4oImageService {
 
         //写入任务
         UserModelTask userModelTask = UserModelTask.create(
-                0,
+                userJwtDTO.getId(),
                 "",
                 0,
                 0,
@@ -79,12 +79,13 @@ public class Gpt4oImageServiceImpl implements Gpt4oImageService {
                 response.getData().getTaskId(),
                 inputUrls,
                 new ArrayList<>(),
+                new HashMap<>(),
                 request,
                 response,
                 new HashMap<>()
         );
 
-        return new BaseResponse(recordsService.create(model, gpt4oImageGenerateDTO.getPrompt(), userModelTask, verifyCreditsBO));
+        return new BaseResponse(recordsService.create(model, gpt4oImageGenerateDTO.getPrompt(), gpt4oImageGenerateDTO, userModelTask, verifyCreditsBO));
 
     }
 }

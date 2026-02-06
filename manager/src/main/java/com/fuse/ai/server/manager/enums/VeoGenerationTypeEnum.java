@@ -1,5 +1,7 @@
 package com.fuse.ai.server.manager.enums;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 
 @Getter
@@ -16,12 +18,29 @@ public enum VeoGenerationTypeEnum {
         this.description = description;
     }
 
-    public static VeoGenerationTypeEnum getByCode(String code) {
+    /**
+     * JSON序列化时，使用code字段的值
+     */
+    @JsonValue
+    public String getCode() {
+        return code;
+    }
+
+    /**
+     * JSON反序列化时，从code字符串转换为枚举
+     */
+    @JsonCreator
+    public static VeoGenerationTypeEnum fromCode(String code) {
         for (VeoGenerationTypeEnum value : values()) {
             if (value.getCode().equals(code)) {
                 return value;
             }
         }
         return null;
+    }
+
+    @Override
+    public String toString() {
+        return code;
     }
 }
