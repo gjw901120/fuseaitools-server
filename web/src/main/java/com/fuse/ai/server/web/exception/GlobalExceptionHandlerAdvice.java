@@ -20,6 +20,7 @@ import javax.validation.ConstraintViolationException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -159,7 +160,7 @@ public class GlobalExceptionHandlerAdvice {
             body.put("type", "system_error");
         }
         
-        body.put("data", new Object());
+        body.put("data", new HashMap<>());
 
         response.getWriter().write(objectMapper.writeValueAsString(body));
     }

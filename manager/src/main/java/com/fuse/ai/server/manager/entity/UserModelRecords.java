@@ -43,6 +43,7 @@ public class UserModelRecords {
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime gmtModified;
 
+
     /**
      * 生成UUID
      */

@@ -1,9 +1,9 @@
-package com.fuse.ai.server.manager.manager;
+package com.fuse.ai.server.web.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fuse.ai.server.manager.entity.News;
 
-public interface NewsManager {
+public interface NewsService {
 
     Page<News> getList(Integer category, int page, int size);
 

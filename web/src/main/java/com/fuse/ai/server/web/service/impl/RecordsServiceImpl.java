@@ -1,5 +1,7 @@
 package com.fuse.ai.server.web.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.fuse.ai.server.manager.entity.*;
 import com.fuse.ai.server.manager.enums.*;
 import com.fuse.ai.server.manager.manager.*;
@@ -349,7 +351,19 @@ public class RecordsServiceImpl implements RecordsService {
             recordVO.setRecordId(userModelRecords.getUuid());
             recordVO.setModelId(userModelRecords.getModelId());
             recordVO.setCategory(modelsIdToCategoryNameMap.get(userModelRecords.getModelId()));
-            recordVO.setModel(modelMap.get(userModelRecords.getModelId()) == null ? "" : modelMap.get(userModelRecords.getModelId()));
+            //处理veo3特殊逻辑
+            String model = modelMap.get(userModelRecords.getModelId()) == null ? "" : modelMap.get(userModelRecords.getModelId());
+            if(VeoModelEnum.VEO3.getCode().equals(model) || VeoModelEnum.VEO3_FAST.getCode().equals(model)) {
+                String generationType = "";
+                if (userModelRecords.getOriginalData() != null) {
+                    JSONObject jsonObject = JSON.parseObject(userModelRecords.getOriginalData().toString());
+                    generationType = jsonObject.getString("generationType");
+                }
+                recordVO.setModel(generationType);
+            } else {
+                recordVO.setModel(model);
+            }
+
             recordVO.setTitle(userModelRecords.getTitle());
             recordVO.setGtmCreated(userModelRecords.getGmtCreate().plusHours(user.getTimeZoneOffset()).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
             recordVOList.add(recordVO);

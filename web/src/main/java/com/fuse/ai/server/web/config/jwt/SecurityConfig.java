@@ -34,7 +34,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 // ----- 【请在此处配置您的公开接口】-----
                 // 示例：登录、注册、获取验证码等接口完全公开
                 .antMatchers("/api/user/login/google/callback", "/api/user/send-email-code", "/api/user/login-by-email").permitAll()
-                .antMatchers("/api/common/models/tree", "/api/callback/**").permitAll()
+                .antMatchers("/api/common/models/tree", "/api/callback/**","/api/news/**").permitAll()
                 // 示例：允许对OPTIONS方法的预检请求（用于跨域）
                 .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 // -----------------------------------

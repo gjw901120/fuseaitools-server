@@ -151,4 +151,5 @@ public class VeoGenerateDTO {
     public VeoAspectRatioEnum getAspectRatioEnum() {
         return VeoAspectRatioEnum.getByCode(aspectRatio);
     }
+
 }
