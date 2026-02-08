@@ -1,8 +1,14 @@
 package com.fuse.ai.server.manager.enums;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
+import lombok.Getter;
+
 /**
  * 响应状态码枚举
  */
+
+@Getter
 public enum ResponseCodeEnum {
 
     SUCCESS(200, "成功"),
@@ -26,12 +32,21 @@ public enum ResponseCodeEnum {
         this.message = message;
     }
 
-    public Integer getCode() {
-        return code;
+    // 添加这个方法用于JSON反序列化
+    @JsonCreator
+    public static ResponseCodeEnum fromCode(Integer code) {
+        for (ResponseCodeEnum value : values()) {
+            if (value.getCode().equals(code)) {
+                return value;
+            }
+        }
+        return null;
     }
 
-    public String getMessage() {
-        return message;
+    // 添加这个方法用于JSON序列化
+    @JsonValue
+    public Integer getCode() {
+        return code;
     }
 
     public static ResponseCodeEnum getByCode(Integer code) {

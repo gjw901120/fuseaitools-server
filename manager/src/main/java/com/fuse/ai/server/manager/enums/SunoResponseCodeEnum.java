@@ -1,6 +1,8 @@
 // SunoResponseCodeEnum.java
 package com.fuse.ai.server.manager.enums;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 
 @Getter
@@ -22,6 +24,23 @@ public enum SunoResponseCodeEnum {
     SunoResponseCodeEnum(Integer code, String message) {
         this.code = code;
         this.message = message;
+    }
+
+    // 添加这个方法用于JSON反序列化
+    @JsonCreator
+    public static SunoResponseCodeEnum fromCode(Integer code) {
+        for (SunoResponseCodeEnum value : values()) {
+            if (value.getCode().equals(code)) {
+                return value;
+            }
+        }
+        return null;
+    }
+
+    // 添加这个方法用于JSON序列化
+    @JsonValue
+    public Integer getCode() {
+        return code;
     }
 
     public static SunoResponseCodeEnum getByCode(Integer code) {

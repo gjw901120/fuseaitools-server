@@ -1,5 +1,7 @@
 package com.fuse.ai.server.manager.enums;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 
 @Getter
@@ -19,6 +21,23 @@ public enum ElevenLabsResponseCodeEnum {
     ElevenLabsResponseCodeEnum(Integer code, String message) {
         this.code = code;
         this.message = message;
+    }
+
+    // 添加这个方法用于JSON反序列化
+    @JsonCreator
+    public static ElevenLabsResponseCodeEnum fromCode(Integer code) {
+        for (ElevenLabsResponseCodeEnum value : values()) {
+            if (value.getCode().equals(code)) {
+                return value;
+            }
+        }
+        return null;
+    }
+
+    // 添加这个方法用于JSON序列化
+    @JsonValue
+    public Integer getCode() {
+        return code;
     }
 
     public static ElevenLabsResponseCodeEnum getByCode(Integer code) {

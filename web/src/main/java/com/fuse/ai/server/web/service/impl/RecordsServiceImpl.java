@@ -64,7 +64,7 @@ public class RecordsServiceImpl implements RecordsService {
     @Transactional(rollbackFor = Exception.class)
     public String create(Models model, String title, Object originalData, UserModelTask userModelTask,  verifyCreditsBO verifyCreditsBO) {
 
-        String extractTitle = title.length() > 30 ? title.substring(0, 30).concat("...") : title;
+        String extractTitle = title.length() > 20 ? title.substring(0, 20).concat("...") : title;
 
         UserModelRecords userModelRecords = UserModelRecords.create(userModelTask.getUserId(), model.getId(), extractTitle, originalData, 0);
 
@@ -217,8 +217,7 @@ public class RecordsServiceImpl implements RecordsService {
 
         UserModelRecords userModelRecords = userModelRecordsManager.getDetailIdByUuId(userModelTask.getRecordId());
         userModelRecords.setIsCompleted(1);
-        userModelRecords.setGmtCompleted(LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))));
-
+        userModelRecords.setGmtCompleted(LocalDateTime.now());
         userModelRecordsManager.updateById(userModelRecords);
 
         //去除冻结金额，更新状态
@@ -230,17 +229,17 @@ public class RecordsServiceImpl implements RecordsService {
             UserCredits userRechargeCredits = userCreditsManager.getDetailByUserIdAndType(userModelTask.getUserId(), UserCreditTypeEnum.RECHARGE.getCode());
             BigDecimal blockCredits = userRechargeCredits.getBlockCredits().compareTo(bill.getRechargeDeductCredits()) > 0 ?
                     userRechargeCredits.getBlockCredits().subtract(bill.getRechargeDeductCredits()) : BigDecimal.ZERO;
-            userRechargeCredits.setBlockCredits(blockCredits);
             userRechargeCredits.setCredits(userRechargeCredits.getCredits().add(userRechargeCredits.getBlockCredits()).subtract(blockCredits));
+            userRechargeCredits.setBlockCredits(blockCredits);
             userCreditsManager.updateById(userRechargeCredits);
         }
 
         if(bill.getSubscriptionDeductCredits().compareTo(BigDecimal.ZERO) > 0) {
             UserCredits userSubscriptionCredits = userCreditsManager.getDetailByUserIdAndType(userModelTask.getUserId(), UserCreditTypeEnum.SUBSCRIPTION.getCode());
-            BigDecimal blockCredits = userSubscriptionCredits.getBlockCredits().compareTo(bill.getRechargeDeductCredits()) > 0 ?
-                    userSubscriptionCredits.getBlockCredits().subtract(bill.getRechargeDeductCredits()) : BigDecimal.ZERO;
-            userSubscriptionCredits.setBlockCredits(blockCredits);
+            BigDecimal blockCredits = userSubscriptionCredits.getBlockCredits().compareTo(bill.getSubscriptionDeductCredits()) > 0 ?
+                    userSubscriptionCredits.getBlockCredits().subtract(bill.getSubscriptionDeductCredits()) : BigDecimal.ZERO;
             userSubscriptionCredits.setCredits(userSubscriptionCredits.getCredits().add(userSubscriptionCredits.getBlockCredits()).subtract(blockCredits));
+            userSubscriptionCredits.setBlockCredits(blockCredits);
             userCreditsManager.updateById(userSubscriptionCredits);
         }
 
@@ -351,6 +350,7 @@ public class RecordsServiceImpl implements RecordsService {
             recordVO.setRecordId(userModelRecords.getUuid());
             recordVO.setModelId(userModelRecords.getModelId());
             recordVO.setCategory(modelsIdToCategoryNameMap.get(userModelRecords.getModelId()));
+            recordVO.setIsCompleted(userModelRecords.getIsCompleted());
             //处理veo3特殊逻辑
             String model = modelMap.get(userModelRecords.getModelId()) == null ? "" : modelMap.get(userModelRecords.getModelId());
             if(VeoModelEnum.VEO3.getCode().equals(model) || VeoModelEnum.VEO3_FAST.getCode().equals(model)) {

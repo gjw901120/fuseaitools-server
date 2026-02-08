@@ -9,6 +9,7 @@ public class RecordVO {
     private Integer modelId;
     private String category;
     private String model;
+    private Integer isCompleted;
     private String title; // Record Name
     private String gtmCreated;
 }

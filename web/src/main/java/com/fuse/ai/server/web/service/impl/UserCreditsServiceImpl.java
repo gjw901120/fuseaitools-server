@@ -52,11 +52,13 @@ public class UserCreditsServiceImpl implements UserCreditsService {
         Integer  pricingRulesId = 0;
         if(PricingTypeEnum.CHARACTER.equals(model.getPricingType())) {
             ModelsPricingCharacter  pricingCharacter = modelsPricingCharacterManager.getDetailByModelId(model.getId());
-            credits = BigDecimal.valueOf((extraData.getEleCharacter() / pricingCharacter.getCharacter()))
+            double result = Math.ceil((double) extraData.getEleCharacter() / pricingCharacter.getCharacter());
+            credits = BigDecimal.valueOf(result)
                     .multiply(pricingCharacter.getCredits());
         } else if(PricingTypeEnum.DURATION.equals(model.getPricingType())) {
             ModelsPricingDuration  pricingDuration = modelsPricingDurationManager.getDetailByModelId(model.getId());
-            credits  = BigDecimal.valueOf((extraData.getEleDuration() / pricingDuration.getDuration()))
+            double result = Math.ceil((double) extraData.getEleDuration() / pricingDuration.getDuration());
+            credits  = BigDecimal.valueOf(result)
                     .multiply(pricingDuration.getCredits());
         } else if(PricingTypeEnum.ONCE.equals(model.getPricingType())){
             if(model.getIsPricingRules()  == 1) {

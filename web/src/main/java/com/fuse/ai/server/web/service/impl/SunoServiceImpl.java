@@ -89,7 +89,7 @@ public class SunoServiceImpl implements SunoService {
                 new HashMap<>()
         );
 
-        return new BaseResponse(recordsService.create(model, sunoGenerateDTO.getPrompt(), sunoGenerateDTO, userModelTask, verifyCreditsBO));
+        return new BaseResponse(recordsService.create(model, sunoGenerateDTO.getTitle(), sunoGenerateDTO, userModelTask, verifyCreditsBO));
 
     }
 
@@ -133,7 +133,7 @@ public class SunoServiceImpl implements SunoService {
                 new HashMap<>()
         );
 
-        return new BaseResponse(recordsService.create(model, sunoExtendDTO.getPrompt(), sunoExtendDTO, userModelTask, verifyCreditsBO));
+        return new BaseResponse(recordsService.create(model, sunoExtendDTO.getTitle(), sunoExtendDTO, userModelTask, verifyCreditsBO));
 
     }
 
@@ -183,7 +183,7 @@ public class SunoServiceImpl implements SunoService {
                 new HashMap<>()
         );
 
-        return new BaseResponse(recordsService.create(model, sunoUploadCoverDTO.getPrompt(), sunoUploadCoverDTO, userModelTask, verifyCreditsBO));
+        return new BaseResponse(recordsService.create(model, sunoUploadCoverDTO.getTitle(), sunoUploadCoverDTO, userModelTask, verifyCreditsBO));
 
     }
 
@@ -233,7 +233,7 @@ public class SunoServiceImpl implements SunoService {
                 new HashMap<>()
         );
 
-        return new BaseResponse(recordsService.create(model, sunoAddVocalsDTO.getPrompt(), sunoAddVocalsDTO, userModelTask, verifyCreditsBO));
+        return new BaseResponse(recordsService.create(model, sunoAddVocalsDTO.getTitle(), sunoAddVocalsDTO, userModelTask, verifyCreditsBO));
 
     }
 
@@ -283,7 +283,7 @@ public class SunoServiceImpl implements SunoService {
                 new HashMap<>()
         );
 
-        return new BaseResponse(recordsService.create(model, sunoUploadExtendDTO.getPrompt(), sunoUploadExtendDTO, userModelTask, verifyCreditsBO));
+        return new BaseResponse(recordsService.create(model, sunoUploadExtendDTO.getTitle(), sunoUploadExtendDTO, userModelTask, verifyCreditsBO));
 
     }
 
