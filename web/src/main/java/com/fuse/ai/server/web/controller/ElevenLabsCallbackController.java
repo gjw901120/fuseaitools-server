@@ -13,7 +13,7 @@ import javax.validation.Valid;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/callback/elevenlabs")
+@RequestMapping("/api/callback/ele")
 @RequiredArgsConstructor
 public class ElevenLabsCallbackController {
 
