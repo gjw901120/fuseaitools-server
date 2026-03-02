@@ -46,7 +46,7 @@ public class UserController {
 
         LoginResponse loginResponse = userService.loginByGoogle(code);
 
-        String redirectUrl = "http://localhost:3000/home".concat("?token=").concat(loginResponse.getToken());
+        String redirectUrl = "https://www.fuseaitools.com/home".concat("?token=").concat(loginResponse.getToken());
 
         log.info("Processing Google login redirectUrl：{} ", redirectUrl);
 
