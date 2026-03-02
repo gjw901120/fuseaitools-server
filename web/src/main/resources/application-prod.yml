@@ -135,6 +135,10 @@ mybatis-plus:
 callback:
   url: https://api.fuseaitools.com/api/callback
 
+webClient:
+  url: https://www.fuseaitools.com
+
+
 
 # 自定义配置
 app:
