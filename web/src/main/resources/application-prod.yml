@@ -102,6 +102,14 @@ feign:
       url: https://www.towerfun.net/v1
     sora:
       url: https://api.kie.ai
+    qwen:
+      url: https://api.kie.ai
+    wan:
+      url: https://api.kie.ai
+    seedance:
+      url: https://api.kie.ai
+    seedream:
+      url: https://api.kie.ai
     suno:
       url: https://api.kie.ai
     video:
