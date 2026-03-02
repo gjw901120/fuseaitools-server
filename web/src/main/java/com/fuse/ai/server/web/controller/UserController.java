@@ -1,12 +1,14 @@
 package com.fuse.ai.server.web.controller;
 
-import com.fuse.ai.server.web.model.dto.request.user.*;
+import com.fuse.ai.server.web.model.dto.request.user.LoginByEmailDTO;
+import com.fuse.ai.server.web.model.dto.request.user.SendEmailCodeDTO;
+import com.fuse.ai.server.web.model.dto.request.user.UpdateUserDTO;
+import com.fuse.ai.server.web.model.dto.request.user.UserJwtDTO;
 import com.fuse.ai.server.web.model.dto.response.LoginResponse;
 import com.fuse.ai.server.web.service.UserService;
 import com.fuse.common.core.entity.vo.ResponseResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -62,6 +64,15 @@ public class UserController {
     public ResponseResult<?> update(@AuthenticationPrincipal UserJwtDTO userJwtDTO, @RequestBody @Valid UpdateUserDTO updateUserDTO) {
 
         return ResponseResult.success(userService.update(userJwtDTO, updateUserDTO));
+
+    }
+
+    @GetMapping("/credits-detail")
+    public ResponseResult<?> creditsDetail(@RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
+                                           @RequestParam(value = "size", required = false, defaultValue = "10") Integer size,
+                                           @AuthenticationPrincipal UserJwtDTO userJwtDTO) {
+
+        return ResponseResult.success(userService.creditsDetail(userJwtDTO.getId(), page, size));
 
     }
 

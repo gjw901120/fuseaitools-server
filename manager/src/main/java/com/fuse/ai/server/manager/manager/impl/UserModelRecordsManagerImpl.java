@@ -47,6 +47,17 @@ public class UserModelRecordsManagerImpl implements UserModelRecordsManager {
     }
 
     @Override
+    public List<UserModelRecords> getListByUserId(Integer userId) {
+
+        LambdaQueryWrapper<UserModelRecords> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper
+                .eq(UserModelRecords::getUserId, userId)
+                .orderByDesc(UserModelRecords::getGmtCreate);
+
+        return userModelRecordsMapper.selectList(queryWrapper);
+    }
+
+    @Override
     public Integer updateById(UserModelRecords userModelRecords) {
         return userModelRecordsMapper.updateById(userModelRecords);
     }

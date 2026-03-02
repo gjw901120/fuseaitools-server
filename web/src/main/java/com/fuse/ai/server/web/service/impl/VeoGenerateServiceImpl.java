@@ -70,7 +70,7 @@ public class VeoGenerateServiceImpl implements VeoGenerateService {
 
         request.setGenerationType(VeoGenerationTypeEnum.fromCode(veoGenerateDTO.getGenerationType()));
 
-        request.setCallBackUrl(callbackUrl.concat("video/veo"));
+        request.setCallBackUrl(callbackUrl.concat("/video/veo"));
 
         VideoGenerateResponse response = videoManager.veoGenerate(request, model.getRequestToken());
 
@@ -110,7 +110,7 @@ public class VeoGenerateServiceImpl implements VeoGenerateService {
 
         BeanUtils.copyProperties(veoExtendDTO, request);
 
-        request.setCallBackUrl(callbackUrl.concat("video/veo"));
+        request.setCallBackUrl(callbackUrl.concat("/video/veo"));
 
         VideoGenerateResponse response = videoManager.veoExtend(request, model.getRequestToken());
 

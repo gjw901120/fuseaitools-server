@@ -1,28 +1,31 @@
 package com.fuse.ai.server.web.service.impl;
 
-import com.fuse.ai.server.web.common.utils.EmailSenderUtil;
-import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeTokenRequest;
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
-
-import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.gson.GsonFactory;
-import com.fuse.ai.server.manager.entity.User;
-import com.fuse.ai.server.manager.enums.AuthTypeEnum;
-import com.fuse.ai.server.manager.enums.SubscriptionPackageEnum;
-import com.fuse.ai.server.manager.manager.UserManager;
+import com.fuse.ai.server.manager.entity.*;
+import com.fuse.ai.server.manager.enums.*;
+import com.fuse.ai.server.manager.manager.*;
 import com.fuse.ai.server.web.common.enums.RedisKeysEnum;
+import com.fuse.ai.server.web.common.utils.BrevoEmailSender;
+import com.fuse.ai.server.web.common.utils.EmailSenderUtil;
 import com.fuse.ai.server.web.common.utils.JwtTokenUtil;
 import com.fuse.ai.server.web.common.utils.RedisUtil;
-import com.fuse.ai.server.web.model.dto.request.user.*;
+import com.fuse.ai.server.web.model.dto.request.user.LoginByEmailDTO;
+import com.fuse.ai.server.web.model.dto.request.user.SendEmailCodeDTO;
+import com.fuse.ai.server.web.model.dto.request.user.UpdateUserDTO;
+import com.fuse.ai.server.web.model.dto.request.user.UserJwtDTO;
 import com.fuse.ai.server.web.model.dto.response.LoginResponse;
+import com.fuse.ai.server.web.model.vo.CreditsDetailVO;
 import com.fuse.ai.server.web.model.vo.UserDetailVO;
 import com.fuse.ai.server.web.service.UserService;
 import com.fuse.common.core.exception.BaseException;
 import com.fuse.common.core.exception.error.SystemErrorType;
 import com.fuse.common.core.exception.error.ThirdpartyErrorType;
 import com.fuse.common.core.exception.error.UserErrorType;
+import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeTokenRequest;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.gson.GsonFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,11 +33,13 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -70,6 +75,33 @@ public class UserServiceImpl implements UserService {
     @Value("${app.google.client-secret}")
     private String googleClientSecret;
 
+    @Autowired
+    private BrevoEmailSender brevoEmailSender;
+
+    @Autowired
+    private BillManager billManager;
+
+    @Autowired
+    private UserCreditsManager userCreditsManager;
+
+    @Autowired
+    private OrderManager orderManager;
+
+    @Autowired
+    private SubscriptionConfigManager subscriptionConfigManager;
+
+    @Autowired
+    private SubscriptionManager subscriptionManager;
+
+    @Autowired
+    private ModelsManager modelsManager;
+
+    @Autowired
+    private ModelsCategoryManager modelsCategoryManager;
+
+    @Autowired
+    private UserModelRecordsManager userModelRecordsManager;
+
 
     @Override
     public Boolean sendEmailCode(SendEmailCodeDTO sendEmailCodeDTO, HttpServletRequest request) {
@@ -88,7 +120,7 @@ public class UserServiceImpl implements UserService {
         //  更新发送计数
         updateSendCounters(sendEmailCodeDTO.getEmail(), request);
 
-        sendCodeEmail(sendEmailCodeDTO.getEmail(), code);
+        brevoEmailSender.sendEmail(sendEmailCodeDTO.getEmail(), code, codeExpireMinutes);
 
         return true;
     }
@@ -262,6 +294,107 @@ public class UserServiceImpl implements UserService {
         user.setName(updateUserDTO.getUsername());
         user.setAvatar(updateUserDTO.getAvatar());
         return  userManager.updateById(user) > 0;
+    }
+
+    @Override
+    public CreditsDetailVO creditsDetail(Integer userId, Integer page, Integer size) {
+        page = (page == null || page <= 0) ? 1 : page;
+        size = (size == null || size <= 0) ? 10 : size;
+
+        CreditsDetailVO creditsDetailVO = new CreditsDetailVO();
+        List<CreditsDetailVO.CreditsDetail> creditsDetails = new ArrayList<>();
+        CreditsDetailVO.SubscriptionDetail subscriptionDetail = new CreditsDetailVO.SubscriptionDetail();
+        CreditsDetailVO.RechargeDetail rechargeDetail = new CreditsDetailVO.RechargeDetail();
+
+        User user = userManager.selectById(userId);
+
+        creditsDetailVO.setIsSubscription(0);
+        creditsDetailVO.setIsRecharge(0);
+        if(user.getIsSubscription() == 1) {
+            Order order = orderManager.selectByUserIdAndType(userId, OrderTypeEnum.SUBSCRIPTION);
+            if(order != null) {
+                creditsDetailVO.setIsSubscription(1);
+                SubscriptionConfig subscriptionConfig = subscriptionConfigManager.getDetailById(order.getConfigId());
+                UserCredits userCredits = userCreditsManager.getDetailByUserIdAndType(userId, 2); // 2: Subscription
+                Subscription subscription = subscriptionManager.selectByOrderId(order.getId());
+                subscriptionDetail.setCredits(subscriptionConfig.getTotalCredits());
+                subscriptionDetail.setRemainingCredits(userCredits.getCredits());
+                subscriptionDetail.setRatio(userCredits.getCredits().divide(subscriptionConfig.getTotalCredits(), 2, RoundingMode.HALF_UP));
+                subscriptionDetail.setStartDate(subscription.getStartDate());
+                subscriptionDetail.setEndDate(subscription.getEndDate());
+                subscriptionDetail.setPackageType(SubscriptionPackageEnum.of(subscriptionConfig.getSubscriptionPackage()).getDescription());
+                subscriptionDetail.setDiscount(subscriptionConfig.getDiscount());
+                subscriptionDetail.setType(SubscriptionTypeEnum.of(subscriptionConfig.getType()).getDescription());
+            }
+        }
+
+        if(user.getIsTopUp() == 1) {
+            Order order = orderManager.selectByUserIdAndType(userId, OrderTypeEnum.TOP_UP);
+            if(order != null) {
+                creditsDetailVO.setIsRecharge(1);
+                UserCredits userCredits = userCreditsManager.getDetailByUserIdAndType(userId, 1);
+                rechargeDetail.setRemainingCredits(userCredits.getCredits());
+            }
+        }
+
+        List<Models> modelsList = modelsManager.getAll();
+        Map<Integer, String> modelMap = modelsList.stream()
+                .collect(Collectors.toMap(Models::getId, Models::getName));
+        List<UserModelRecords> userModelRecordsList = userModelRecordsManager.getListByUserId(userId);
+        Map<String, UserModelRecords> recordsMap = userModelRecordsList.stream()
+                .collect(Collectors.toMap(
+                        UserModelRecords::getUuid,  // key 映射函数
+                        Function.identity()
+                ));
+        List<ModelsCategory> categoryList = modelsCategoryManager.getAll();
+        Map<Integer, String> modelsIdToCategoryNameMap = modelsList.stream()
+                .collect(Collectors.toMap(
+                        Models::getId,
+                        model -> {
+                            // 查找对应的分类名称
+                            return categoryList.stream()
+                                    .filter(category -> category.getId().equals(model.getCategoryId()))
+                                    .findFirst()
+                                    .map(ModelsCategory::getName)
+                                    .orElse("");
+                        },
+                        (oldValue, newValue) -> oldValue  // 处理重复键
+                ));
+
+        List<Bill> bills = billManager.getListByUserId(userId, page, size);
+        if(!bills.isEmpty()) {
+            for (Bill bill :bills) {
+                CreditsDetailVO.CreditsDetail creditsDetail = new CreditsDetailVO.CreditsDetail();
+                //处理veo3特殊逻辑
+                String model = modelMap.get(bill.getModelId()) == null ? "" : modelMap.get(bill.getModelId());
+                if(VeoModelEnum.VEO3.getCode().equals(model) || VeoModelEnum.VEO3_FAST.getCode().equals(model)) {
+                    String generationType = "";
+                    if (recordsMap.get(bill.getRecordId()).getOriginalData() != null) {
+                        Map<String, Object> dataMap = (Map<String, Object>) recordsMap.get(bill.getRecordId()).getOriginalData();
+                        generationType = (String) dataMap.get("generationType");
+                    }
+                    creditsDetail.setModel(generationType);
+                } else {
+                    creditsDetail.setModel(model);
+                }
+                creditsDetail.setCredits(bill.getSubscriptionDeductCredits());
+                creditsDetail.setDiscountCredits(bill.getRechargeDeductCredits().add(bill.getSubscriptionDeductCredits()));
+                creditsDetail.setStatus(bill.getStatus().getDescription());
+                creditsDetail.setTitle(recordsMap.get(bill.getRecordId()).getTitle());
+                creditsDetail.setModelCategory(modelsIdToCategoryNameMap.get(bill.getModelId()));
+                creditsDetail.setDiscount(bill.getDiscount());
+                creditsDetail.setCompletedDate(bill.getGmtModified().plusHours(user.getTimeZoneOffset()).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+                creditsDetail.setRecordId(bill.getRecordId());
+                creditsDetails.add(creditsDetail);
+            }
+        }
+
+
+        creditsDetailVO.setSubscriptionDetail(subscriptionDetail);
+        creditsDetailVO.setRechargeDetail(rechargeDetail);
+        creditsDetailVO.setCreditsDetails(creditsDetails);
+
+        return creditsDetailVO;
     }
 
     /**

@@ -143,11 +143,15 @@ public class SqlLogInterceptor implements Interceptor {
         }
 
         try {
-            // 替换参数占位符
+            // ✅ 使用 StringBuilder 手动遍历替换，避免正则问题
+            StringBuilder result = new StringBuilder();
+            List<String> paramValues = new ArrayList<>();
+
+            // 1. 先收集所有参数值
             TypeHandlerRegistry typeHandlerRegistry = configuration.getTypeHandlerRegistry();
             if (typeHandlerRegistry.hasTypeHandler(parameterObject.getClass())) {
                 // 简单类型参数
-                sql = sql.replaceFirst("\\?", formatParameterValue(parameterObject));
+                paramValues.add(formatParameterValue(parameterObject));
             } else {
                 // 复杂对象参数
                 MetaObject metaObject = configuration.newMetaObject(parameterObject);
@@ -155,13 +159,27 @@ public class SqlLogInterceptor implements Interceptor {
                     String propertyName = parameterMapping.getProperty();
                     if (metaObject.hasGetter(propertyName)) {
                         Object value = metaObject.getValue(propertyName);
-                        sql = sql.replaceFirst("\\?", formatParameterValue(value));
+                        paramValues.add(formatParameterValue(value));
                     } else if (boundSql.hasAdditionalParameter(propertyName)) {
                         Object value = boundSql.getAdditionalParameter(propertyName);
-                        sql = sql.replaceFirst("\\?", formatParameterValue(value));
+                        paramValues.add(formatParameterValue(value));
                     }
                 }
             }
+
+            // 2. 手动替换 ? 占位符
+            int paramIndex = 0;
+            for (int i = 0; i < sql.length(); i++) {
+                char c = sql.charAt(i);
+                if (c == '?' && paramIndex < paramValues.size()) {
+                    result.append(paramValues.get(paramIndex++));
+                } else {
+                    result.append(c);
+                }
+            }
+
+            sql = result.toString();
+
         } catch (Exception e) {
             // 参数替换失败，返回不带参数的SQL
             logger.warn("SQL参数替换失败，返回原始SQL", e);

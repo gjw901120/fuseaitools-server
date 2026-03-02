@@ -117,4 +117,32 @@ public class VideoCallbackServiceImpl implements VideoCallbackService {
 
     }
 
+    @Override
+    public void SeedanceCallback(SeedanceCallbackRequest request) {
+        SeedanceCallbackData data = request.getData();
+        log.info("Seedance回调处理完成, taskId: {}", data.getTaskId());
+        if (recordsService.isCompleted(data.getTaskId())) return;
+        if(request.getCode().equals(VideoRequestCodeEnum.SUCCESS.getCode())) {
+            List<String> outputUrl = new ArrayList<>();
+            outputUrl.add(s3UploadUtil.uploadFileFromUrl(data.getResultUrls().get(0)));
+            recordsService.completed(data.getTaskId(), outputUrl, new HashMap<>(), request);
+        } else {
+            recordsService.failed(data.getTaskId(), request);
+        }
+    }
+
+    @Override
+    public void WanCallback(WanCallbackRequest request) {
+        WanCallbackData data = request.getData();
+        log.info("Wan回调处理完成, taskId: {}", data.getTaskId());
+        if (recordsService.isCompleted(data.getTaskId())) return;
+        if(request.getCode().equals(VideoRequestCodeEnum.SUCCESS.getCode())) {
+            List<String> outputUrl = new ArrayList<>();
+            outputUrl.add(s3UploadUtil.uploadFileFromUrl(data.getResultUrls().get(0)));
+            recordsService.completed(data.getTaskId(), outputUrl, new HashMap<>(), request);
+        } else {
+            recordsService.failed(data.getTaskId(), request);
+        }
+    }
+
 }

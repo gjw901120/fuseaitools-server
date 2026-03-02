@@ -1,4 +1,3 @@
-// SubscriptionTypeEnum.java
 package com.fuse.ai.server.manager.enums;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
@@ -6,9 +5,11 @@ import lombok.Getter;
 
 @Getter
 public enum SubscriptionTypeEnum {
-    WEEKLY(1, "周订阅"),
-    MONTHLY(2, "月订阅"),
-    YEARLY(3, "年订阅");
+
+    FREE(0, "Free"),
+    WEEKLY(1, "Weekly"),
+    MONTHLY(2, "Monthly"),
+    YEARLY(3, "Yearly");
 
     @EnumValue
     private final Integer code;
@@ -17,5 +18,14 @@ public enum SubscriptionTypeEnum {
     SubscriptionTypeEnum(Integer code, String description) {
         this.code = code;
         this.description = description;
+    }
+
+    public static SubscriptionTypeEnum of(Integer code) {
+        for (SubscriptionTypeEnum value : SubscriptionTypeEnum.values()) {
+            if (value.code.equals(code)) {
+                return value;
+            }
+        }
+        return FREE;
     }
 }

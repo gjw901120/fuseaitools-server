@@ -154,4 +154,78 @@ public class ImageCallbackServiceImpl implements ImageCallbackService {
         }
     }
 
+    @Override
+    public void processQwenCallback(ImageQwenCallbackRequest request) {
+        try {
+            String taskId = request.getData().getTaskId();
+            String state = request.getData().getState();
+            String resultJson = request.getData().getResultJson();
+
+            //幂等性校验
+            if (recordsService.isCompleted(request.getData().getTaskId())) return;
+
+            log.info("Processing Qwen image callback: taskId={}, state={}", taskId, state);
+
+            if ("success".equals(state)) {
+                // 解析结果
+                ImageQwenCallbackRequest.QwenResult result =
+                        objectMapper.readValue(resultJson, ImageQwenCallbackRequest.QwenResult.class);
+
+                log.info("Qwen image generation completed: taskId={}, resultUrls={}", taskId, result.getResultUrls());
+
+                List<String> outputUrl = new ArrayList<>();
+                for (String url : result.getResultUrls()) {
+                    outputUrl.add(s3UploadUtil.uploadFileFromUrl(url));
+                }
+                recordsService.completed(request.getData().getTaskId(), outputUrl, new HashMap<>(), request);
+
+            } else if ("fail".equals(state)) {
+                log.info("Qwen image generation failed: taskId={}, info={}", taskId, request);
+
+                recordsService.failed(request.getData().getTaskId(), request);
+            }
+
+        } catch (Exception e) {
+            recordsService.failed(request.getData().getTaskId(), request);
+            log.error("Failed to process Qwen callback: taskId={}, error={}", request.getData().getTaskId(), e);
+        }
+    }
+
+    @Override
+    public void processSeedreamCallback(ImageSeedreamCallbackRequest request) {
+        try {
+            String taskId = request.getData().getTaskId();
+            String state = request.getData().getState();
+            String resultJson = request.getData().getResultJson();
+
+            //幂等性校验
+            if (recordsService.isCompleted(request.getData().getTaskId())) return;
+
+            log.info("Processing Seedream image callback: taskId={}, state={}", taskId, state);
+
+            if ("success".equals(state)) {
+                // 解析结果
+                ImageSeedreamCallbackRequest.SeedreamResult result =
+                        objectMapper.readValue(resultJson, ImageSeedreamCallbackRequest.SeedreamResult.class);
+
+                log.info("Seedream image generation completed: taskId={}, resultUrls={}", taskId, result.getResultUrls());
+
+                List<String> outputUrl = new ArrayList<>();
+                for (String url : result.getResultUrls()) {
+                    outputUrl.add(s3UploadUtil.uploadFileFromUrl(url));
+                }
+                recordsService.completed(request.getData().getTaskId(), outputUrl, new HashMap<>(), request);
+
+            } else if ("fail".equals(state)) {
+                log.info("Seedream image generation failed: taskId={}, info={}", taskId, request);
+
+                recordsService.failed(request.getData().getTaskId(), request);
+            }
+
+        } catch (Exception e) {
+            recordsService.failed(request.getData().getTaskId(), request);
+            log.error("Failed to process Qwen callback: taskId={}, error={}", request.getData().getTaskId(), e);
+        }
+    }
+
 }

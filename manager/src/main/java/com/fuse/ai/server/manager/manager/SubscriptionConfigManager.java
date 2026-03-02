@@ -9,4 +9,6 @@ public interface SubscriptionConfigManager {
 
     SubscriptionConfig getDetailById(Integer id);
 
+    SubscriptionConfig getDetailByStripePriceId(String stripePriceId);
+
 }

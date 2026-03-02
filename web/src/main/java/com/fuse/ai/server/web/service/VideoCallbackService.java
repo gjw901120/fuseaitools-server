@@ -32,4 +32,8 @@ public interface VideoCallbackService {
      */
     void SoraCallback(SoraCallbackRequest request);
 
+    void SeedanceCallback(SeedanceCallbackRequest request);
+
+    void WanCallback(WanCallbackRequest request);
+
 }

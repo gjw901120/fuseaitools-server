@@ -87,7 +87,7 @@ public class ElevenlabsServiceImpl implements ElevenlabsService {
 
         request.setInput(input);
 
-        request.setCallBackUrl(callbackUrl.concat("/elevenLabs/tts"));
+        request.setCallBackUrl(callbackUrl.concat("/ele/tts"));
 
         ElevenLabsResponse response = elevenLabsManager.textToSpeech(request, model.getRequestToken());
 
@@ -149,7 +149,7 @@ public class ElevenlabsServiceImpl implements ElevenlabsService {
 
         request.setInput(input);
 
-        request.setCallBackUrl(callbackUrl.concat("/elevenLabs/stt"));
+        request.setCallBackUrl(callbackUrl.concat("/ele/stt"));
 
         ElevenLabsResponse response = elevenLabsManager.speechToText(request, model.getRequestToken());
 
@@ -206,7 +206,7 @@ public class ElevenlabsServiceImpl implements ElevenlabsService {
 
         request.setInput(input);
 
-        request.setCallBackUrl(callbackUrl.concat("/elevenLabs/audio-isolation"));
+        request.setCallBackUrl(callbackUrl.concat("/ele/audio-isolation"));
 
         ElevenLabsResponse response = elevenLabsManager.isolateAudio(request, model.getRequestToken());
 
@@ -261,7 +261,7 @@ public class ElevenlabsServiceImpl implements ElevenlabsService {
 
         request.setInput(input);
 
-        request.setCallBackUrl(callbackUrl.concat("/elevenLabs/sound-effect"));
+        request.setCallBackUrl(callbackUrl.concat("/ele/sound-effect"));
 
         ElevenLabsResponse response = elevenLabsManager.generateSoundEffect(request, model.getRequestToken());
 

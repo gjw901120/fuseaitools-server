@@ -95,4 +95,38 @@ public class ImageCallbackController {
             return "failed";
         }
     }
+
+    @PostMapping("/qwen")
+    public String QwenCallback(@Valid @RequestBody ImageQwenCallbackRequest request) {
+        try {
+            String taskId = request.getData().getTaskId();
+            log.info("Received Qwen image callback: taskId={}", taskId);
+
+            imageCallbackService.processQwenCallback(request);
+
+            return "success";
+
+        } catch (Exception e) {
+            log.error("Qwen image callback processing failed: taskId={}, error={}", request.getData().getTaskId(), e.getMessage(), e);
+
+            return "failed";
+        }
+    }
+
+    @PostMapping("/seedream")
+    public String SeedreamCallback(@Valid @RequestBody ImageSeedreamCallbackRequest request) {
+        try {
+            String taskId = request.getData().getTaskId();
+            log.info("Received Seedream image callback: taskId={}", taskId);
+
+            imageCallbackService.processSeedreamCallback(request);
+
+            return "success";
+
+        } catch (Exception e) {
+            log.error("Seedream image callback processing failed: taskId={}, error={}", request.getData().getTaskId(), e.getMessage(), e);
+
+            return "failed";
+        }
+    }
 }

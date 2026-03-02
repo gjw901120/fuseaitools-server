@@ -27,10 +27,10 @@ public class SubscriptionPlan {
     private LocalDate endDate;
 
     @Builder.Default
-    private BigDecimal amount = BigDecimal.ZERO;
+    private BigDecimal credits = BigDecimal.ZERO;
 
     @Builder.Default
-    private BigDecimal giftAmount = BigDecimal.ZERO;
+    private BigDecimal giftCredits = BigDecimal.ZERO;
 
     private Integer status;
 
@@ -46,15 +46,15 @@ public class SubscriptionPlan {
     /**
      * 创建订阅计划对象的便捷方法
      */
-    public static SubscriptionPlan create(Integer userId, Integer subscriptionId, LocalDate startDate, LocalDate endDate, BigDecimal amount,
-                                          BigDecimal giftAmount, Integer status) {
+    public static SubscriptionPlan create(Integer userId, Integer subscriptionId, LocalDate startDate, LocalDate endDate, BigDecimal credits,
+                                          BigDecimal giftCredits, Integer status) {
         return SubscriptionPlan.builder()
                 .userId(userId)
                 .subscriptionId(subscriptionId)
                 .startDate(startDate)
                 .endDate(endDate)
-                .amount(amount != null ? amount : BigDecimal.ZERO)
-                .giftAmount(giftAmount != null ? giftAmount : BigDecimal.ZERO)
+                .credits(credits != null ? credits : BigDecimal.ZERO)
+                .giftCredits(giftCredits != null ? giftCredits : BigDecimal.ZERO)
                 .status(status)
                 .build();
     }

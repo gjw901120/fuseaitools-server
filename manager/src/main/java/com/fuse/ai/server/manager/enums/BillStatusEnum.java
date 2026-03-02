@@ -5,9 +5,9 @@ import lombok.Getter;
 
 @Getter
 public enum BillStatusEnum {
-    PROGRESS(1, "进行中"),
-    COMPLETED(2, "已完成"),
-    FAILED(3, "失败");
+    PROGRESS(1, "Progress"),
+    COMPLETED(2, "Completed"),
+    FAILED(3, "Failed");
 
     @EnumValue
     private final Integer code;
@@ -16,6 +16,15 @@ public enum BillStatusEnum {
     BillStatusEnum(Integer code, String description) {
         this.code = code;
         this.description = description;
+    }
+
+    public static BillStatusEnum of(Integer code) {
+        for (BillStatusEnum value : BillStatusEnum.values()) {
+            if (value.code.equals(code)) {
+                return value;
+            }
+        }
+        return PROGRESS;
     }
 
 }

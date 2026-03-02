@@ -1,4 +1,3 @@
-// SoraFeignClient.java
 package com.fuse.ai.server.manager.feign.client;
 
 import com.fuse.ai.server.manager.feign.config.FeignConfig;

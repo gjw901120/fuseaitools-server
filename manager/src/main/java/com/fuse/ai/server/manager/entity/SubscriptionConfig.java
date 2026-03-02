@@ -13,6 +13,8 @@ public class SubscriptionConfig {
     @TableId(type = IdType.AUTO)
     private Integer id;
 
+    private String stripePriceId;
+
     private Integer type;
 
     @TableField("`package`")

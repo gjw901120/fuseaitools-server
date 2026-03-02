@@ -75,4 +75,26 @@ public class VideoCallbackController {
         return "success";
     }
 
+    /**
+     * 处理Seedance视频生成回调
+     */
+    @PostMapping("/seedance")
+    public String seedanceCallback(@Valid @RequestBody SeedanceCallbackRequest request) {
+
+        videoCallbackService.SeedanceCallback(request);
+
+        return "success";
+    }
+
+    /**
+     * 处理Wan视频生成回调
+     */
+    @PostMapping("/wan")
+    public String wanCallback(@Valid @RequestBody WanCallbackRequest request) {
+
+        videoCallbackService.WanCallback(request);
+
+        return "success";
+    }
+
 }

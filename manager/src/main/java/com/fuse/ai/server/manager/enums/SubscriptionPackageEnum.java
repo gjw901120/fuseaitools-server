@@ -5,10 +5,10 @@ import lombok.Getter;
 
 @Getter
 public enum SubscriptionPackageEnum {
-    NONE(0, "无"),
-    BASIC(1, "基础版"),
-    PRO(2, "专业版"),
-    ULTIMATE(3, "无限版");
+    NONE(0, ""),
+    BASIC(1, "Basic"),
+    PRO(2, "Pro"),
+    ULTIMATE(3, "Ultimate");
 
     @EnumValue
     private final Integer code;
@@ -17,5 +17,14 @@ public enum SubscriptionPackageEnum {
     SubscriptionPackageEnum(Integer code, String description) {
         this.code = code;
         this.description = description;
+    }
+
+    public static SubscriptionPackageEnum of(Integer code) {
+        for (SubscriptionPackageEnum value : SubscriptionPackageEnum.values()) {
+            if (value.code.equals(code)) {
+                return value;
+            }
+        }
+        return NONE;
     }
 }

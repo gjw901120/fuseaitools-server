@@ -51,6 +51,10 @@ public class Order {
 
     private String stripeInvoiceId;
 
+    private String stripeChargeId;
+
+    private String stripeOrderId;
+
     @Builder.Default
     private Integer isDel = 0;
 
@@ -72,7 +76,8 @@ public class Order {
      */
     public static Order create(Integer userId, OrderTypeEnum type, Integer couponId, BigDecimal paymentAmount, BigDecimal discountAmount,
                                BigDecimal amount, BigDecimal giftAmount, OrderStatusEnum status,
-                               String stripePaymentIntentId, String stripeCustomerId, String stripeInvoiceId) {
+                               String stripeOrderId,
+                               String stripePaymentIntentId, String stripeCustomerId, String stripeInvoiceId, String stripeChargeId) {
         return Order.builder()
                 .userId(userId)
                 .type(type)
@@ -85,6 +90,8 @@ public class Order {
                 .stripePaymentIntentId(stripePaymentIntentId)
                 .stripeCustomerId(stripeCustomerId)
                 .stripeInvoiceId(stripeInvoiceId)
+                .stripeOrderId(stripeOrderId)
+                .stripeChargeId(stripeChargeId)
                 .build();
     }
 }

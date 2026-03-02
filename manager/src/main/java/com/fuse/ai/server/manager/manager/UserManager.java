@@ -8,6 +8,10 @@ public interface UserManager {
 
     User selectById(Integer id);
 
+    User selectByUuid(String uuid);
+
+    User selectByStripeCustomerId(String stripeCustomerId);
+
     User selectByEmail(String email);
 
     User selectByThirdPartyId(String thirdPartyId);

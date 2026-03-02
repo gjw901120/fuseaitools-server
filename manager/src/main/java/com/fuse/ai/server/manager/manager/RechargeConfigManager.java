@@ -6,4 +6,6 @@ public interface RechargeConfigManager {
 
     RechargeConfig getDetailById(Integer id);
 
+    RechargeConfig getDetailByStripePriceId(String stripePriceId);
+
 }

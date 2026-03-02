@@ -1,7 +1,7 @@
 package com.fuse.ai.server.manager.manager.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fuse.ai.server.manager.entity.Bill;
 import com.fuse.ai.server.manager.manager.BillManager;
 import com.fuse.ai.server.manager.mapper.BillMapper;
@@ -23,10 +23,12 @@ public class BillManagerImpl implements BillManager {
     }
 
     @Override
-    public List<Bill> getListByUserId(Integer userId) {
+    public List<Bill> getListByUserId(Integer userId, Integer page, Integer size) {
+        Page<Bill> pageInfo = new Page<>(page, size);
         LambdaQueryWrapper<Bill> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(Bill::getUserId, userId);
-        return billMapper.selectList(queryWrapper);
+        queryWrapper.orderByDesc(Bill::getGmtModified);
+        return billMapper.selectPage(pageInfo, queryWrapper).getRecords();
     }
 
     @Override

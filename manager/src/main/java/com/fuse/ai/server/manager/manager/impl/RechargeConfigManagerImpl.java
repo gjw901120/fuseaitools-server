@@ -21,4 +21,13 @@ public class RechargeConfigManagerImpl implements RechargeConfigManager {
                 .eq(RechargeConfig::getIsDel, 0);
         return rechargeConfigMapper.selectOne(queryWrapper);
     }
+
+    @Override
+    public RechargeConfig getDetailByStripePriceId(String stripePriceId) {
+        LambdaQueryWrapper<RechargeConfig> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper
+                .eq(RechargeConfig::getStripePriceId, stripePriceId)
+                .eq(RechargeConfig::getIsDel, 0);
+        return rechargeConfigMapper.selectOne(queryWrapper);
+    }
 }

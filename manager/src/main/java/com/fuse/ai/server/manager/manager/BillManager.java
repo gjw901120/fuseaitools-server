@@ -8,7 +8,7 @@ public interface BillManager {
 
     Integer insert(Bill bill);
 
-    List<Bill> getListByUserId(Integer userId);
+    List<Bill> getListByUserId(Integer userId, Integer page, Integer size);
 
     Bill getDetailByRecordId(String recordId);
 

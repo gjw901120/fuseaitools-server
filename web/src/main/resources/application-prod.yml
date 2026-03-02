@@ -5,13 +5,42 @@ spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     type: com.alibaba.druid.pool.DruidDataSource
-    url: jdbc:mysql://localhost:3306/ai_tools
-    username: root
-    password: 123456
+    url: jdbc:mysql://database-fuseai.c1q86e0oyp0s.us-west-1.rds.amazonaws.com:3306/ai_tools?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&characterEncoding=utf8&connectTimeout=3000&socketTimeout=30000
+    username: admin  # RDS 用户名，不是 root
+    password: Fuseaitools0303!  # RDS 密码
+
+    # Druid 连接池生产配置
+    druid:
+      # 核心连接池配置（生产环境适当调大）
+      initial-size: 5
+      min-idle: 5
+      max-active: 20
+      max-wait: 10000
+
+      # 连接验证配置
+      validation-query: SELECT 1
+      validation-query-timeout: 3000
+      test-on-borrow: false
+      test-on-return: false
+      test-while-idle: true
+      time-between-eviction-runs-millis: 60000
+      min-evictable-idle-time-millis: 300000
+      max-evictable-idle-time-millis: 600000
+
+      # ⭐ 关键：错误重试控制
+      connection-error-retry-attempts: 1
+      break-after-acquire-failure: true
+      time-between-connect-error-millis: 30000
+      max-create-task-count: 3
+
+      # 连接泄漏检测
+      remove-abandoned: true
+      remove-abandoned-timeout: 1800
+      log-abandoned: true
   redis:
     host: 127.0.0.1
     port: 6379
-    password: YourStrongRedisPassword123!
+    password: 
     database: 0
 
 # AWS SES 配置
@@ -38,6 +67,19 @@ aws:
     # 发送设置
     max-retries: 3
     retry-delay-ms: 1000
+
+brevo:
+  sender:
+    apiKey: ${BREVO_API_KEY}
+    email: no-reply@fuseaitools.com
+    name: FuseAITools Service
+
+
+stripe:
+  api:
+    secret-key: ${STRIPE_SECRET_KEY}
+  webhook:
+    secret: ${STRIPE_WEBHOOK_SECRET}
 
 server:
   port: 8080

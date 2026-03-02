@@ -51,7 +51,7 @@ public interface VideoFeignClient {
     /**
      * 视频Luma修改
      */
-    @PostMapping("/api/v1/luma/modify")
+    @PostMapping("/api/v1/modify/generate")
     @Headers("Content-Type: application/json")
     VideoGenerateResponse lumaModify(@Valid @RequestBody LumaGenerateRequest request, @RequestParam("apiKey") String apiKey);
 

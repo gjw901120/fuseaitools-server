@@ -1,9 +1,11 @@
 package com.fuse.ai.server.web.model.dto.request.callback.video;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 
@@ -11,6 +13,7 @@ import java.util.List;
  * Sora回调数据
  */
 @Data
+@Slf4j
 public class SoraCallbackData {
     private Long completeTime;
 
@@ -45,8 +48,43 @@ public class SoraCallbackData {
      * 解析参数JSON
      */
     public SoraParam getParamObject() {
-        if (param != null) {
-            return JSON.parseObject(param, SoraParam.class);
+        if (param != null && !param.trim().isEmpty()) {
+            try {
+                // 第一次解析：获取外层 JSON
+                JSONObject outerJson = JSON.parseObject(param);
+
+                // 提取 input 字段，它可能是一个字符串或对象
+                Object inputObj = outerJson.get("input");
+                SoraParam soraParam = new SoraParam();
+
+                // 设置其他字段
+                soraParam.setCallBackUrl(outerJson.getString("callBackUrl"));
+                soraParam.setModel(outerJson.getString("model"));
+
+                // 处理 input 字段
+                SoraParam.SoraInput input = null;
+                if (inputObj instanceof String inputStr) {
+                    // 如果 input 是字符串，再次解析
+                    try {
+                        input = JSON.parseObject(inputStr, SoraParam.SoraInput.class);
+                    } catch (Exception e) {
+                        // 如果解析失败，创建一个包含视频URL的简单对象
+                        input = new SoraParam.SoraInput();
+                        // 这里可以根据实际情况处理
+                    }
+                } else if (inputObj instanceof JSONObject) {
+                    // 如果 input 已经是 JSON 对象
+                    input = JSON.parseObject(((JSONObject) inputObj).toJSONString(),
+                            SoraParam.SoraInput.class);
+                }
+
+                soraParam.setInput(input);
+                return soraParam;
+
+            } catch (Exception e) {
+                log.error("Failed to parse param JSON: {}, error: {}", param, e.getMessage());
+                return null;
+            }
         }
         return null;
     }

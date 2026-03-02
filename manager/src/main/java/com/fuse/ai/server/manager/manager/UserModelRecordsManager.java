@@ -12,6 +12,7 @@ public interface UserModelRecordsManager {
     UserModelRecords getDetailIdByUuId(String Uuid);
 
     List<UserModelRecords> getListByUserId(Integer page, Integer size,Integer userId);
+    List<UserModelRecords> getListByUserId(Integer userId);
 
     Integer updateById(UserModelRecords userModelRecords);
 

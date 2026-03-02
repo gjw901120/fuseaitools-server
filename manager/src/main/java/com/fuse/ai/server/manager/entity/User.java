@@ -18,6 +18,9 @@ public class User {
     @TableId(type = IdType.AUTO)
     private Integer id;
 
+    @Builder.Default
+    private String uuid = generateUuid();
+
     private String name;
 
     private String email;
@@ -36,6 +39,8 @@ public class User {
 
     private SubscriptionPackageEnum subscriptionPackage;
 
+    private String stripeCustomerId;
+
     private String timeZone;
 
     private Integer timeZoneOffset;
@@ -48,6 +53,11 @@ public class User {
 
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime gmtModified;
+
+    private static String generateUuid() {
+        return java.util.UUID.randomUUID().toString().replace("-", "");
+    }
+
 
     /**
      * 创建用户对象的便捷方法

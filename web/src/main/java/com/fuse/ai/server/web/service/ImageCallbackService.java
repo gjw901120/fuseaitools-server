@@ -23,4 +23,8 @@ public interface ImageCallbackService {
     void processNanoBananaCallback(ImageNanoBananaCallbackRequest request);
 
     void processMjGenerateCallback(ImageMjGenerateCallbackRequest request);
+
+    void processQwenCallback(ImageQwenCallbackRequest request);
+
+    void processSeedreamCallback(ImageSeedreamCallbackRequest request);
 }

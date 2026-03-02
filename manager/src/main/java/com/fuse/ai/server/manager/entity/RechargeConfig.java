@@ -16,6 +16,8 @@ public class RechargeConfig {
     @TableId(type = IdType.AUTO)
     private Integer id;
 
+    private String stripePriceId;
+
     /**
      * 费用
      */

@@ -26,6 +26,24 @@ public class UserManagerImpl implements UserManager {
     }
 
     @Override
+    public User selectByUuid(String uuid) {
+        LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper
+                .eq(User::getUuid, uuid)
+                .eq(User::getIsDel, 0);
+        return userMapper.selectOne(queryWrapper);
+    }
+
+    @Override
+    public User selectByStripeCustomerId(String stripeCustomerId) {
+        LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper
+                .eq(User::getStripeCustomerId, stripeCustomerId)
+                .eq(User::getIsDel, 0);
+        return userMapper.selectOne(queryWrapper);
+    }
+
+    @Override
     public Integer updateById(User user) {
         return userMapper.updateById(user);
     }

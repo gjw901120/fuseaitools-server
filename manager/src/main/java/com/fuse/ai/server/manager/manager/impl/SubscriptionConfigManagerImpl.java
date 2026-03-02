@@ -32,4 +32,13 @@ public class SubscriptionConfigManagerImpl implements SubscriptionConfigManager 
                 .eq(SubscriptionConfig::getIsDel, 0);
         return subscriptionConfigMapper.selectOne(queryWrapper);
     }
+
+    @Override
+    public SubscriptionConfig getDetailByStripePriceId(String stripePriceId) {
+        LambdaQueryWrapper<SubscriptionConfig> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper
+                .eq(SubscriptionConfig::getStripePriceId, stripePriceId)
+                .eq(SubscriptionConfig::getIsDel, 0);
+        return subscriptionConfigMapper.selectOne(queryWrapper);
+    }
 }

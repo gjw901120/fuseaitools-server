@@ -5,9 +5,31 @@ spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     type: com.alibaba.druid.pool.DruidDataSource
-    url: jdbc:mysql://localhost:3306/ai_tools
-    username: root
-    password: 123456
+    url: jdbc:mysql://localhost:3307/ai_tools?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&characterEncoding=utf8&connectTimeout=5000&socketTimeout=30000
+    username: admin
+    password: Fuseaitools0303!
+    druid:
+      # 核心连接池配置
+      initial-size: 1                # 初始连接数（从5降到1）
+      min-idle: 1                     # 最小空闲连接
+      max-active: 5                   # 最大活跃连接（从20降到5）
+      max-wait: 5000                   # 获取连接最大等待时间
+
+      # 连接验证配置
+      validation-query: SELECT 1
+      validation-query-timeout: 3000
+      test-on-borrow: false           # 获取连接时不验证（重要！）
+      test-on-return: false           # 归还连接时不验证
+      test-while-idle: true           # 空闲时验证
+      time-between-eviction-runs-millis: 60000
+      min-evictable-idle-time-millis: 300000
+
+      # ⭐ 关键配置：控制错误重试行为
+      connection-error-retry-attempts: 1        # 连接失败重试次数（从默认改为1）
+      break-after-acquire-failure: true          # 获取失败后直接断开（防止无限重试）
+      time-between-connect-error-millis: 30000   # 连接错误后等待30秒再重试
+      max-create-task-count: 3                    # 最大创建连接线程数
+      not-full-timeout-retry-count: 2             # 非完整超时重试次数
   redis:
     host: 127.0.0.1
     port: 6379
@@ -39,6 +61,18 @@ aws:
     max-retries: 3
     retry-delay-ms: 1000
 
+brevo:
+  sender:
+    apiKey: ${BREVO_API_KEY}
+    email: no-reply@fuseaitools.com
+    name: FuseAITools Service
+
+stripe:
+  api:
+    secret-key: ${STRIPE_SECRET_KEY}
+  webhook:
+    secret: ${STRIPE_WEBHOOK_SECRET}
+
 server:
   port: 8080
 
@@ -59,6 +93,14 @@ feign:
     midjourney:
       url: https://api.kie.ai
     sora:
+      url: https://api.kie.ai
+    qwen:
+      url: https://api.kie.ai
+    wan:
+      url: https://api.kie.ai
+    seedance:
+      url: https://api.kie.ai
+    seedream:
       url: https://api.kie.ai
     suno:
       url: https://api.kie.ai
@@ -84,6 +126,8 @@ mybatis-plus:
 
 callback:
   url: https://api.fuseaitools.com/api/callback
+webClient:
+  url: https://www.fuseaitools.com
 
 
 # 自定义配置
