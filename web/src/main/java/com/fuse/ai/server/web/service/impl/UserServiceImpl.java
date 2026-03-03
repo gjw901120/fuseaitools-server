@@ -33,6 +33,7 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -148,6 +149,14 @@ public class UserServiceImpl implements UserService {
                     0
             );
             userManager.insert(user);
+            //初次赠送100credits
+            userCreditsManager.insert(UserCredits.create(
+                    user.getId(),
+                    BigDecimal.valueOf(100),
+                    BigDecimal.valueOf(0),
+                    1,
+                    1
+            ));
         } else {
             userManager.updateById(user);
         }
@@ -197,6 +206,14 @@ public class UserServiceImpl implements UserService {
                     .avatar(newUser.getAvatar())
                     .email(newUser.getEmail())
                     .build();
+            //初次赠送100credits
+            userCreditsManager.insert(UserCredits.create(
+                    newUser.getId(),
+                    BigDecimal.valueOf(100),
+                    BigDecimal.valueOf(0),
+                    1,
+                    1
+            ));
         } else {
              userJwtDTO = UserJwtDTO.builder()
                     .id(user.getId())
