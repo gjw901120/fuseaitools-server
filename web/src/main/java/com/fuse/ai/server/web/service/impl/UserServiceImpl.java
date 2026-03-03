@@ -227,7 +227,7 @@ public class UserServiceImpl implements UserService {
                     googleClientId,
                     googleClientSecret,
                     authorizationCode,
-                    "http://127.0.0.1:8080/api/user/login/google/callback") // 请确认与前端完全一致
+                    "https://api.fuseaitools.com/api/user/login/google/callback") // 请确认与前端完全一致
                     .execute();
 
         } catch (IOException e) {
