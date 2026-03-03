@@ -40,7 +40,7 @@ spring:
   redis:
     host: 172.31.22.233
     port: 6379
-    password:
+    password: YourStrongRedisPassword123!
     database: 0
 
 # AWS SES 配置
