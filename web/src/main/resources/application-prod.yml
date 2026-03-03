@@ -38,7 +38,7 @@ spring:
       remove-abandoned-timeout: 1800
       log-abandoned: true
   redis:
-    host: 127.0.0.1
+    host: 172.31.22.233
     port: 6379
     password:
     database: 0
