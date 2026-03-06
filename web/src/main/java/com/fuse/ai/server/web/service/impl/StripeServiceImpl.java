@@ -374,6 +374,11 @@ public class StripeServiceImpl implements StripeService {
             throw new BaseException(UserErrorType.USER_CLIENT_ERROR, "User has no subscription order");
         }
 
+        User user = userManager.selectById(userId);
+        if(user == null || user.getIsSubscription() == 0) {
+            throw new BaseException(UserErrorType.USER_CLIENT_ERROR, "User has no subscription");
+        }
+
         Subscription subscription = Subscription.retrieve(order.getStripeInvoiceId());
         Subscription canceledSubscription = subscription.cancel();
 

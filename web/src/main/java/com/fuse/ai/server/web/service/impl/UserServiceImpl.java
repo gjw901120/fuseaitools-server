@@ -100,6 +100,9 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserModelRecordsManager userModelRecordsManager;
 
+    @Autowired
+    private OrderRefundManager orderRefundManager;
+
 
     @Override
     public Boolean sendEmailCode(SendEmailCodeDTO sendEmailCodeDTO, HttpServletRequest request) {
@@ -324,30 +327,41 @@ public class UserServiceImpl implements UserService {
 
         creditsDetailVO.setIsSubscription(0);
         creditsDetailVO.setIsRecharge(0);
-        if(user.getIsSubscription() == 1) {
-            Order order = orderManager.selectByUserIdAndType(userId, OrderTypeEnum.SUBSCRIPTION);
-            if(order != null) {
-                creditsDetailVO.setIsSubscription(1);
-                SubscriptionConfig subscriptionConfig = subscriptionConfigManager.getDetailById(order.getConfigId());
-                UserCredits userCredits = userCreditsManager.getDetailByUserIdAndType(userId, 2); // 2: Subscription
-                Subscription subscription = subscriptionManager.selectByOrderId(order.getId());
-                subscriptionDetail.setCredits(subscriptionConfig.getTotalCredits());
-                subscriptionDetail.setRemainingCredits(userCredits.getCredits());
-                subscriptionDetail.setRatio(userCredits.getCredits().divide(subscriptionConfig.getTotalCredits(), 2, RoundingMode.HALF_UP));
-                subscriptionDetail.setStartDate(subscription.getStartDate());
-                subscriptionDetail.setEndDate(subscription.getEndDate());
-                subscriptionDetail.setPackageType(SubscriptionPackageEnum.of(subscriptionConfig.getSubscriptionPackage()).getDescription());
-                subscriptionDetail.setDiscount(subscriptionConfig.getDiscount());
-                subscriptionDetail.setType(SubscriptionTypeEnum.of(subscriptionConfig.getType()).getDescription());
+
+        Order order = orderManager.selectByUserIdAndType(userId, OrderTypeEnum.SUBSCRIPTION);
+        if(order != null) {
+            creditsDetailVO.setIsSubscription(1);
+            subscriptionDetail.setIsCancel(user.getIsSubscription());
+            SubscriptionConfig subscriptionConfig = subscriptionConfigManager.getDetailById(order.getConfigId());
+            UserCredits userCredits = userCreditsManager.getDetailByUserIdAndType(userId, 2); // 2: Subscription
+            Subscription subscription = subscriptionManager.selectByOrderId(order.getId());
+            subscriptionDetail.setCredits(subscriptionConfig.getTotalCredits());
+            subscriptionDetail.setRemainingCredits(userCredits.getCredits());
+            subscriptionDetail.setRatio(userCredits.getCredits().divide(subscriptionConfig.getTotalCredits(), 2, RoundingMode.HALF_UP));
+            subscriptionDetail.setStartDate(subscription.getStartDate());
+            subscriptionDetail.setEndDate(subscription.getEndDate());
+            subscriptionDetail.setPackageType(SubscriptionPackageEnum.of(subscriptionConfig.getSubscriptionPackage()).getDescription());
+            subscriptionDetail.setDiscount(subscriptionConfig.getDiscount());
+            subscriptionDetail.setType(SubscriptionTypeEnum.of(subscriptionConfig.getType()).getDescription());
+            OrderRefund orderRefund = orderRefundManager.selectByOrderId(order.getId());
+            subscriptionDetail.setRefundStatus(0);
+            if(orderRefund != null) {
+                subscriptionDetail.setRefundStatus(orderRefund.getStatus());
             }
         }
 
+
         if(user.getIsTopUp() == 1) {
-            Order order = orderManager.selectByUserIdAndType(userId, OrderTypeEnum.TOP_UP);
-            if(order != null) {
+            Order rechargeOrder = orderManager.selectByUserIdAndType(userId, OrderTypeEnum.TOP_UP);
+            if(rechargeOrder != null) {
                 creditsDetailVO.setIsRecharge(1);
+                OrderRefund orderRefund = orderRefundManager.selectByOrderId(rechargeOrder.getId());
                 UserCredits userCredits = userCreditsManager.getDetailByUserIdAndType(userId, 1);
                 rechargeDetail.setRemainingCredits(userCredits.getCredits());
+                rechargeDetail.setRefundStatus(0);
+                if(orderRefund != null) {
+                    rechargeDetail.setRefundStatus(orderRefund.getStatus());
+                }
             }
         }
 

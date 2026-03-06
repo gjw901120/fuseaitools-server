@@ -23,9 +23,9 @@ public interface OrderService {
 
     void refundChange(String refundId, Event event);
 
-    OrderRefundVO refundRecharge(Integer userId);
+    OrderRefundVO refundRecharge(Integer userId, Boolean isConfirm);
 
-    OrderRefundVO refundSubscription(Integer userId);
+    OrderRefundVO refundSubscription(Integer userId, Boolean isConfirm);
 
     void cancelSubscription(Integer userId);
 

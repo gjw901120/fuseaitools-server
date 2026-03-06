@@ -24,6 +24,8 @@ public class CreditsDetailVO
     @Data
     public static class SubscriptionDetail
     {
+        private Integer isCancel;
+        private Integer refundStatus;
         private BigDecimal credits;
         private BigDecimal remainingCredits;
         private BigDecimal ratio;
@@ -40,6 +42,7 @@ public class CreditsDetailVO
     public static class RechargeDetail
     {
         private BigDecimal remainingCredits;
+        private Integer refundStatus;
     }
 
     @Data

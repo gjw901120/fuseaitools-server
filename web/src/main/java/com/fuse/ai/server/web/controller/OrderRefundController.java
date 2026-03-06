@@ -9,10 +9,7 @@ import com.fuse.common.core.exception.error.ThirdpartyErrorType;
 import com.stripe.exception.StripeException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/refund")
@@ -47,14 +44,24 @@ public class OrderRefundController {
         return ResponseResult.success(stripeService.cancelSubscription(userJwtDTO.getId()));
     }
 
+    @GetMapping("/refund-recharge-detail")
+    public ResponseResult<?> refundRechargeDetail(@AuthenticationPrincipal UserJwtDTO userJwtDTO) {
+        return ResponseResult.success(orderService.refundRecharge(userJwtDTO.getId(), false));
+    }
+
     @PostMapping("/refund-recharge")
     public ResponseResult<?> refundRecharge(@AuthenticationPrincipal UserJwtDTO userJwtDTO) {
-        return ResponseResult.success(orderService.refundRecharge(userJwtDTO.getId()));
+        return ResponseResult.success(orderService.refundRecharge(userJwtDTO.getId(), true));
+    }
+
+    @GetMapping("/refund-subscription-detail")
+    public ResponseResult<?> refundSubscriptionDetail(@AuthenticationPrincipal UserJwtDTO userJwtDTO) {
+        return ResponseResult.success(orderService.refundSubscription(userJwtDTO.getId(), false));
     }
 
     @PostMapping("/refund-subscription")
     public ResponseResult<?> refundSubscription(@AuthenticationPrincipal UserJwtDTO userJwtDTO) {
-        return ResponseResult.success(orderService.refundSubscription(userJwtDTO.getId()));
+        return ResponseResult.success(orderService.refundSubscription(userJwtDTO.getId(), true));
     }
 
 

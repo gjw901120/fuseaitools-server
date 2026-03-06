@@ -408,7 +408,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public OrderRefundVO refundRecharge(Integer userId) {
+    public OrderRefundVO refundRecharge(Integer userId, Boolean isConfirm) {
         Order order = orderManager.selectByUserIdAndType(userId, OrderTypeEnum.TOP_UP);
         if(order == null) {
             throw new BaseException(UserErrorType.USER_CLIENT_ERROR, "User has recharge order");
@@ -422,15 +422,17 @@ public class OrderServiceImpl implements OrderService {
         }
         //实际剩余credits/充值的credits*订单金额=退款金额
         BigDecimal refundAmount = order.getAmount().multiply(reallyCredits.divide(rechargeConfig.getCredits(), 2, RoundingMode.HALF_UP));
-        OrderRefund orderRefund = OrderRefund.create(
-                order.getId(),
-                "",
-                1,
-                2,
-                refundAmount,
-                ""
-        );
-        orderRefundManager.insert(orderRefund);
+        if(isConfirm) {
+            OrderRefund orderRefund = OrderRefund.create(
+                    order.getId(),
+                    "",
+                    1,
+                    2,
+                    refundAmount,
+                    ""
+            );
+            orderRefundManager.insert(orderRefund);
+        }
         OrderRefundVO orderRefundVO = new OrderRefundVO();
         orderRefundVO.setRefundAmount(refundAmount);
         return orderRefundVO;
@@ -439,7 +441,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public OrderRefundVO refundSubscription(Integer userId) {
+    public OrderRefundVO refundSubscription(Integer userId, Boolean isConfirm) {
         Order order = orderManager.selectByUserIdAndType(userId, OrderTypeEnum.SUBSCRIPTION);
         if(order == null) {
             throw new BaseException(UserErrorType.USER_CLIENT_ERROR, "User has no subscription order");
@@ -465,15 +467,18 @@ public class OrderServiceImpl implements OrderService {
             throw new BaseException(UserErrorType.USER_CLIENT_ERROR, "User has no remaining credits");
         }
         BigDecimal refundAmount = order.getAmount().multiply(reallyCredits.divide(totalCredits, 2, RoundingMode.HALF_UP));
-        OrderRefund orderRefund = OrderRefund.create(
-                order.getId(),
-                "",
-                1,
-                2,
-                refundAmount,
-                ""
-        );
-        orderRefundManager.insert(orderRefund);
+        if(isConfirm) {
+            OrderRefund orderRefund = OrderRefund.create(
+                    order.getId(),
+                    "",
+                    1,
+                    2,
+                    refundAmount,
+                    ""
+            );
+            orderRefundManager.insert(orderRefund);
+        }
+
         OrderRefundVO orderRefundVO = new OrderRefundVO();
         orderRefundVO.setRefundAmount(refundAmount);
         return orderRefundVO;
