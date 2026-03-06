@@ -8,6 +8,7 @@ import com.fuse.ai.server.manager.manager.SubscriptionPlanManager;
 import com.fuse.ai.server.manager.mapper.SubscriptionPlanMapper;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Component
@@ -41,4 +42,21 @@ public class SubscriptionPlanManagerImpl extends ServiceImpl<SubscriptionPlanMap
         this.update(updateWrapper);
     }
 
+    @Override
+    public List<SubscriptionPlan> selectByEndDate(LocalDate endDate) {
+        LambdaQueryWrapper<SubscriptionPlan> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(SubscriptionPlan::getEndDate, endDate);
+        queryWrapper.eq(SubscriptionPlan::getStatus, 1);
+        queryWrapper.eq(SubscriptionPlan::getIsDel, 0);
+        return this.baseMapper.selectList(queryWrapper);
+    }
+
+    @Override
+    public List<SubscriptionPlan> selectByStartDate(LocalDate startDate) {
+        LambdaQueryWrapper<SubscriptionPlan> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(SubscriptionPlan::getStartDate, startDate);
+        queryWrapper.eq(SubscriptionPlan::getStatus, 1);
+        queryWrapper.eq(SubscriptionPlan::getIsDel, 0);
+        return this.baseMapper.selectList(queryWrapper);
+    }
 }

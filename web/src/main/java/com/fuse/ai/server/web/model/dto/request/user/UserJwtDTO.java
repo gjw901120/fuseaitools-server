@@ -15,5 +15,9 @@ public class UserJwtDTO {
 
     private String email;
 
+    private Integer timeZoneOffset;
+
+    private String timeZone;
+
 
 }

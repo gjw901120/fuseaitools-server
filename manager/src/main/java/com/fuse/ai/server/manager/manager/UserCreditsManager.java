@@ -8,6 +8,8 @@ public interface UserCreditsManager {
 
     UserCredits getDetailByUserIdAndType(Integer userId, Integer type);
 
+    void updateStatusByUserId(Integer userId, Integer status);
+
     Integer updateById(UserCredits userCredits);
 
 }

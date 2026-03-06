@@ -1,9 +1,6 @@
 package com.fuse.ai.server.web.controller;
 
-import com.fuse.ai.server.web.model.dto.request.user.LoginByEmailDTO;
-import com.fuse.ai.server.web.model.dto.request.user.SendEmailCodeDTO;
-import com.fuse.ai.server.web.model.dto.request.user.UpdateUserDTO;
-import com.fuse.ai.server.web.model.dto.request.user.UserJwtDTO;
+import com.fuse.ai.server.web.model.dto.request.user.*;
 import com.fuse.ai.server.web.model.dto.response.LoginResponse;
 import com.fuse.ai.server.web.service.UserService;
 import com.fuse.common.core.entity.vo.ResponseResult;
@@ -73,6 +70,13 @@ public class UserController {
                                            @AuthenticationPrincipal UserJwtDTO userJwtDTO) {
 
         return ResponseResult.success(userService.creditsDetail(userJwtDTO.getId(), page, size));
+
+    }
+
+    @PostMapping("/auth/refresh-timezone")
+    public ResponseResult<?> refreshTimezone(@RequestBody @Valid RefreshTimezoneDTO refreshTimezoneDTO, @AuthenticationPrincipal UserJwtDTO userJwtDTO) {
+
+        return ResponseResult.success(userService.refreshTimezone(refreshTimezoneDTO, userJwtDTO));
 
     }
 

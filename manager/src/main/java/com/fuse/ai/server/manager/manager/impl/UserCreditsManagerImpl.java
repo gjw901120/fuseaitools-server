@@ -32,6 +32,19 @@ public class UserCreditsManagerImpl implements UserCreditsManager {
     }
 
     @Override
+    public void updateStatusByUserId(Integer userId, Integer status) {
+        LambdaQueryWrapper<UserCredits> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper
+                .eq(UserCredits::getUserId, userId)
+                .eq(UserCredits::getIsDel, 0);
+        UserCredits userCredits = userCreditsMapper.selectOne(queryWrapper);
+        if (userCredits != null) {
+            userCredits.setStatus(status);
+            userCreditsMapper.updateById(userCredits);
+        }
+    }
+
+    @Override
     public Integer updateById(UserCredits userCredits) {
         return userCreditsMapper.updateById(userCredits);
     }

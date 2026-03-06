@@ -1,7 +1,10 @@
 package com.fuse.ai.server.web.service;
 
+import com.fuse.ai.server.manager.entity.SubscriptionPlan;
 import com.fuse.ai.server.web.model.vo.OrderRefundVO;
 import com.stripe.model.Event;
+
+import java.util.List;
 
 public interface OrderService {
 
@@ -26,7 +29,6 @@ public interface OrderService {
 
     void cancelSubscription(Integer userId);
 
-
-
+    List<SubscriptionPlan> refreshPlan();
 
 }

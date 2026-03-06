@@ -36,6 +36,8 @@ public class JwtTokenUtil {
         claims.put("name", userJwtDTO.getName());
         claims.put("avatar", userJwtDTO.getAvatar());
         claims.put("email", userJwtDTO.getEmail()); // 邮箱作为普通Claim
+        claims.put("timeZoneOffset", userJwtDTO.getTimeZoneOffset());
+        claims.put("timeZone", userJwtDTO.getTimeZone());
         // 使用用户ID作为Token的主题(Subject)
         return doGenerateToken(claims, userJwtDTO.getId().toString());
     }

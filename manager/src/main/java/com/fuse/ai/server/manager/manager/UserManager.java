@@ -18,4 +18,6 @@ public interface UserManager {
 
     Integer updateById(User user);
 
+    Integer updateIsSubscriptionByUserId(Integer userId, Integer isSubscription);
+
 }

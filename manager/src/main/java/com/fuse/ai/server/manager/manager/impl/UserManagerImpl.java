@@ -66,4 +66,13 @@ public class UserManagerImpl implements UserManager {
         return userMapper.selectOne(queryWrapper);
     }
 
+    @Override
+    public Integer updateIsSubscriptionByUserId(Integer userId, Integer isSubscription) {
+        LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(User::getId, userId);
+        queryWrapper.eq(User::getIsDel, 0);
+        User user = userMapper.selectOne(queryWrapper);
+        return userMapper.update(user.setIsSubscription(isSubscription), queryWrapper);
+    }
+
 }

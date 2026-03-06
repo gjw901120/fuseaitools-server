@@ -22,8 +22,10 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @Slf4j
@@ -475,6 +477,54 @@ public class OrderServiceImpl implements OrderService {
         OrderRefundVO orderRefundVO = new OrderRefundVO();
         orderRefundVO.setRefundAmount(refundAmount);
         return orderRefundVO;
+    }
+
+    /*
+     * 刷新订阅计划，每日0点执行，将昨日到期的订阅credits失效，将今日生效的订阅credits添加，返回所有受影响的订阅计划列表
+     * @return 受影响的订阅计划列表
+     */
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public List<SubscriptionPlan> refreshPlan() {
+        //获取今日日期
+        LocalDate today = LocalDate.now();
+        //获取昨日
+        LocalDate yesterday = today.minusDays(1);
+        //失效昨日到期订阅credits
+        List<SubscriptionPlan> expiredPlans = subscriptionPlanManager.selectByEndDate(yesterday);
+        //失效之前的credits
+        if(expiredPlans == null || expiredPlans.isEmpty()) {
+            return Collections.emptyList();
+        }
+        for (SubscriptionPlan expiredPlan : expiredPlans) {
+            userCreditsManager.updateStatusByUserId(expiredPlan.getUserId(), 2);
+        }
+        List<Integer> expiredUserIds = expiredPlans.stream().map(SubscriptionPlan::getUserId).toList();
+        subscriptionPlanManager.updateStatusByIds(expiredPlans.stream().map(SubscriptionPlan::getId).collect(Collectors.toList()), 2);
+        //进日生效任务添加credits
+        List<SubscriptionPlan> todayPlans = subscriptionPlanManager.selectByStartDate(today);
+        if(todayPlans == null || todayPlans.isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<Integer> newUserIds = todayPlans.stream().map(SubscriptionPlan::getUserId).toList();
+        for (SubscriptionPlan todayPlan : todayPlans) {
+            userCreditsManager.insert(
+                    UserCredits.create(
+                            todayPlan.getUserId(),
+                            todayPlan.getCredits().add(todayPlan.getGiftCredits()),
+                            BigDecimal.ZERO,
+                            2, 1
+                    )
+            );
+        }
+        //对比本期订阅计划已结束，并且没有新订阅的用户，将is_subscription设置为0
+        List<Integer> diffUserIds = expiredUserIds.stream().filter(userId -> !newUserIds.contains(userId)).toList();
+        for (Integer diffUserId : diffUserIds) {
+            userManager.updateIsSubscriptionByUserId(diffUserId, 0);
+        }
+
+        return Stream.concat(expiredPlans.stream(), todayPlans.stream()).collect(Collectors.toList());
     }
 
     private static int getCeilingMonthDifferenceAlternative(LocalDate startDate) {

@@ -1,9 +1,6 @@
 package com.fuse.ai.server.web.service;
 
-import com.fuse.ai.server.web.model.dto.request.user.LoginByEmailDTO;
-import com.fuse.ai.server.web.model.dto.request.user.SendEmailCodeDTO;
-import com.fuse.ai.server.web.model.dto.request.user.UpdateUserDTO;
-import com.fuse.ai.server.web.model.dto.request.user.UserJwtDTO;
+import com.fuse.ai.server.web.model.dto.request.user.*;
 import com.fuse.ai.server.web.model.dto.response.LoginResponse;
 import com.fuse.ai.server.web.model.vo.CreditsDetailVO;
 import com.fuse.ai.server.web.model.vo.UserDetailVO;
@@ -23,5 +20,7 @@ public interface UserService {
     Boolean update(UserJwtDTO userJwtDTO, UpdateUserDTO updateUserDTO);
 
     CreditsDetailVO creditsDetail(Integer userId, Integer page, Integer size);
+
+    LoginResponse refreshTimezone(RefreshTimezoneDTO refreshTimezoneDTO, UserJwtDTO userJwtDTO);
 
 }

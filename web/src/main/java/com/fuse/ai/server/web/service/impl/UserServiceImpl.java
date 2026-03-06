@@ -8,10 +8,7 @@ import com.fuse.ai.server.web.common.utils.BrevoEmailSender;
 import com.fuse.ai.server.web.common.utils.EmailSenderUtil;
 import com.fuse.ai.server.web.common.utils.JwtTokenUtil;
 import com.fuse.ai.server.web.common.utils.RedisUtil;
-import com.fuse.ai.server.web.model.dto.request.user.LoginByEmailDTO;
-import com.fuse.ai.server.web.model.dto.request.user.SendEmailCodeDTO;
-import com.fuse.ai.server.web.model.dto.request.user.UpdateUserDTO;
-import com.fuse.ai.server.web.model.dto.request.user.UserJwtDTO;
+import com.fuse.ai.server.web.model.dto.request.user.*;
 import com.fuse.ai.server.web.model.dto.response.LoginResponse;
 import com.fuse.ai.server.web.model.vo.CreditsDetailVO;
 import com.fuse.ai.server.web.model.vo.UserDetailVO;
@@ -412,6 +409,17 @@ public class UserServiceImpl implements UserService {
         creditsDetailVO.setCreditsDetails(creditsDetails);
 
         return creditsDetailVO;
+    }
+
+    @Override
+    public LoginResponse refreshTimezone(RefreshTimezoneDTO refreshTimezoneDTO, UserJwtDTO userJwtDTO) {
+        User user = userManager.selectById(userJwtDTO.getId());
+        user.setTimeZoneOffset(refreshTimezoneDTO.getTimeZoneOffset());
+        user.setTimeZone(refreshTimezoneDTO.getTimeZone());
+        userManager.updateById(user);
+        userJwtDTO.setTimeZone(refreshTimezoneDTO.getTimeZone());
+        userJwtDTO.setTimeZoneOffset(refreshTimezoneDTO.getTimeZoneOffset());
+        return LoginResponse.create(jwtTokenUtil.generateToken(userJwtDTO));
     }
 
     /**
