@@ -228,4 +228,78 @@ public class ImageCallbackServiceImpl implements ImageCallbackService {
         }
     }
 
+    @Override
+    public void processGptImageCallback(ImageGptImageCallbackRequest request) {
+        try {
+            String taskId = request.getData().getTaskId();
+            String state = request.getData().getState();
+            String resultJson = request.getData().getResultJson();
+
+            //幂等性校验
+            if (recordsService.isCompleted(request.getData().getTaskId())) return;
+
+            log.info("Processing Gpt Image image callback: taskId={}, state={}", taskId, state);
+
+            if ("success".equals(state)) {
+                // 解析结果
+                ImageGptImageCallbackRequest.GptImageResult result =
+                        objectMapper.readValue(resultJson, ImageGptImageCallbackRequest.GptImageResult.class);
+
+                log.info("Gpt Image generation completed: taskId={}, resultUrls={}", taskId, result.getResultUrls());
+
+                List<String> outputUrl = new ArrayList<>();
+                for (String url : result.getResultUrls()) {
+                    outputUrl.add(s3UploadUtil.uploadFileFromUrl(url));
+                }
+                recordsService.completed(request.getData().getTaskId(), outputUrl, new HashMap<>(), request);
+
+            } else if ("fail".equals(state)) {
+                log.info("Gpt Image generation failed: taskId={}, info={}", taskId, request);
+
+                recordsService.failed(request.getData().getTaskId(), request);
+            }
+
+        } catch (Exception e) {
+            recordsService.failed(request.getData().getTaskId(), request);
+            log.error("Failed to process Gpt Image callback: taskId={}, error={}", request.getData().getTaskId(), e);
+        }
+    }
+
+    @Override
+    public void processIdeogramCallback(ImageIdeogramCallbackRequest request) {
+        try {
+            String taskId = request.getData().getTaskId();
+            String state = request.getData().getState();
+            String resultJson = request.getData().getResultJson();
+
+            //幂等性校验
+            if (recordsService.isCompleted(request.getData().getTaskId())) return;
+
+            log.info("Processing Ideogram image callback: taskId={}, state={}", taskId, state);
+
+            if ("success".equals(state)) {
+                // 解析结果
+                ImageIdeogramCallbackRequest.IdeogramResult result =
+                        objectMapper.readValue(resultJson, ImageIdeogramCallbackRequest.IdeogramResult.class);
+
+                log.info("Ideogram image generation completed: taskId={}, resultUrls={}", taskId, result.getResultUrls());
+
+                List<String> outputUrl = new ArrayList<>();
+                for (String url : result.getResultUrls()) {
+                    outputUrl.add(s3UploadUtil.uploadFileFromUrl(url));
+                }
+                recordsService.completed(request.getData().getTaskId(), outputUrl, new HashMap<>(), request);
+
+            } else if ("fail".equals(state)) {
+                log.info("Ideogram image generation failed: taskId={}, info={}", taskId, request);
+
+                recordsService.failed(request.getData().getTaskId(), request);
+            }
+
+        } catch (Exception e) {
+            recordsService.failed(request.getData().getTaskId(), request);
+            log.error("Failed to process Ideogram callback: taskId={}, error={}", request.getData().getTaskId(), e);
+        }
+    }
+
 }

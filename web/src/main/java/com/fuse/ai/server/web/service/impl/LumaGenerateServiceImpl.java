@@ -7,6 +7,7 @@ import com.fuse.ai.server.manager.enums.TaskStatusEnum;
 import com.fuse.ai.server.manager.manager.VideoManager;
 import com.fuse.ai.server.manager.model.request.LumaGenerateRequest;
 import com.fuse.ai.server.manager.model.response.VideoGenerateResponse;
+import com.fuse.ai.server.web.common.utils.FeishuMessageUtil;
 import com.fuse.ai.server.web.model.bo.ExtraDataBO;
 import com.fuse.ai.server.web.model.bo.verifyCreditsBO;
 import com.fuse.ai.server.web.model.dto.request.user.UserJwtDTO;
@@ -68,7 +69,8 @@ public class LumaGenerateServiceImpl implements LumaGenerateService {
         VideoGenerateResponse response = videoManager.lumaModify(request, model.getRequestToken());
 
         if(!ResponseCodeEnum.SUCCESS.equals(response.getCode())) {
-            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, response.getMsg());
+            FeishuMessageUtil.sendExceptionMessage("Luma generate error: " + response.getMsg());
+            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, "The volume of service requests is too high. Please try again later.");
         }
 
         //写入任务

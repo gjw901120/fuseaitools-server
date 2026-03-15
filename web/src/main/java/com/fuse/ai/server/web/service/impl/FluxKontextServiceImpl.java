@@ -7,6 +7,7 @@ import com.fuse.ai.server.manager.enums.TaskStatusEnum;
 import com.fuse.ai.server.manager.manager.ImageManager;
 import com.fuse.ai.server.manager.model.request.FluxKontextImageRequest;
 import com.fuse.ai.server.manager.model.response.ImageGenerateResponse;
+import com.fuse.ai.server.web.common.utils.FeishuMessageUtil;
 import com.fuse.ai.server.web.model.bo.ExtraDataBO;
 import com.fuse.ai.server.web.model.bo.verifyCreditsBO;
 import com.fuse.ai.server.web.model.dto.request.image.FluxKontextGenerateDTO;
@@ -67,7 +68,8 @@ public class FluxKontextServiceImpl implements FluxKontextService {
         ImageGenerateResponse response = imageManager.fluxKontextGenerate(request, model.getRequestToken());
 
         if(!ImageResponseCodeEnum.SUCCESS.equals(response.getCode())) {
-            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, response.getMessage());
+            FeishuMessageUtil.sendExceptionMessage("FluxKontext generate error: " + response.getMessage());
+            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, "The volume of service requests is too high. Please try again later.");
         }
 
         //写入任务

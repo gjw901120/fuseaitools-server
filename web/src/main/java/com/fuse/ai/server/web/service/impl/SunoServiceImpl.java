@@ -9,6 +9,7 @@ import com.fuse.ai.server.manager.enums.TaskStatusEnum;
 import com.fuse.ai.server.manager.manager.SunoManger;
 import com.fuse.ai.server.manager.model.request.*;
 import com.fuse.ai.server.manager.model.response.SunoMusicResponse;
+import com.fuse.ai.server.web.common.utils.FeishuMessageUtil;
 import com.fuse.ai.server.web.model.bo.ExtraDataBO;
 import com.fuse.ai.server.web.model.bo.verifyCreditsBO;
 import com.fuse.ai.server.web.model.dto.request.suno.*;
@@ -69,7 +70,8 @@ public class SunoServiceImpl implements SunoService {
         SunoMusicResponse response = sunoManger.generateMusic(request, model.getRequestToken());
 
         if(!SunoResponseCodeEnum.SUCCESS.equals(response.getCode())) {
-            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, response.getMsg());
+            FeishuMessageUtil.sendExceptionMessage("suno generate error: " + response.getMsg());
+            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, "The volume of service requests is too high. Please try again later.");
         }
 
         //写入任务
@@ -113,7 +115,8 @@ public class SunoServiceImpl implements SunoService {
         SunoMusicResponse response = sunoManger.extendMusic(request, model.getRequestToken());
 
         if(!SunoResponseCodeEnum.SUCCESS.equals(response.getCode())) {
-            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, response.getMsg());
+            FeishuMessageUtil.sendExceptionMessage("suno extend error: " + response.getMsg());
+            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, "The volume of service requests is too high. Please try again later.");
         }
 
         //写入任务
@@ -163,7 +166,8 @@ public class SunoServiceImpl implements SunoService {
         SunoMusicResponse response = sunoManger.uploadCover(request, model.getRequestToken());
 
         if(!SunoResponseCodeEnum.SUCCESS.equals(response.getCode())) {
-            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, response.getMsg());
+            FeishuMessageUtil.sendExceptionMessage("suno upload cover error: " + response.getMsg());
+            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, "The volume of service requests is too high. Please try again later.");
         }
 
         //写入任务
@@ -213,7 +217,8 @@ public class SunoServiceImpl implements SunoService {
         SunoMusicResponse response = sunoManger.addVocals(request, model.getRequestToken());
 
         if(!SunoResponseCodeEnum.SUCCESS.equals(response.getCode())) {
-            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, response.getMsg());
+            FeishuMessageUtil.sendExceptionMessage("suno add vocals error: " + response.getMsg());
+            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, "The volume of service requests is too high. Please try again later.");
         }
 
         //写入任务
@@ -263,7 +268,8 @@ public class SunoServiceImpl implements SunoService {
         SunoMusicResponse response = sunoManger.uploadExtend(request, model.getRequestToken());
 
         if(!SunoResponseCodeEnum.SUCCESS.equals(response.getCode())) {
-            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, response.getMsg());
+            FeishuMessageUtil.sendExceptionMessage("suno upload extend error: " + response.getMsg());
+            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, "The volume of service requests is too high. Please try again later.");
         }
 
         //写入任务
@@ -313,7 +319,8 @@ public class SunoServiceImpl implements SunoService {
         SunoMusicResponse response = sunoManger.addInstrumental(request, model.getRequestToken());
 
         if(!SunoResponseCodeEnum.SUCCESS.equals(response.getCode())) {
-            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, response.getMsg());
+            FeishuMessageUtil.sendExceptionMessage("suno add instrumental error: " + response.getMsg());
+            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, "The volume of service requests is too high. Please try again later.");
         }
 
         //写入任务

@@ -104,6 +104,10 @@ feign:
       url: https://api.kie.ai
     suno:
       url: https://api.kie.ai
+    hailuo:
+      url: https://api.kie.ai
+    kling:
+      url: https://api.kie.ai
     video:
       url: https://api.kie.ai
 

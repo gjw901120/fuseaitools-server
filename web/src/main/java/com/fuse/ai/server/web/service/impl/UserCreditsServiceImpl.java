@@ -67,10 +67,16 @@ public class UserCreditsServiceImpl implements UserCreditsService {
                             modelsPricingRulesManager.getDetailByModelIdAndDurationQuality(model.getId(), extraData.getDuration(), extraData.getQuality());
                     case DURATION_SIZE ->
                             modelsPricingRulesManager.getDetailByModelIdAndDurationSize(model.getId(), extraData.getDuration(), extraData.getSize());
+                    case DURATION_SCENE_SIZE ->
+                            modelsPricingRulesManager.getDetailByModelIdAndDurationSizeScene(model.getId(), extraData.getDuration(), extraData.getSize(), extraData.getScene());
+                    case DURATION_SCENE ->
+                            modelsPricingRulesManager.getDetailByModelIdAndDurationScene(model.getId(), extraData.getDuration(), extraData.getScene());
                     case DURATION ->
                             modelsPricingRulesManager.getDetailByModelIdAndDuration(model.getId(), extraData.getDuration());
                     case QUALITY ->
                             modelsPricingRulesManager.getDetailByModelIdAndQuality(model.getId(), extraData.getQuality());
+                    case SIZE ->
+                            modelsPricingRulesManager.getDetailByModelIdAndSize(model.getId(), extraData.getSize());
                     case SPEED ->
                             modelsPricingRulesManager.getDetailByModelIdAndSpeed(model.getId(), extraData.getSpeed());
                     default -> new ModelsPricingRules();

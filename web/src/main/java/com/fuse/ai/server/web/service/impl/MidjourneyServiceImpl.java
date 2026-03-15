@@ -10,6 +10,7 @@ import com.fuse.ai.server.manager.model.request.MidjourneyUpscaleRequest;
 import com.fuse.ai.server.manager.model.request.MidjourneyVaryRequest;
 import com.fuse.ai.server.manager.model.response.ImageGenerateResponse;
 import com.fuse.ai.server.web.common.enums.ExtraDataEnum;
+import com.fuse.ai.server.web.common.utils.FeishuMessageUtil;
 import com.fuse.ai.server.web.common.utils.ImageUtil;
 import com.fuse.ai.server.web.model.bo.ExtraDataBO;
 import com.fuse.ai.server.web.model.bo.verifyCreditsBO;
@@ -73,7 +74,8 @@ public class MidjourneyServiceImpl implements MidjourneyService {
         ImageGenerateResponse response = midjourneyManager.submitImagine(request, model.getRequestToken());
 
         if(!ImageResponseCodeEnum.SUCCESS.equals(response.getCode())) {
-            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, response.getMessage());
+            FeishuMessageUtil.sendExceptionMessage("Midjourney imagine error: " + response.getMessage());
+            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, "The volume of service requests is too high. Please try again later.");
         }
 
         UserModelTask userModelTask = UserModelTask.create(
@@ -108,7 +110,8 @@ public class MidjourneyServiceImpl implements MidjourneyService {
         ImageGenerateResponse response = midjourneyManager.submitVary(request, model.getRequestToken());
 
         if(!ImageResponseCodeEnum.SUCCESS.equals(response.getCode())) {
-            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, response.getMessage());
+            FeishuMessageUtil.sendExceptionMessage("Midjourney vary error: " + response.getMessage());
+            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, "The volume of service requests is too high. Please try again later.");
         }
 
         UserModelTask userModelTask = UserModelTask.create(
@@ -144,7 +147,8 @@ public class MidjourneyServiceImpl implements MidjourneyService {
         ImageGenerateResponse response = midjourneyManager.submitUpscale(request, model.getRequestToken());
 
         if(!ImageResponseCodeEnum.SUCCESS.equals(response.getCode())) {
-            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, response.getMessage());
+            FeishuMessageUtil.sendExceptionMessage("Midjourney upscale error: " + response.getMessage());
+            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, "The volume of service requests is too high. Please try again later.");
         }
 
         UserModelTask userModelTask = UserModelTask.create(

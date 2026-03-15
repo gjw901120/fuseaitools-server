@@ -7,8 +7,12 @@ public enum ExtraDataEnum {
 
     DURATION_QUALITY("duration_quality", "时间 & 质量"),
     DURATION_SIZE("duration_size", "时间 & 大小"),
+    DURATION_SCENE_SIZE("duration_scene_size", "时间 & 场景 & 大小"),
+    DURATION_SCENE("duration_scene", "时间 & 场景"),
     DURATION("duration", "时间"),
     QUALITY("quality", "质量"),
+
+    SIZE("size", "大小"),
 
     SPEED("speed", "速度"),
     ELE_DURATION("ele_duration", "ele 时间"),

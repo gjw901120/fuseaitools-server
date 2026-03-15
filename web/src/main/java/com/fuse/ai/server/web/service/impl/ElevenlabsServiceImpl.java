@@ -12,6 +12,7 @@ import com.fuse.ai.server.manager.model.request.ElevenLabsTTSRequest;
 import com.fuse.ai.server.manager.model.response.ElevenLabsResponse;
 import com.fuse.ai.server.web.common.enums.ExtraDataEnum;
 import com.fuse.ai.server.web.common.utils.EnhancedAudioUtil;
+import com.fuse.ai.server.web.common.utils.FeishuMessageUtil;
 import com.fuse.ai.server.web.model.bo.ExtraDataBO;
 import com.fuse.ai.server.web.model.bo.verifyCreditsBO;
 import com.fuse.ai.server.web.model.dto.request.elevenlabs.ElevenlabsAudioIsolationDTO;
@@ -92,7 +93,8 @@ public class ElevenlabsServiceImpl implements ElevenlabsService {
         ElevenLabsResponse response = elevenLabsManager.textToSpeech(request, model.getRequestToken());
 
         if(!ElevenLabsResponseCodeEnum.SUCCESS.equals(response.getCode())) {
-            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, response.getMessage());
+            FeishuMessageUtil.sendExceptionMessage("Elevenlabs TTS error: " + response.getMessage());
+            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, "The volume of service requests is too high. Please try again later.");
         }
 
         //写入任务
@@ -154,7 +156,8 @@ public class ElevenlabsServiceImpl implements ElevenlabsService {
         ElevenLabsResponse response = elevenLabsManager.speechToText(request, model.getRequestToken());
 
         if(!ElevenLabsResponseCodeEnum.SUCCESS.equals(response.getCode())) {
-            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, response.getMessage());
+            FeishuMessageUtil.sendExceptionMessage("Elevenlabs STT error: " + response.getMessage());
+            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, "The volume of service requests is too high. Please try again later.");
         }
 
         //写入任务
@@ -211,7 +214,8 @@ public class ElevenlabsServiceImpl implements ElevenlabsService {
         ElevenLabsResponse response = elevenLabsManager.isolateAudio(request, model.getRequestToken());
 
         if(!ElevenLabsResponseCodeEnum.SUCCESS.equals(response.getCode())) {
-            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, response.getMessage());
+            FeishuMessageUtil.sendExceptionMessage("Elevenlabs Audio Isolation error: " + response.getMessage());
+            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, "The volume of service requests is too high. Please try again later.");
         }
 
         //写入任务
@@ -266,7 +270,8 @@ public class ElevenlabsServiceImpl implements ElevenlabsService {
         ElevenLabsResponse response = elevenLabsManager.generateSoundEffect(request, model.getRequestToken());
 
         if(!ElevenLabsResponseCodeEnum.SUCCESS.equals(response.getCode())) {
-            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, response.getMessage());
+            FeishuMessageUtil.sendExceptionMessage("Elevenlabs Sound Effect error: " + response.getMessage());
+            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, "The volume of service requests is too high. Please try again later.");
         }
 
         //写入任务

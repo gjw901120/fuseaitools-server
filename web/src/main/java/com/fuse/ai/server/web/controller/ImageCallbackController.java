@@ -129,4 +129,38 @@ public class ImageCallbackController {
             return "failed";
         }
     }
+
+    @PostMapping("/gpt-image")
+    public String GptImageCallback(@Valid @RequestBody ImageGptImageCallbackRequest request) {
+        try {
+            String taskId = request.getData().getTaskId();
+            log.info("Received GPT Image callback: taskId={}", taskId);
+
+            imageCallbackService.processGptImageCallback(request);
+
+            return "success";
+
+        } catch (Exception e) {
+            log.error("GPT Image callback processing failed: taskId={}, error={}", request.getData().getTaskId(), e.getMessage(), e);
+
+            return "failed";
+        }
+    }
+
+    @PostMapping("/ideogram")
+    public String IdeogramCallback(@Valid @RequestBody ImageIdeogramCallbackRequest request) {
+        try {
+            String taskId = request.getData().getTaskId();
+            log.info("Received Ideogram image callback: taskId={}", taskId);
+
+            imageCallbackService.processIdeogramCallback(request);
+
+            return "success";
+
+        } catch (Exception e) {
+            log.error("Ideogram image callback processing failed: taskId={}, error={}", request.getData().getTaskId(), e.getMessage(), e);
+
+            return "failed";
+        }
+    }
 }

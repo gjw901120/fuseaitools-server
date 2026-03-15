@@ -8,6 +8,7 @@ import com.fuse.ai.server.manager.manager.SeedanceManager;
 import com.fuse.ai.server.manager.model.request.*;
 import com.fuse.ai.server.manager.model.response.VideoGenerateResponse;
 import com.fuse.ai.server.web.common.enums.ExtraDataEnum;
+import com.fuse.ai.server.web.common.utils.FeishuMessageUtil;
 import com.fuse.ai.server.web.model.bo.ExtraDataBO;
 import com.fuse.ai.server.web.model.bo.verifyCreditsBO;
 import com.fuse.ai.server.web.model.dto.request.user.UserJwtDTO;
@@ -76,7 +77,8 @@ public class SeedanceServiceImpl implements SeedanceService {
         VideoGenerateResponse response = seedanceManager.liteTextToVideo(request, model.getRequestToken());
 
         if(!ResponseCodeEnum.SUCCESS.equals(response.getCode())) {
-            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, response.getMsg());
+            FeishuMessageUtil.sendExceptionMessage("Seedance lite text to video error: " + response.getMsg());
+            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, "The volume of service requests is too high. Please try again later.");
         }
 
         //写入任务
@@ -131,7 +133,8 @@ public class SeedanceServiceImpl implements SeedanceService {
         VideoGenerateResponse response = seedanceManager.liteImageToVideo(request, model.getRequestToken());
 
         if(!ResponseCodeEnum.SUCCESS.equals(response.getCode())) {
-            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, response.getMsg());
+            FeishuMessageUtil.sendExceptionMessage("Seedance lite image to video error: " + response.getMsg());
+            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, "The volume of service requests is too high. Please try again later.");
         }
 
         ArrayList<String> inputUrls = new ArrayList<>();
@@ -189,7 +192,8 @@ public class SeedanceServiceImpl implements SeedanceService {
         VideoGenerateResponse response = seedanceManager.proTextToVideo(request, model.getRequestToken());
 
         if(!ResponseCodeEnum.SUCCESS.equals(response.getCode())) {
-            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, response.getMsg());
+            FeishuMessageUtil.sendExceptionMessage("Seedance pro text to video error: " + response.getMsg());
+            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, "The volume of service requests is too high. Please try again later.");
         }
 
         //写入任务
@@ -243,7 +247,8 @@ public class SeedanceServiceImpl implements SeedanceService {
         VideoGenerateResponse response = seedanceManager.proImageToVideo(request, model.getRequestToken());
 
         if(!ResponseCodeEnum.SUCCESS.equals(response.getCode())) {
-            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, response.getMsg());
+            FeishuMessageUtil.sendExceptionMessage("Seedance pro image to video error: " + response.getMsg());
+            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, "The volume of service requests is too high. Please try again later.");
         }
 
         ArrayList<String> inputUrls = new ArrayList<>();
@@ -297,7 +302,8 @@ public class SeedanceServiceImpl implements SeedanceService {
         VideoGenerateResponse response = seedanceManager.proFastImageToVideo(request, model.getRequestToken());
 
         if(!ResponseCodeEnum.SUCCESS.equals(response.getCode())) {
-            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, response.getMsg());
+            FeishuMessageUtil.sendExceptionMessage("Seedance pro fast image to video error: " + response.getMsg());
+            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, "The volume of service requests is too high. Please try again later.");
         }
 
         ArrayList<String> inputUrls = new ArrayList<>();

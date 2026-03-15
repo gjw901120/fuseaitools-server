@@ -36,6 +36,27 @@ public class ModelsPricingRulesManagerImpl implements ModelsPricingRulesManager 
     }
 
     @Override
+    public  ModelsPricingRules getDetailByModelIdAndDurationSizeScene(Integer modelId, Integer duration, String  size, String scene) {
+        LambdaQueryWrapper<ModelsPricingRules> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(ModelsPricingRules::getModelId, modelId);
+        queryWrapper.eq(ModelsPricingRules::getSize, size);
+        queryWrapper.eq(ModelsPricingRules::getDuration, duration);
+        queryWrapper.eq(ModelsPricingRules::getScene, scene);
+        queryWrapper.eq(ModelsPricingRules::getIsDel, 0);
+        return modelsPricingRulesMapper.selectOne(queryWrapper);
+    }
+
+    @Override
+    public ModelsPricingRules getDetailByModelIdAndDurationScene(Integer modelId, Integer duration, String scene) {
+        LambdaQueryWrapper<ModelsPricingRules> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(ModelsPricingRules::getModelId, modelId);
+        queryWrapper.eq(ModelsPricingRules::getDuration, duration);
+        queryWrapper.eq(ModelsPricingRules::getScene, scene);
+        queryWrapper.eq(ModelsPricingRules::getIsDel, 0);
+        return modelsPricingRulesMapper.selectOne(queryWrapper);
+    }
+
+    @Override
     public ModelsPricingRules getDetailByModelIdAndDuration(Integer modelId, Integer duration) {
         LambdaQueryWrapper<ModelsPricingRules> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(ModelsPricingRules::getModelId, modelId);
@@ -58,6 +79,15 @@ public class ModelsPricingRulesManagerImpl implements ModelsPricingRulesManager 
         LambdaQueryWrapper<ModelsPricingRules> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(ModelsPricingRules::getModelId, modelId);
         queryWrapper.eq(ModelsPricingRules::getSpeed, speed);
+        queryWrapper.eq(ModelsPricingRules::getIsDel, 0);
+        return modelsPricingRulesMapper.selectOne(queryWrapper);
+    }
+
+    @Override
+    public ModelsPricingRules getDetailByModelIdAndSize(Integer modelId, String size) {
+        LambdaQueryWrapper<ModelsPricingRules> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(ModelsPricingRules::getModelId, modelId);
+        queryWrapper.eq(ModelsPricingRules::getSize, size);
         queryWrapper.eq(ModelsPricingRules::getIsDel, 0);
         return modelsPricingRulesMapper.selectOne(queryWrapper);
     }

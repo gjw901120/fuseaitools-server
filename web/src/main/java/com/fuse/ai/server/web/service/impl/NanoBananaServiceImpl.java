@@ -12,6 +12,7 @@ import com.fuse.ai.server.manager.model.request.NanoBananaGenerateRequest;
 import com.fuse.ai.server.manager.model.request.NanoBananaProGenerateRequest;
 import com.fuse.ai.server.manager.model.response.ImageGenerateResponse;
 import com.fuse.ai.server.web.common.enums.ExtraDataEnum;
+import com.fuse.ai.server.web.common.utils.FeishuMessageUtil;
 import com.fuse.ai.server.web.model.bo.ExtraDataBO;
 import com.fuse.ai.server.web.model.bo.verifyCreditsBO;
 import com.fuse.ai.server.web.model.dto.request.image.NanoBananaEditDTO;
@@ -71,7 +72,8 @@ public class NanoBananaServiceImpl implements NanoBananaService {
         ImageGenerateResponse response = imageManager.nanoBananaGenerate(request, model.getRequestToken());
 
         if(!ImageResponseCodeEnum.SUCCESS.equals(response.getCode())) {
-            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, response.getMessage());
+            FeishuMessageUtil.sendExceptionMessage("NanoBanana generate error: " + response.getMessage());
+            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, "The volume of service requests is too high. Please try again later.");
         }
 
         //写入任务
@@ -118,7 +120,8 @@ public class NanoBananaServiceImpl implements NanoBananaService {
         ImageGenerateResponse response = imageManager.nanoBananaEdit(request, model.getRequestToken());
 
         if(!ImageResponseCodeEnum.SUCCESS.equals(response.getCode())) {
-            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, response.getMessage());
+            FeishuMessageUtil.sendExceptionMessage("NanoBanana edit error: " + response.getMessage());
+            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, "The volume of service requests is too high. Please try again later.");
         }
 
         //写入任务
@@ -170,7 +173,8 @@ public class NanoBananaServiceImpl implements NanoBananaService {
         ImageGenerateResponse response = imageManager.nanoBananaProGenerate(request, model.getRequestToken());
 
         if(!ImageResponseCodeEnum.SUCCESS.equals(response.getCode())) {
-            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, response.getMessage());
+            FeishuMessageUtil.sendExceptionMessage("NanoBanana pro generate error: " + response.getMessage());
+            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, "The volume of service requests is too high. Please try again later.");
         }
 
         //写入任务

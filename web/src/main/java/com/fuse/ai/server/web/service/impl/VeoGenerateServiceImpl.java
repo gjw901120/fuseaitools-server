@@ -10,6 +10,7 @@ import com.fuse.ai.server.manager.manager.VideoManager;
 import com.fuse.ai.server.manager.model.request.VeoExtendRequest;
 import com.fuse.ai.server.manager.model.request.VeoGenerateRequest;
 import com.fuse.ai.server.manager.model.response.VideoGenerateResponse;
+import com.fuse.ai.server.web.common.utils.FeishuMessageUtil;
 import com.fuse.ai.server.web.model.bo.ExtraDataBO;
 import com.fuse.ai.server.web.model.bo.verifyCreditsBO;
 import com.fuse.ai.server.web.model.dto.request.user.UserJwtDTO;
@@ -75,7 +76,8 @@ public class VeoGenerateServiceImpl implements VeoGenerateService {
         VideoGenerateResponse response = videoManager.veoGenerate(request, model.getRequestToken());
 
         if(!ResponseCodeEnum.SUCCESS.equals(response.getCode())) {
-            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, response.getMsg());
+            FeishuMessageUtil.sendExceptionMessage("Veo generate error: " + response.getMsg());
+            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, "The volume of service requests is too high. Please try again later.");
         }
 
         //写入任务
@@ -115,7 +117,8 @@ public class VeoGenerateServiceImpl implements VeoGenerateService {
         VideoGenerateResponse response = videoManager.veoExtend(request, model.getRequestToken());
 
         if(!ResponseCodeEnum.SUCCESS.equals(response.getCode())) {
-            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, response.getMsg());
+            FeishuMessageUtil.sendExceptionMessage("Veo extend error: " + response.getMsg());
+            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, "The volume of service requests is too high. Please try again later.");
         }
 
         //写入任务

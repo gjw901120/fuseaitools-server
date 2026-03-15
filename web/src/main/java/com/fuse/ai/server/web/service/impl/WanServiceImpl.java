@@ -10,6 +10,7 @@ import com.fuse.ai.server.manager.model.request.WanTextToVideoRequest;
 import com.fuse.ai.server.manager.model.request.WanVideoToVideoRequest;
 import com.fuse.ai.server.manager.model.response.VideoGenerateResponse;
 import com.fuse.ai.server.web.common.enums.ExtraDataEnum;
+import com.fuse.ai.server.web.common.utils.FeishuMessageUtil;
 import com.fuse.ai.server.web.model.bo.ExtraDataBO;
 import com.fuse.ai.server.web.model.bo.verifyCreditsBO;
 import com.fuse.ai.server.web.model.dto.request.user.UserJwtDTO;
@@ -78,7 +79,8 @@ public class WanServiceImpl implements WanService {
         VideoGenerateResponse response = wanManager.wanTextToVideo(request, model.getRequestToken());
 
         if(!ResponseCodeEnum.SUCCESS.equals(response.getCode())) {
-            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, response.getMsg());
+            FeishuMessageUtil.sendExceptionMessage("Wan text to video error: " + response.getMsg());
+            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, "The volume of service requests is too high. Please try again later.");
         }
 
         //写入任务
@@ -132,7 +134,8 @@ public class WanServiceImpl implements WanService {
         VideoGenerateResponse response = wanManager.wanImageToVideo(request, model.getRequestToken());
 
         if(!ResponseCodeEnum.SUCCESS.equals(response.getCode())) {
-            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, response.getMsg());
+            FeishuMessageUtil.sendExceptionMessage("Wan image to video error: " + response.getMsg());
+            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, "The volume of service requests is too high. Please try again later.");
         }
 
         //写入任务
@@ -185,7 +188,8 @@ public class WanServiceImpl implements WanService {
         VideoGenerateResponse response = wanManager.wanVideoToVideo(request, model.getRequestToken());
 
         if(!ResponseCodeEnum.SUCCESS.equals(response.getCode())) {
-            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, response.getMsg());
+            FeishuMessageUtil.sendExceptionMessage("Wan video to video error: " + response.getMsg());
+            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, "The volume of service requests is too high. Please try again later.");
         }
 
         //写入任务

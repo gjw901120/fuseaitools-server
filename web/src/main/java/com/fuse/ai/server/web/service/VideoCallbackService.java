@@ -36,4 +36,7 @@ public interface VideoCallbackService {
 
     void WanCallback(WanCallbackRequest request);
 
+    void KlingCallback(KlingCallbackRequest request);
+    void HailuoCallback(HailuoCallbackRequest request);
+
 }

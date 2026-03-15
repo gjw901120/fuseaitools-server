@@ -97,4 +97,26 @@ public class VideoCallbackController {
         return "success";
     }
 
+    /**
+     * 处理kling视频生成回调
+     */
+    @PostMapping("/kling")
+    public String klingCallback(@Valid @RequestBody KlingCallbackRequest request) {
+
+        videoCallbackService.KlingCallback(request);
+
+        return "success";
+    }
+
+    /**
+     * 处理hailuo视频生成回调
+     */
+    @PostMapping("/hailuo")
+    public String hailuoCallback(@Valid @RequestBody HailuoCallbackRequest request) {
+
+        videoCallbackService.HailuoCallback(request);
+
+        return "success";
+    }
+
 }

@@ -27,4 +27,8 @@ public interface ImageCallbackService {
     void processQwenCallback(ImageQwenCallbackRequest request);
 
     void processSeedreamCallback(ImageSeedreamCallbackRequest request);
+
+    void processIdeogramCallback(ImageIdeogramCallbackRequest request);
+
+    void processGptImageCallback(ImageGptImageCallbackRequest request);
 }
