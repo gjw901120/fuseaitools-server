@@ -293,14 +293,31 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDetailVO detail(UserJwtDTO userJwtDTO, String timeZone) {
-        //TODO 查询user和拼接订阅，余额等信息
-        User user = userManager.selectById(userJwtDTO.getId());
+    public UserDetailVO detail(Integer userId) {
+        //查询user和订阅折扣
+        User user = userManager.selectById(userId);
+        //获取当前订阅折扣
+        BigDecimal discount = BigDecimal.valueOf(1);
+        if (user.getIsSubscription() == 1) {
+            Order order = orderManager.selectByUserIdAndType(userId, OrderTypeEnum.SUBSCRIPTION);
+            if (order != null) {
+                //判断订阅是否在有效期
+                Subscription subscription = subscriptionManager.selectByOrderId(order.getId());
+                if(subscription != null) {
+                    SubscriptionConfig subscriptionConfig = subscriptionConfigManager.getDetailById(order.getConfigId());
+                    if (subscriptionConfig != null) {
+                        discount = subscriptionConfig.getDiscount();
+                    }
+                }
+            }
+        }
+
         return UserDetailVO.builder()
-                .id(userJwtDTO.getId())
-                .name(userJwtDTO.getName())
-                .avatar(userJwtDTO.getAvatar())
-                .email(userJwtDTO.getEmail())
+                .id(user.getId())
+                .name(user.getName())
+                .avatar(user.getAvatar())
+                .email(user.getEmail())
+                .discount(discount)
                 .build();
     }
 
@@ -405,8 +422,8 @@ public class UserServiceImpl implements UserService {
                 } else {
                     creditsDetail.setModel(model);
                 }
-                creditsDetail.setCredits(bill.getSubscriptionDeductCredits());
-                creditsDetail.setDiscountCredits(bill.getRechargeDeductCredits().add(bill.getSubscriptionDeductCredits()));
+                creditsDetail.setCredits(bill.getRechargeDeductCredits().add(bill.getSubscriptionDeductCredits()));
+                creditsDetail.setDiscountCredits(bill.getRechargeDeductCredits().add(bill.getSubscriptionDeductCredits()).multiply(bill.getDiscount()));
                 creditsDetail.setStatus(bill.getStatus().getDescription());
                 creditsDetail.setTitle(recordsMap.get(bill.getRecordId()).getTitle());
                 creditsDetail.setModelCategory(modelsIdToCategoryNameMap.get(bill.getModelId()));

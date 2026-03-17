@@ -51,9 +51,8 @@ public class UserController {
     }
 
     @GetMapping("/detail")
-    public ResponseResult<?> detail(@AuthenticationPrincipal UserJwtDTO userJwtDTO, @RequestParam String timeZone) {
-        //TODO 用户获取详情的时候，刷新timeZone  向上取整
-        return ResponseResult.success(userService.detail(userJwtDTO, timeZone));
+    public ResponseResult<?> detail(@AuthenticationPrincipal UserJwtDTO userJwtDTO) {
+        return ResponseResult.success(userService.detail(userJwtDTO.getId()));
 
     }
 

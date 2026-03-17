@@ -15,7 +15,7 @@ public interface UserService {
 
     LoginResponse loginByGoogle(String code);
 
-    UserDetailVO detail(UserJwtDTO userJwtDTO, String timeZone);
+    UserDetailVO detail(Integer userId);
 
     Boolean update(UserJwtDTO userJwtDTO, UpdateUserDTO updateUserDTO);
 

@@ -3,6 +3,8 @@ package com.fuse.ai.server.web.model.vo;
 import lombok.Builder;
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 @Data
 @Builder
 public class UserDetailVO {
@@ -14,5 +16,7 @@ public class UserDetailVO {
     private String avatar;
 
     private String email;
+
+    private BigDecimal discount;
 
 }

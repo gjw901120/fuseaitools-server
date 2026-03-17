@@ -9,4 +9,18 @@ public interface NewsManager {
 
     News getDetail(String path);
 
+    /**
+     * 获取上一篇新闻的path
+     * @param currentPath 当前新闻的path
+     * @return 上一篇新闻的path，如果没有则返回空字符串
+     */
+    String getPrevNewsPath(String currentPath);
+
+    /**
+     * 获取下一篇新闻的path
+     * @param currentPath 当前新闻的path
+     * @return 下一篇新闻的path，如果没有则返回空字符串
+     */
+    String getNextNewsPath(String currentPath);
+
 }
