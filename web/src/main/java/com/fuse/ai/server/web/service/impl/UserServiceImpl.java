@@ -189,7 +189,7 @@ public class UserServiceImpl implements UserService {
         if(user == null) {
             User newUser = User.create(
                 (String) payload.get("name"),
-                "",
+                (String) payload.get("email"),
                 payload.getSubject(),
                 (String) payload.get("picture"),
                 AuthTypeEnum.fromJson(AuthTypeEnum.GOOGLE.getCode()),
