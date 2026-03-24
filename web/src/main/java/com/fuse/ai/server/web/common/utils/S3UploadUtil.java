@@ -122,8 +122,8 @@ public class S3UploadUtil {
             String extension = getFileExtension(originalFileName).toLowerCase();
             String category = getFileCategory(extension);
 
-            // 4. 验证文件大小
-            if (contentLength > getMaxSizeForCategory(category)) {
+            // 4. 验证文件大小  -> 生成内容限制大小为上传的3倍
+            if (contentLength > getMaxSizeForCategory(category) * 3) {
                 throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR,
                         String.format("%s文件大小超过限制%s", category, formatFileSize(getMaxSizeForCategory(category))));
             }
