@@ -1,0 +1,124 @@
+package com.fuse.ai.server.manager.model.request.image;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fuse.ai.server.manager.constant.NanoBananaConstant;
+import com.fuse.ai.server.manager.enums.NanoBananaAspectRatioEnum;
+import com.fuse.ai.server.manager.enums.NanoBananaOutputFormatEnum;
+import com.fuse.common.core.exception.BaseException;
+import com.fuse.common.core.exception.error.SystemErrorType;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import org.hibernate.validator.constraints.URL;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.List;
+
+/**
+ * Nano Banana图像编辑请求参数
+ */
+@EqualsAndHashCode(callSuper = true)
+@Data
+public class NanoBananaEditRequest extends NanoBananaBaseRequest {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * 输入参数
+     */
+    @NotNull(message = "输入参数不能为空")
+    private EditInput input;
+
+    @Data
+    public static class EditInput implements Serializable {
+        @Serial
+        private static final long serialVersionUID = 1L;
+
+        /**
+         * 图像编辑提示词
+         */
+        @NotBlank(message = "提示词不能为空")
+        @Size(max = NanoBananaConstant.PROMPT_MAX_LENGTH, message = "提示词长度不能超过" + NanoBananaConstant.PROMPT_MAX_LENGTH + "个字符")
+        private String prompt;
+
+        /**
+         * 输入图像URL列表
+         */
+        @NotNull(message = "输入图像URL列表不能为空")
+        @Size(min = 1, max = 8, message = "输入图像数量必须在 1 到 8 之间")
+        @JsonProperty("image_urls")
+        private List<@URL(message = "图像URL格式不正确") String> imageUrls;
+
+        /**
+         * 输出格式
+         */
+        @JsonProperty("output_format")
+        private NanoBananaOutputFormatEnum outputFormat = NanoBananaOutputFormatEnum.PNG;
+
+        /**
+         * 图像尺寸比例
+         */
+        @NotNull(message = "图像尺寸比例不能为空")
+        @JsonProperty("image_size")
+        private NanoBananaAspectRatioEnum imageSize = NanoBananaAspectRatioEnum.RATIO_1_1;
+    }
+
+    /**
+     * 构建基础编辑请求
+     */
+    public static NanoBananaEditRequest buildEditRequest(String prompt,
+                                                         List<String> imageUrls,
+                                                         NanoBananaAspectRatioEnum imageSize,
+                                                         String callBackUrl) {
+        NanoBananaEditRequest request = new NanoBananaEditRequest();
+        request.setModel(NanoBananaConstant.MODEL_EDIT);
+        request.setCallBackUrl(callBackUrl);
+
+        EditInput input = new EditInput();
+        input.setPrompt(prompt);
+        input.setImageUrls(imageUrls);
+        input.setImageSize(imageSize);
+        request.setInput(input);
+
+        return request;
+    }
+
+    /**
+     * 构建完整编辑请求
+     */
+    public static NanoBananaEditRequest buildEditRequest(String prompt,
+                                                         List<String> imageUrls,
+                                                         NanoBananaAspectRatioEnum imageSize,
+                                                         NanoBananaOutputFormatEnum outputFormat,
+                                                         String callBackUrl) {
+        NanoBananaEditRequest request = buildEditRequest(prompt, imageUrls, imageSize, callBackUrl);
+        request.getInput().setOutputFormat(outputFormat);
+        return request;
+    }
+
+    /**
+     * 验证业务规则
+     */
+    public void validateBusinessRules() {
+        if (input != null) {
+            // 验证提示词长度
+            if (input.getPrompt() != null && input.getPrompt().length() > NanoBananaConstant.PROMPT_MAX_LENGTH) {
+                throw new BaseException(SystemErrorType.SYSTEM_EXECUTION_ERROR, "The prompt word length exceeds the limit.");
+            }
+
+            // 验证图像数量
+            if (input.getImageUrls() != null) {
+                if (input.getImageUrls().size() > NanoBananaConstant.MAX_IMAGES_EDIT) {
+                    throw new BaseException(SystemErrorType.SYSTEM_EXECUTION_ERROR, "The number of input images exceeds the limit.");
+                }
+                if (input.getImageUrls().isEmpty()) {
+                    throw new BaseException(SystemErrorType.SYSTEM_EXECUTION_ERROR, "At least one input image needs to be provided.");
+                }
+            }
+        }
+    }
+}

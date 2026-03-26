@@ -1,6 +1,6 @@
 package com.fuse.ai.server.manager.manager;
 
-import com.fuse.ai.server.manager.model.request.*;
+import com.fuse.ai.server.manager.model.request.audio.*;
 import com.fuse.ai.server.manager.model.response.SunoMusicResponse;
 
 public interface SunoManger {

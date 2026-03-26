@@ -1,6 +1,6 @@
 package com.fuse.ai.server.manager.manager;
 
-import com.fuse.ai.server.manager.model.request.*;
+import com.fuse.ai.server.manager.model.request.video.*;
 import com.fuse.ai.server.manager.model.response.VideoGenerateResponse;
 
 public interface KlingManager {
@@ -44,4 +44,9 @@ public interface KlingManager {
      * Kling 3.0 视频生成
      */
     VideoGenerateResponse kling30Video(Kling30VideoRequest request, String apiKey);
+
+    /**
+     * Kling 3.0 运动控制
+     */
+    VideoGenerateResponse kling30MotionControl(Kling30MotionControlRequest request, String apiKey);
 }

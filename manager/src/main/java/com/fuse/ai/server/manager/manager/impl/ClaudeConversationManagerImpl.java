@@ -3,7 +3,7 @@ package com.fuse.ai.server.manager.manager.impl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fuse.ai.server.manager.feign.client.ClaudeFeignClient;
 import com.fuse.ai.server.manager.manager.ClaudeConversationManager;
-import com.fuse.ai.server.manager.model.request.ClaudeRequest;
+import com.fuse.ai.server.manager.model.request.chat.ClaudeRequest;
 import com.fuse.ai.server.manager.model.response.ClaudeResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

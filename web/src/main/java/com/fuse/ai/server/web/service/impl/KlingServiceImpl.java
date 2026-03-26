@@ -5,7 +5,7 @@ import com.fuse.ai.server.manager.entity.UserModelTask;
 import com.fuse.ai.server.manager.enums.ResponseCodeEnum;
 import com.fuse.ai.server.manager.enums.TaskStatusEnum;
 import com.fuse.ai.server.manager.manager.KlingManager;
-import com.fuse.ai.server.manager.model.request.*;
+import com.fuse.ai.server.manager.model.request.video.*;
 import com.fuse.ai.server.manager.model.response.VideoGenerateResponse;
 import com.fuse.ai.server.web.common.enums.ExtraDataEnum;
 import com.fuse.ai.server.web.common.utils.FeishuMessageUtil;
@@ -524,6 +524,67 @@ public class KlingServiceImpl implements KlingService {
         );
 
         return new BaseResponse(recordsService.create(model, prompt, kling30VideoDTO, userModelTask, verifyCreditsBO));
+    }
+
+    @Override
+    public BaseResponse kling30MotionControl(Kling30MotionControlDTO kling30MotionControlDTO, UserJwtDTO userJwtDTO) {
+        Models model = modelsService.getModelByName(kling30MotionControlDTO.getModel());
+
+        ExtraDataBO extraData = new ExtraDataBO();
+        extraData.setType(ExtraDataEnum.DURATION_SIZE);
+        extraData.setDuration(kling30MotionControlDTO.getDuration());
+        extraData.setSize(kling30MotionControlDTO.getMode());
+
+        verifyCreditsBO verifyCreditsBO = userCreditsService.verifyCredits(userJwtDTO.getId(), model, extraData);
+
+        // 实现视频生成逻辑
+        Kling30MotionControlRequest request = new Kling30MotionControlRequest();
+
+        Kling30MotionControlRequest.Kling30MotionControlInput input = new Kling30MotionControlRequest.Kling30MotionControlInput();
+
+        input.setPrompt(kling30MotionControlDTO.getPrompt());
+        input.setInputUrls(kling30MotionControlDTO.getInputUrls());
+        input.setVideoUrls(kling30MotionControlDTO.getVideoUrls());
+        input.setCharacterOrientation(kling30MotionControlDTO.getCharacterOrientation());
+        input.setMode(kling30MotionControlDTO.getMode());
+        input.setBackgroundSource(kling30MotionControlDTO.getBackgroundSource());
+
+        request.setInput(input);
+        request.setModel(model.getRequestName());
+
+        request.setCallBackUrl(callbackUrl.concat("/video/kling"));
+
+        List<String> inputUrls = kling30MotionControlDTO.getInputUrls();
+        inputUrls.addAll(kling30MotionControlDTO.getVideoUrls());
+        if(kling30MotionControlDTO.getBackgroundSource() != null) {
+            inputUrls.add(kling30MotionControlDTO.getBackgroundSource());
+        }
+
+        VideoGenerateResponse response = klingManager.kling30MotionControl(request, model.getRequestToken());
+
+        if(!ResponseCodeEnum.SUCCESS.equals(response.getCode())) {
+            FeishuMessageUtil.sendExceptionMessage("Kling 30 motion control error: " + response.getMsg());
+            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, "The volume of service requests is too high. Please try again later.");
+        }
+
+        //写入任务
+        UserModelTask userModelTask = UserModelTask.create(
+                userJwtDTO.getId(),
+                "",
+                0,
+                0,
+                TaskStatusEnum.PROCESSING,
+                "",
+                response.getData().getTaskId(),
+                inputUrls,
+                new ArrayList<>(),
+                new HashMap<>(),
+                request,
+                response,
+                new HashMap<>()
+        );
+
+        return new BaseResponse(recordsService.create(model, kling30MotionControlDTO.getPrompt(), kling30MotionControlDTO, userModelTask, verifyCreditsBO));
     }
 
 }

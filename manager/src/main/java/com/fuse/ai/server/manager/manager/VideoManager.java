@@ -1,6 +1,6 @@
 package com.fuse.ai.server.manager.manager;
 
-import com.fuse.ai.server.manager.model.request.*;
+import com.fuse.ai.server.manager.model.request.video.*;
 import com.fuse.ai.server.manager.model.response.VideoGenerateResponse;
 
 public interface VideoManager {

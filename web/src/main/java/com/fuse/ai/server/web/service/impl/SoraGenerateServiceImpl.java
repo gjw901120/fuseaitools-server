@@ -4,7 +4,7 @@ import com.fuse.ai.server.manager.entity.Models;
 import com.fuse.ai.server.manager.entity.UserModelTask;
 import com.fuse.ai.server.manager.enums.*;
 import com.fuse.ai.server.manager.manager.SoraManager;
-import com.fuse.ai.server.manager.model.request.*;
+import com.fuse.ai.server.manager.model.request.video.*;
 import com.fuse.ai.server.manager.model.response.VideoGenerateResponse;
 import com.fuse.ai.server.web.common.enums.ExtraDataEnum;
 import com.fuse.ai.server.web.common.utils.FeishuMessageUtil;

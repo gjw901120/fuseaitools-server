@@ -7,7 +7,7 @@ import com.fuse.ai.server.manager.enums.SunoResponseCodeEnum;
 import com.fuse.ai.server.manager.enums.SunoVocalGenderEnum;
 import com.fuse.ai.server.manager.enums.TaskStatusEnum;
 import com.fuse.ai.server.manager.manager.SunoManger;
-import com.fuse.ai.server.manager.model.request.*;
+import com.fuse.ai.server.manager.model.request.audio.*;
 import com.fuse.ai.server.manager.model.response.SunoMusicResponse;
 import com.fuse.ai.server.web.common.utils.FeishuMessageUtil;
 import com.fuse.ai.server.web.model.bo.ExtraDataBO;

@@ -2,9 +2,9 @@ package com.fuse.ai.server.manager.manager.impl;
 
 import com.fuse.ai.server.manager.feign.client.WanFeignClient;
 import com.fuse.ai.server.manager.manager.WanManager;
-import com.fuse.ai.server.manager.model.request.WanTextToVideoRequest;
-import com.fuse.ai.server.manager.model.request.WanImageToVideoRequest;
-import com.fuse.ai.server.manager.model.request.WanVideoToVideoRequest;
+import com.fuse.ai.server.manager.model.request.video.WanTextToVideoRequest;
+import com.fuse.ai.server.manager.model.request.video.WanImageToVideoRequest;
+import com.fuse.ai.server.manager.model.request.video.WanVideoToVideoRequest;
 import com.fuse.ai.server.manager.model.response.VideoGenerateResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

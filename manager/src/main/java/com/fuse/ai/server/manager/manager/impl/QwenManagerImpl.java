@@ -2,10 +2,10 @@ package com.fuse.ai.server.manager.manager.impl;
 
 import com.fuse.ai.server.manager.feign.client.QwenFeignClient;
 import com.fuse.ai.server.manager.manager.QwenManager;
-import com.fuse.ai.server.manager.model.request.QwenImageEditRequest;
-import com.fuse.ai.server.manager.model.request.QwenImageToImageRequest;
-import com.fuse.ai.server.manager.model.request.QwenTextToImageRequest;
-import com.fuse.ai.server.manager.model.request.QwenZImageRequest;
+import com.fuse.ai.server.manager.model.request.image.QwenImageEditRequest;
+import com.fuse.ai.server.manager.model.request.image.QwenImageToImageRequest;
+import com.fuse.ai.server.manager.model.request.image.QwenTextToImageRequest;
+import com.fuse.ai.server.manager.model.request.image.QwenZImageRequest;
 import com.fuse.ai.server.manager.model.response.ImageGenerateResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,7 +1,7 @@
 package com.fuse.ai.server.manager.manager;
 
-import com.fuse.ai.server.manager.model.request.HailuoImageToVideoRequest;
-import com.fuse.ai.server.manager.model.request.HailuoTextToVideoRequest;
+import com.fuse.ai.server.manager.model.request.video.HailuoImageToVideoRequest;
+import com.fuse.ai.server.manager.model.request.video.HailuoTextToVideoRequest;
 import com.fuse.ai.server.manager.model.response.VideoGenerateResponse;
 
 public interface HailuoManager {

@@ -12,6 +12,8 @@ public interface ModelsPricingRulesManager {
 
     ModelsPricingRules getDetailByModelIdAndDurationSizeScene(Integer modelId, Integer duration, String  size, String scene);
 
+    ModelsPricingRules getDetailByModelIdAndDurationQualityScene(Integer modelId, Integer duration, String quality, String scene);
+
     ModelsPricingRules getDetailByModelIdAndDurationScene(Integer modelId, Integer duration, String scene);
 
     ModelsPricingRules getDetailByModelIdAndDuration(Integer modelId, Integer duration);

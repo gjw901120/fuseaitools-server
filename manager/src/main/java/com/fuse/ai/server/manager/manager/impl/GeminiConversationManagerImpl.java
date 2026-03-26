@@ -3,7 +3,7 @@ package com.fuse.ai.server.manager.manager.impl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fuse.ai.server.manager.feign.client.GeminiFeignClient;
 import com.fuse.ai.server.manager.manager.GeminiConversationManager;
-import com.fuse.ai.server.manager.model.request.GeminiRequest;
+import com.fuse.ai.server.manager.model.request.chat.GeminiRequest;
 import com.fuse.ai.server.manager.model.response.GeminiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

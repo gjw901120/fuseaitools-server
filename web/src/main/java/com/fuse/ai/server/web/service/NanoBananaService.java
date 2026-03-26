@@ -1,5 +1,6 @@
 package com.fuse.ai.server.web.service;
 
+import com.fuse.ai.server.web.model.dto.request.image.NanoBanana2DTO;
 import com.fuse.ai.server.web.model.dto.request.image.NanoBananaEditDTO;
 import com.fuse.ai.server.web.model.dto.request.image.NanoBananaGenerateDTO;
 import com.fuse.ai.server.web.model.dto.request.image.NanoBananaProGenerateDTO;
@@ -13,5 +14,7 @@ public interface NanoBananaService {
     BaseResponse nanoBananaEdit(NanoBananaEditDTO request, UserJwtDTO userJwtDTO);
 
     BaseResponse nanoBananaProGenerate(NanoBananaProGenerateDTO request, UserJwtDTO userJwtDTO);
+
+    BaseResponse nanoBanana2Generate(NanoBanana2DTO request, UserJwtDTO userJwtDTO);
 
 }

@@ -67,4 +67,10 @@ public class KlingController {
                                           @AuthenticationPrincipal UserJwtDTO userJwtDTO) {
         return ResponseResult.success(klingService.kling30Video(request, userJwtDTO));
     }
+
+    @PostMapping("/3-0-motion-control")
+    public ResponseResult<?> kling30MotionControl(@Valid @RequestBody Kling30MotionControlDTO request,
+                                                  @AuthenticationPrincipal UserJwtDTO userJwtDTO) {
+        return ResponseResult.success(klingService.kling30MotionControl(request, userJwtDTO));
+    }
 }

@@ -2,7 +2,7 @@ package com.fuse.ai.server.manager.manager.impl;
 
 import com.fuse.ai.server.manager.feign.client.IdeogramFeignClient;
 import com.fuse.ai.server.manager.manager.IdeogramManager;
-import com.fuse.ai.server.manager.model.request.*;
+import com.fuse.ai.server.manager.model.request.video.*;
 import com.fuse.ai.server.manager.model.response.ImageGenerateResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

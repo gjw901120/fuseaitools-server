@@ -2,8 +2,8 @@ package com.fuse.ai.server.manager.manager.impl;
 
 import com.fuse.ai.server.manager.feign.client.HailuoFeignClient;
 import com.fuse.ai.server.manager.manager.HailuoManager;
-import com.fuse.ai.server.manager.model.request.HailuoImageToVideoRequest;
-import com.fuse.ai.server.manager.model.request.HailuoTextToVideoRequest;
+import com.fuse.ai.server.manager.model.request.video.HailuoImageToVideoRequest;
+import com.fuse.ai.server.manager.model.request.video.HailuoTextToVideoRequest;
 import com.fuse.ai.server.manager.model.response.VideoGenerateResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -2,7 +2,7 @@ package com.fuse.ai.server.manager.manager.impl;
 
 import com.fuse.ai.server.manager.feign.client.SeedanceFeignClient;
 import com.fuse.ai.server.manager.manager.SeedanceManager;
-import com.fuse.ai.server.manager.model.request.*;
+import com.fuse.ai.server.manager.model.request.video.*;
 import com.fuse.ai.server.manager.model.response.VideoGenerateResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,5 +38,10 @@ public class SeedanceManagerImpl implements SeedanceManager {
     @Override
     public VideoGenerateResponse proFastImageToVideo(SeedanceProFastImageToVideoRequest request, String apiKey) {
         return seedanceFeignClient.proFastImageToVideo(request, apiKey);
+    }
+
+    @Override
+    public VideoGenerateResponse pro15ToVideo(Seedance15ProRequest request, String apiKey) {
+        return seedanceFeignClient.pro15ToVideo(request, apiKey);
     }
 }

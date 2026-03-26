@@ -1,6 +1,6 @@
 package com.fuse.ai.server.manager.manager;
 
-import com.fuse.ai.server.manager.model.request.DeepseekRequest;
+import com.fuse.ai.server.manager.model.request.chat.DeepseekRequest;
 import com.fuse.ai.server.manager.model.response.DeepseekResponse;
 
 public interface DeepseekConversationManager {

@@ -2,7 +2,7 @@ package com.fuse.ai.server.manager.manager.impl;
 
 import com.fuse.ai.server.manager.feign.client.KlingFeignClient;
 import com.fuse.ai.server.manager.manager.KlingManager;
-import com.fuse.ai.server.manager.model.request.*;
+import com.fuse.ai.server.manager.model.request.video.*;
 import com.fuse.ai.server.manager.model.response.VideoGenerateResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,5 +53,10 @@ public class KlingManagerImpl implements KlingManager {
     @Override
     public VideoGenerateResponse kling30Video(Kling30VideoRequest request, String apiKey) {
         return klingFeignClient.kling30Video(request, apiKey);
+    }
+
+    @Override
+    public VideoGenerateResponse kling30MotionControl(Kling30MotionControlRequest request, String apiKey) {
+        return klingFeignClient.kling30MotionControl(request, apiKey);
     }
 }

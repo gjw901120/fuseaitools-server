@@ -1,7 +1,7 @@
 package com.fuse.ai.server.manager.manager;
 
-import com.fuse.ai.server.manager.model.request.SeedreamImageToImageRequest;
-import com.fuse.ai.server.manager.model.request.SeedreamTextToImageRequest;
+import com.fuse.ai.server.manager.model.request.video.SeedreamImageToImageRequest;
+import com.fuse.ai.server.manager.model.request.video.SeedreamTextToImageRequest;
 import com.fuse.ai.server.manager.model.response.ImageGenerateResponse;
 
 public interface SeedreamManager {

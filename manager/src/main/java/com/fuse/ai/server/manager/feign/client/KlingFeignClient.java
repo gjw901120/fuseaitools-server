@@ -2,7 +2,7 @@ package com.fuse.ai.server.manager.feign.client;
 
 import com.fuse.ai.server.manager.feign.config.FeignConfig;
 import com.fuse.ai.server.manager.feign.fallback.ErrorFallback;
-import com.fuse.ai.server.manager.model.request.*;
+import com.fuse.ai.server.manager.model.request.video.*;
 import com.fuse.ai.server.manager.model.response.VideoGenerateResponse;
 import feign.Headers;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -75,4 +75,11 @@ public interface KlingFeignClient {
     @PostMapping("/api/v1/jobs/createTask")
     @Headers("Content-Type: application/json")
     VideoGenerateResponse kling30Video(@Valid @RequestBody Kling30VideoRequest request, @RequestParam("apiKey") String apiKey);
+
+    /**
+     * Kling 3.0 运动控制
+     */
+    @PostMapping("/api/v1/jobs/createTask")
+    @Headers("Content-Type: application/json")
+    VideoGenerateResponse kling30MotionControl(@Valid @RequestBody Kling30MotionControlRequest request, @RequestParam("apiKey") String apiKey);
 }

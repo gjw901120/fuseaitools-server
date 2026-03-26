@@ -1,7 +1,7 @@
 package com.fuse.ai.server.manager.manager;
 
-import com.fuse.ai.server.manager.model.request.GptImageTextToImageRequest;
-import com.fuse.ai.server.manager.model.request.GptImageImageToImageRequest;
+import com.fuse.ai.server.manager.model.request.image.GptImageTextToImageRequest;
+import com.fuse.ai.server.manager.model.request.image.GptImageImageToImageRequest;
 import com.fuse.ai.server.manager.model.response.ImageGenerateResponse;
 
 public interface GptImageManager {

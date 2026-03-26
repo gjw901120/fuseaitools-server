@@ -5,7 +5,7 @@ import com.fuse.ai.server.manager.entity.UserModelTask;
 import com.fuse.ai.server.manager.enums.ResponseCodeEnum;
 import com.fuse.ai.server.manager.enums.TaskStatusEnum;
 import com.fuse.ai.server.manager.manager.SeedanceManager;
-import com.fuse.ai.server.manager.model.request.*;
+import com.fuse.ai.server.manager.model.request.video.*;
 import com.fuse.ai.server.manager.model.response.VideoGenerateResponse;
 import com.fuse.ai.server.web.common.enums.ExtraDataEnum;
 import com.fuse.ai.server.web.common.utils.FeishuMessageUtil;
@@ -327,6 +327,65 @@ public class SeedanceServiceImpl implements SeedanceService {
         );
 
         return new BaseResponse(recordsService.create(model, seedanceProFastImageToVideoDTO.getPrompt(), seedanceProFastImageToVideoDTO, userModelTask, verifyCreditsBO));
+    }
+
+    @Override
+    public BaseResponse pro15GenerateVideo(Seedance15ProDTO seedance15ProDTO, UserJwtDTO userJwtDTO) {
+        Models model = modelsService.getModelByName(seedance15ProDTO.getModel());
+
+        ExtraDataBO extraData = new ExtraDataBO();
+        extraData.setType(ExtraDataEnum.DURATION_QUALITY_SCENE);
+        extraData.setDuration(Integer.valueOf(seedance15ProDTO.getDuration()));
+        extraData.setQuality(seedance15ProDTO.getResolution());
+        extraData.setScene(seedance15ProDTO.getGenerateAudio() ? "with_sound" : "without_sound");
+
+        verifyCreditsBO verifyCreditsBO = userCreditsService.verifyCredits(userJwtDTO.getId(), model, extraData);
+
+        // 实现视频生成逻辑
+        Seedance15ProRequest request = new Seedance15ProRequest();
+
+        Seedance15ProRequest.Seedance15ProInput input = new Seedance15ProRequest.Seedance15ProInput();
+
+        input.setPrompt(seedance15ProDTO.getPrompt());
+        input.setInputUrls(seedance15ProDTO.getInputUrls());
+        input.setAspectRatio(seedance15ProDTO.getAspectRatio());
+        input.setResolution(seedance15ProDTO.getResolution());
+        input.setDuration(Integer.valueOf(seedance15ProDTO.getDuration()));
+        input.setFixedLens(seedance15ProDTO.getFixedLens());
+        input.setGenerateAudio(seedance15ProDTO.getGenerateAudio());
+        input.setNsfwChecker(seedance15ProDTO.getNsfwChecker());
+
+
+        request.setInput(input);
+        request.setModel(model.getRequestName());
+
+        request.setCallBackUrl(callbackUrl.concat("/video/seedance"));
+
+        VideoGenerateResponse response = seedanceManager.pro15ToVideo(request, model.getRequestToken());
+
+        if(!ResponseCodeEnum.SUCCESS.equals(response.getCode())) {
+            FeishuMessageUtil.sendExceptionMessage("Seedance pro 1.5 to video error: " + response.getMsg());
+            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, "The volume of service requests is too high. Please try again later.");
+        }
+
+        //写入任务
+        UserModelTask userModelTask = UserModelTask.create(
+                userJwtDTO.getId(),
+                "",
+                0,
+                0,
+                TaskStatusEnum.PROCESSING,
+                "",
+                response.getData().getTaskId(),
+                seedance15ProDTO.getInputUrls(),
+                new ArrayList<>(),
+                new HashMap<>(),
+                request,
+                response,
+                new HashMap<>()
+        );
+
+        return new BaseResponse(recordsService.create(model, seedance15ProDTO.getPrompt(), seedance15ProDTO, userModelTask, verifyCreditsBO));
     }
 
 

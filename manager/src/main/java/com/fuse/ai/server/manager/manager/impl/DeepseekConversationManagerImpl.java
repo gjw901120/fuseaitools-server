@@ -3,7 +3,7 @@ package com.fuse.ai.server.manager.manager.impl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fuse.ai.server.manager.feign.client.DeepseekFeignClient;
 import com.fuse.ai.server.manager.manager.DeepseekConversationManager;
-import com.fuse.ai.server.manager.model.request.DeepseekRequest;
+import com.fuse.ai.server.manager.model.request.chat.DeepseekRequest;
 import com.fuse.ai.server.manager.model.response.DeepseekResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

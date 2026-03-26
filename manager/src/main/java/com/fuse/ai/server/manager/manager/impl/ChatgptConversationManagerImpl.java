@@ -3,7 +3,7 @@ package com.fuse.ai.server.manager.manager.impl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fuse.ai.server.manager.feign.client.ChatgptFeignClient;
 import com.fuse.ai.server.manager.manager.ChatgptConversationManager;
-import com.fuse.ai.server.manager.model.request.ChatgptRequest;
+import com.fuse.ai.server.manager.model.request.chat.ChatgptRequest;
 import com.fuse.ai.server.manager.model.response.ChatgptResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

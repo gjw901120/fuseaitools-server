@@ -2,7 +2,7 @@ package com.fuse.ai.server.manager.manager.impl;
 
 import com.fuse.ai.server.manager.feign.client.SunoFeignClient;
 import com.fuse.ai.server.manager.manager.SunoManger;
-import com.fuse.ai.server.manager.model.request.*;
+import com.fuse.ai.server.manager.model.request.audio.*;
 import com.fuse.ai.server.manager.model.response.SunoMusicResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

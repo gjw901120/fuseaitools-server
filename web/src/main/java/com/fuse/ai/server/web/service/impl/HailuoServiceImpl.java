@@ -5,7 +5,7 @@ import com.fuse.ai.server.manager.entity.UserModelTask;
 import com.fuse.ai.server.manager.enums.ResponseCodeEnum;
 import com.fuse.ai.server.manager.enums.TaskStatusEnum;
 import com.fuse.ai.server.manager.manager.HailuoManager;
-import com.fuse.ai.server.manager.model.request.HailuoImageToVideoRequest;
+import com.fuse.ai.server.manager.model.request.video.HailuoImageToVideoRequest;
 import com.fuse.ai.server.manager.model.response.VideoGenerateResponse;
 import com.fuse.ai.server.web.common.enums.ExtraDataEnum;
 import com.fuse.ai.server.web.common.utils.FeishuMessageUtil;

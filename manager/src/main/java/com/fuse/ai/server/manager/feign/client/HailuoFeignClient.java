@@ -2,8 +2,8 @@ package com.fuse.ai.server.manager.feign.client;
 
 import com.fuse.ai.server.manager.feign.config.FeignConfig;
 import com.fuse.ai.server.manager.feign.fallback.ErrorFallback;
-import com.fuse.ai.server.manager.model.request.HailuoImageToVideoRequest;
-import com.fuse.ai.server.manager.model.request.HailuoTextToVideoRequest;
+import com.fuse.ai.server.manager.model.request.video.HailuoImageToVideoRequest;
+import com.fuse.ai.server.manager.model.request.video.HailuoTextToVideoRequest;
 import com.fuse.ai.server.manager.model.response.VideoGenerateResponse;
 import feign.Headers;
 import org.springframework.cloud.openfeign.FeignClient;

@@ -1,8 +1,8 @@
 package com.fuse.ai.server.manager.manager;
 
-import com.fuse.ai.server.manager.model.request.MidjourneyImagineRequest;
-import com.fuse.ai.server.manager.model.request.MidjourneyUpscaleRequest;
-import com.fuse.ai.server.manager.model.request.MidjourneyVaryRequest;
+import com.fuse.ai.server.manager.model.request.image.MidjourneyImagineRequest;
+import com.fuse.ai.server.manager.model.request.image.MidjourneyUpscaleRequest;
+import com.fuse.ai.server.manager.model.request.image.MidjourneyVaryRequest;
 import com.fuse.ai.server.manager.model.response.ImageGenerateResponse;
 
 public interface MidjourneyManager {

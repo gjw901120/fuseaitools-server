@@ -1,6 +1,6 @@
 package com.fuse.ai.server.manager.feign.client;
 
-import com.fuse.ai.server.manager.model.request.GeminiRequest;
+import com.fuse.ai.server.manager.model.request.chat.GeminiRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;

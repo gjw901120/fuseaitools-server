@@ -2,7 +2,7 @@ package com.fuse.ai.server.manager.feign.client;
 
 import com.fuse.ai.server.manager.feign.config.FeignConfig;
 import com.fuse.ai.server.manager.feign.fallback.ErrorFallback;
-import com.fuse.ai.server.manager.model.request.*;
+import com.fuse.ai.server.manager.model.request.video.*;
 import com.fuse.ai.server.manager.model.response.VideoGenerateResponse;
 import feign.Headers;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -58,5 +58,10 @@ public interface SeedanceFeignClient {
     @PostMapping("/api/v1/jobs/createTask")
     @Headers("Content-Type: application/json")
     VideoGenerateResponse proFastImageToVideo(@Valid @RequestBody SeedanceProFastImageToVideoRequest request,
+                                              @RequestParam("apiKey") String apiKey);
+
+    @PostMapping("/api/v1/jobs/createTask")
+    @Headers("Content-Type: application/json")
+    VideoGenerateResponse pro15ToVideo(@Valid @RequestBody Seedance15ProRequest request,
                                               @RequestParam("apiKey") String apiKey);
 }

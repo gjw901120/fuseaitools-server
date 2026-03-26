@@ -2,9 +2,9 @@ package com.fuse.ai.server.manager.feign.client;
 
 import com.fuse.ai.server.manager.feign.config.FeignConfig;
 import com.fuse.ai.server.manager.feign.fallback.ErrorFallback;
-import com.fuse.ai.server.manager.model.request.MidjourneyImagineRequest;
-import com.fuse.ai.server.manager.model.request.MidjourneyUpscaleRequest;
-import com.fuse.ai.server.manager.model.request.MidjourneyVaryRequest;
+import com.fuse.ai.server.manager.model.request.image.MidjourneyImagineRequest;
+import com.fuse.ai.server.manager.model.request.image.MidjourneyUpscaleRequest;
+import com.fuse.ai.server.manager.model.request.image.MidjourneyVaryRequest;
 import com.fuse.ai.server.manager.model.response.ImageGenerateResponse;
 import feign.Headers;
 import org.springframework.cloud.openfeign.FeignClient;

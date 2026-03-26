@@ -2,9 +2,9 @@ package com.fuse.ai.server.manager.manager.impl;
 
 import com.fuse.ai.server.manager.feign.client.MidjourneyFeignClient;
 import com.fuse.ai.server.manager.manager.MidjourneyManager;
-import com.fuse.ai.server.manager.model.request.MidjourneyImagineRequest;
-import com.fuse.ai.server.manager.model.request.MidjourneyUpscaleRequest;
-import com.fuse.ai.server.manager.model.request.MidjourneyVaryRequest;
+import com.fuse.ai.server.manager.model.request.image.MidjourneyImagineRequest;
+import com.fuse.ai.server.manager.model.request.image.MidjourneyUpscaleRequest;
+import com.fuse.ai.server.manager.model.request.image.MidjourneyVaryRequest;
 import com.fuse.ai.server.manager.model.response.ImageGenerateResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

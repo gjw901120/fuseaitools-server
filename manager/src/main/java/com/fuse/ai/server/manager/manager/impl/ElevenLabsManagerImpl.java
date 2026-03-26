@@ -2,10 +2,10 @@ package com.fuse.ai.server.manager.manager.impl;
 
 import com.fuse.ai.server.manager.feign.client.ElevenLabsFeignClient;
 import com.fuse.ai.server.manager.manager.ElevenLabsManager;
-import com.fuse.ai.server.manager.model.request.ElevenLabsAudioIsolationRequest;
-import com.fuse.ai.server.manager.model.request.ElevenLabsSTTRequest;
-import com.fuse.ai.server.manager.model.request.ElevenLabsSoundEffectRequest;
-import com.fuse.ai.server.manager.model.request.ElevenLabsTTSRequest;
+import com.fuse.ai.server.manager.model.request.audio.ElevenLabsAudioIsolationRequest;
+import com.fuse.ai.server.manager.model.request.audio.ElevenLabsSTTRequest;
+import com.fuse.ai.server.manager.model.request.audio.ElevenLabsSoundEffectRequest;
+import com.fuse.ai.server.manager.model.request.audio.ElevenLabsTTSRequest;
 import com.fuse.ai.server.manager.model.response.ElevenLabsResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

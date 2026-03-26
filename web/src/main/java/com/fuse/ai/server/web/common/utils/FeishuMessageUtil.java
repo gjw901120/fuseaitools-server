@@ -7,6 +7,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.slf4j.MDC;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -53,52 +54,62 @@ public class FeishuMessageUtil {
     /**
      * 发送文本消息到飞书机器人（支持@功能）
      *
-     * @param webhookKey 机器人webhook key
+     * @param webhookKey 机器人 webhooke key
      * @param content    消息内容
      * @param atAll      是否@所有人
-     * @param atUserIds  需要@的用户ID列表（可选）
+     * @param atUserIds  需要@的用户 ID 列表（可选）
      * @return 是否发送成功
      */
     public static boolean sendTextMessage(String webhookKey, String content, boolean atAll, String... atUserIds) {
         // 参数校验
         if (StringUtils.isBlank(webhookKey)) {
-            log.error("飞书机器人webhook key为空");
+            log.error("飞书机器人 webhook key 为空");
             return false;
         }
-
+    
         if (StringUtils.isBlank(content)) {
             log.error("飞书消息内容为空");
             return false;
         }
-
+    
         try {
-            // 构建消息
-            Map<String, Object> message = buildTextMessage(content, atAll, atUserIds);
-
+            // 获取当前请求的 traceId
+            String traceId = MDC.get("traceId");
+                
+            // 构建消息（添加 traceId）
+            Map<String, Object> message = buildTextMessage(content, atAll, atUserIds, traceId);
+    
             // 发送消息
             return sendToFeishu(webhookKey, message);
-
+    
         } catch (Exception e) {
-            log.error("发送飞书消息失败, webhookKey: {}, content: {}", webhookKey, content, e);
+            log.error("发送飞书消息失败，webhookKey: {}, content: {}", webhookKey, content, e);
             return false;
         }
     }
 
     /**
-     * 构建文本消息JSON
+     * 构建文本消息 JSON
      */
-    private static Map<String, Object> buildTextMessage(String content, boolean atAll, String[] atUserIds) {
+    private static Map<String, Object> buildTextMessage(String content, boolean atAll, String[] atUserIds, String traceId) {
         Map<String, Object> message = new HashMap<>();
         message.put("msg_type", "text");
-
+    
         // 构建消息内容
-        StringBuilder textContent = new StringBuilder(content);
-
+        StringBuilder textContent = new StringBuilder();
+            
+        // 添加 traceId（如果有）
+        if (StringUtils.isNotBlank(traceId)) {
+            textContent.append("【TraceId: ").append(traceId).append("】\n");
+        }
+            
+        textContent.append(content);
+    
         // 添加@所有人
         if (atAll) {
             textContent.append("\n<at user_id=\"all\">所有人</at>");
         }
-
+    
         // 添加@特定用户
         if (atUserIds != null && atUserIds.length > 0) {
             for (String userId : atUserIds) {
@@ -107,10 +118,10 @@ public class FeishuMessageUtil {
                 }
             }
         }
-
+    
         Map<String, String> contentMap = new HashMap<>();
         contentMap.put("text", textContent.toString());
-
+    
         message.put("content", contentMap);
         return message;
     }

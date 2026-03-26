@@ -3,7 +3,7 @@ package com.fuse.ai.server.manager.feign.client;
 
 import com.fuse.ai.server.manager.feign.config.FeignConfig;
 import com.fuse.ai.server.manager.feign.fallback.ErrorFallback;
-import com.fuse.ai.server.manager.model.request.*;
+import com.fuse.ai.server.manager.model.request.audio.*;
 import com.fuse.ai.server.manager.model.response.SunoMusicResponse;
 import feign.Headers;
 import org.springframework.cloud.openfeign.FeignClient;

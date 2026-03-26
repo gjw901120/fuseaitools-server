@@ -57,4 +57,11 @@ public class SeedanceController {
         return ResponseResult.success(seedanceService.proFastImageToVideo(request, userJwtDTO));
     }
 
+    @PostMapping("/pro-15-image-to-video")
+    public ResponseResult<?> pro15ImageToVideo(@Valid @RequestBody Seedance15ProDTO request,
+                                              @AuthenticationPrincipal UserJwtDTO userJwtDTO) {
+
+        return ResponseResult.success(seedanceService.pro15GenerateVideo(request, userJwtDTO));
+    }
+
 }

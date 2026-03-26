@@ -1,6 +1,6 @@
 package com.fuse.ai.server.manager.manager;
 
-import com.fuse.ai.server.manager.model.request.ChatgptRequest;
+import com.fuse.ai.server.manager.model.request.chat.ChatgptRequest;
 import com.fuse.ai.server.manager.model.response.ChatgptResponse;
 
 public interface ChatgptConversationManager {

@@ -163,4 +163,21 @@ public class ImageCallbackController {
             return "failed";
         }
     }
+
+    @PostMapping("/imagen")
+    public String ImagenCallback(@Valid @RequestBody ImagenCallbackRequest request) {
+        try {
+            String taskId = request.getData().getTaskId();
+            log.info("Received Imagen image callback: taskId={}", taskId);
+
+            imageCallbackService.processImagenCallback(request);
+
+            return "success";
+
+        } catch (Exception e) {
+            log.error("Imagen image callback processing failed: taskId={}, error={}", request.getData().getTaskId(), e.getMessage(), e);
+
+            return "failed";
+        }
+    }
 }

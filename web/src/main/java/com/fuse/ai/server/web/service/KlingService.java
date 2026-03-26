@@ -45,4 +45,6 @@ public interface KlingService {
      * Kling 3.0 视频生成
      */
     BaseResponse kling30Video(Kling30VideoDTO request, UserJwtDTO userJwtDTO);
+
+    BaseResponse kling30MotionControl(Kling30MotionControlDTO request, UserJwtDTO userJwtDTO);
 }

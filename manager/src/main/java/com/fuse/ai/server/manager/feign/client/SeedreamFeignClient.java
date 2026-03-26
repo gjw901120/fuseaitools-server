@@ -2,8 +2,8 @@ package com.fuse.ai.server.manager.feign.client;
 
 import com.fuse.ai.server.manager.feign.config.FeignConfig;
 import com.fuse.ai.server.manager.feign.fallback.ErrorFallback;
-import com.fuse.ai.server.manager.model.request.SeedreamImageToImageRequest;
-import com.fuse.ai.server.manager.model.request.SeedreamTextToImageRequest;
+import com.fuse.ai.server.manager.model.request.video.SeedreamImageToImageRequest;
+import com.fuse.ai.server.manager.model.request.video.SeedreamTextToImageRequest;
 import com.fuse.ai.server.manager.model.response.ImageGenerateResponse;
 import feign.Headers;
 import org.springframework.cloud.openfeign.FeignClient;

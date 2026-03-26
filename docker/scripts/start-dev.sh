@@ -70,7 +70,7 @@ docker-compose -f docker/compose/docker-compose.dev.yml ps
 
 # 健康检查
 echo "=== 健康检查 ==="
-if curl -f http://localhost:8080/actuator/health; then
+if curl -f http://localhost:8080/healthcheck; then
     echo "✅ 服务健康检查通过"
 else
     echo "⚠️  健康检查失败，服务可能仍在启动中"

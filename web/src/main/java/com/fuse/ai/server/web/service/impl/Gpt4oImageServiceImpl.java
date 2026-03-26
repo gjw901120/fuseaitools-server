@@ -5,7 +5,7 @@ import com.fuse.ai.server.manager.entity.UserModelTask;
 import com.fuse.ai.server.manager.enums.ImageResponseCodeEnum;
 import com.fuse.ai.server.manager.enums.TaskStatusEnum;
 import com.fuse.ai.server.manager.manager.ImageManager;
-import com.fuse.ai.server.manager.model.request.Gpt4oImageGenerateRequest;
+import com.fuse.ai.server.manager.model.request.image.Gpt4oImageGenerateRequest;
 import com.fuse.ai.server.manager.model.response.ImageGenerateResponse;
 import com.fuse.ai.server.web.common.utils.FeishuMessageUtil;
 import com.fuse.ai.server.web.model.bo.ExtraDataBO;

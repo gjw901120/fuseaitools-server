@@ -47,6 +47,17 @@ public class ModelsPricingRulesManagerImpl implements ModelsPricingRulesManager 
     }
 
     @Override
+    public ModelsPricingRules getDetailByModelIdAndDurationQualityScene(Integer modelId, Integer duration, String quality, String scene) {
+        LambdaQueryWrapper<ModelsPricingRules> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(ModelsPricingRules::getModelId, modelId);
+        queryWrapper.eq(ModelsPricingRules::getQuality, quality);
+        queryWrapper.eq(ModelsPricingRules::getDuration, duration);
+        queryWrapper.eq(ModelsPricingRules::getScene, scene);
+        queryWrapper.eq(ModelsPricingRules::getIsDel, 0);
+        return modelsPricingRulesMapper.selectOne(queryWrapper);
+    }
+
+    @Override
     public ModelsPricingRules getDetailByModelIdAndDurationScene(Integer modelId, Integer duration, String scene) {
         LambdaQueryWrapper<ModelsPricingRules> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(ModelsPricingRules::getModelId, modelId);

@@ -7,14 +7,16 @@ import com.fuse.ai.server.manager.enums.NanoBananaAspectRatioEnum;
 import com.fuse.ai.server.manager.enums.NanoBananaOutputFormatEnum;
 import com.fuse.ai.server.manager.enums.TaskStatusEnum;
 import com.fuse.ai.server.manager.manager.ImageManager;
-import com.fuse.ai.server.manager.model.request.NanoBananaEditRequest;
-import com.fuse.ai.server.manager.model.request.NanoBananaGenerateRequest;
-import com.fuse.ai.server.manager.model.request.NanoBananaProGenerateRequest;
+import com.fuse.ai.server.manager.model.request.image.NanoBanana2Request;
+import com.fuse.ai.server.manager.model.request.image.NanoBananaEditRequest;
+import com.fuse.ai.server.manager.model.request.image.NanoBananaGenerateRequest;
+import com.fuse.ai.server.manager.model.request.image.NanoBananaProGenerateRequest;
 import com.fuse.ai.server.manager.model.response.ImageGenerateResponse;
 import com.fuse.ai.server.web.common.enums.ExtraDataEnum;
 import com.fuse.ai.server.web.common.utils.FeishuMessageUtil;
 import com.fuse.ai.server.web.model.bo.ExtraDataBO;
 import com.fuse.ai.server.web.model.bo.verifyCreditsBO;
+import com.fuse.ai.server.web.model.dto.request.image.NanoBanana2DTO;
 import com.fuse.ai.server.web.model.dto.request.image.NanoBananaEditDTO;
 import com.fuse.ai.server.web.model.dto.request.image.NanoBananaGenerateDTO;
 import com.fuse.ai.server.web.model.dto.request.image.NanoBananaProGenerateDTO;
@@ -60,7 +62,7 @@ public class NanoBananaServiceImpl implements NanoBananaService {
 
         // 实现视频生成逻辑
         NanoBananaGenerateRequest request = new NanoBananaGenerateRequest();
-        NanoBananaGenerateRequest.Input input = new NanoBananaGenerateRequest.Input();
+        NanoBananaGenerateRequest.GenerateInput input = new NanoBananaGenerateRequest.GenerateInput();
 
         request.setModel(model.getRequestName());
         input.setOutputFormat(NanoBananaOutputFormatEnum.fromFormat(nanoBananaGenerateDTO.getOutputFormat()));
@@ -106,7 +108,7 @@ public class NanoBananaServiceImpl implements NanoBananaService {
 
         // 实现生成逻辑
         NanoBananaEditRequest request = new NanoBananaEditRequest();
-        NanoBananaEditRequest.Input  input = new NanoBananaEditRequest.Input();
+        NanoBananaEditRequest.EditInput input = new NanoBananaEditRequest.EditInput();
 
         request.setModel(model.getRequestName());
         input.setImageSize(NanoBananaAspectRatioEnum.fromRatio(nanoBananaEditDTO.getImageSize()));
@@ -158,7 +160,7 @@ public class NanoBananaServiceImpl implements NanoBananaService {
 
         // 实现生成逻辑
         NanoBananaProGenerateRequest request = new NanoBananaProGenerateRequest();
-        NanoBananaProGenerateRequest.Input  input = new NanoBananaProGenerateRequest.Input();
+        NanoBananaProGenerateRequest.ProGenerateInput input = new NanoBananaProGenerateRequest.ProGenerateInput();
 
         request.setModel(model.getRequestName());
         input.setImageSize(NanoBananaAspectRatioEnum.fromRatio(nanoBananaProGenerateDTO.getImageSize()));
@@ -195,6 +197,58 @@ public class NanoBananaServiceImpl implements NanoBananaService {
         );
 
         return new BaseResponse(recordsService.create(model, nanoBananaProGenerateDTO.getPrompt(), nanoBananaProGenerateDTO, userModelTask, verifyCreditsBO));
+
+    }
+
+    @Override
+    public BaseResponse nanoBanana2Generate(NanoBanana2DTO nanoBanana2DTO, UserJwtDTO userJwtDTO) {
+        Models model = modelsService.getModelByName(nanoBanana2DTO.getModel());
+
+        ExtraDataBO extraData = new ExtraDataBO();
+        extraData.setType(ExtraDataEnum.QUALITY);
+        extraData.setQuality(nanoBanana2DTO.getResolution());
+
+        verifyCreditsBO verifyCreditsBO = userCreditsService.verifyCredits(userJwtDTO.getId(), model, extraData);
+
+        // 实现生成逻辑
+        NanoBanana2Request request = new NanoBanana2Request();
+        NanoBanana2Request.NanoBanana2Input input = new NanoBanana2Request.NanoBanana2Input();
+
+        request.setModel(model.getRequestName());
+        input.setImageInput(nanoBanana2DTO.getImageInput());
+        input.setPrompt(nanoBanana2DTO.getPrompt());
+        input.setResolution(nanoBanana2DTO.getResolution());
+        input.setAspectRatio(nanoBanana2DTO.getAspectRatio());
+        input.setImageInput(nanoBanana2DTO.getImageInput());
+        request.setCallBackUrl(callbackUrl.concat("/image/nano-banana"));
+
+        request.setInput(input);
+
+        ImageGenerateResponse response = imageManager.nanoBanana2Generate(request, model.getRequestToken());
+
+        if(!ImageResponseCodeEnum.SUCCESS.equals(response.getCode())) {
+            FeishuMessageUtil.sendExceptionMessage("NanoBanana 2 generate error: " + response.getMessage());
+            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, "The volume of service requests is too high. Please try again later.");
+        }
+
+        //写入任务
+        UserModelTask userModelTask = UserModelTask.create(
+                userJwtDTO.getId(),
+                "",
+                0,
+                verifyCreditsBO.getPricingRulesId(),
+                TaskStatusEnum.PROCESSING,
+                "",
+                response.getData().getTaskId(),
+                nanoBanana2DTO.getImageInput(),
+                new ArrayList<>(),
+                new HashMap<>(),
+                request,
+                new HashMap<>(),
+                new HashMap<>()
+        );
+
+        return new BaseResponse(recordsService.create(model, nanoBanana2DTO.getPrompt(), nanoBanana2DTO, userModelTask, verifyCreditsBO));
 
     }
 

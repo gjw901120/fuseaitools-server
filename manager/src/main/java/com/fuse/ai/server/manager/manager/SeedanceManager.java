@@ -1,6 +1,6 @@
 package com.fuse.ai.server.manager.manager;
 
-import com.fuse.ai.server.manager.model.request.*;
+import com.fuse.ai.server.manager.model.request.video.*;
 import com.fuse.ai.server.manager.model.response.VideoGenerateResponse;
 
 public interface SeedanceManager {
@@ -29,4 +29,9 @@ public interface SeedanceManager {
      * Pro Fast 图生视频
      */
     VideoGenerateResponse proFastImageToVideo(SeedanceProFastImageToVideoRequest request, String apiKey);
+
+    /**
+     * Pro 15 图生视频
+     */
+    VideoGenerateResponse pro15ToVideo(Seedance15ProRequest request, String apiKey);
 }

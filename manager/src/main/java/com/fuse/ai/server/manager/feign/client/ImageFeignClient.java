@@ -2,7 +2,7 @@ package com.fuse.ai.server.manager.feign.client;
 
 import com.fuse.ai.server.manager.feign.config.FeignConfig;
 import com.fuse.ai.server.manager.feign.fallback.ErrorFallback;
-import com.fuse.ai.server.manager.model.request.*;
+import com.fuse.ai.server.manager.model.request.image.*;
 import com.fuse.ai.server.manager.model.response.ImageGenerateResponse;
 import feign.Headers;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -54,4 +54,38 @@ public interface ImageFeignClient {
     @PostMapping("/api/v1/jobs/createTask")
     @Headers("Content-Type: application/json")
     ImageGenerateResponse nanoBananaEdit(@Valid @RequestBody NanoBananaEditRequest request, @RequestParam("apiKey") String apiKey);
+
+    @PostMapping("/api/v1/jobs/createTask")
+    @Headers("Content-Type: application/json")
+    ImageGenerateResponse nanoBanana2Generate(@Valid @RequestBody NanoBanana2Request request, @RequestParam("apiKey") String apiKey);
+
+    @PostMapping("/api/v1/jobs/createTask")
+    @Headers("Content-Type: application/json")
+    ImageGenerateResponse flux2ProImageToImage(@Valid @RequestBody Flux2ProImageToImageRequest request, @RequestParam("apiKey") String apiKey);
+
+    @PostMapping("/api/v1/jobs/createTask")
+    @Headers("Content-Type: application/json")
+    ImageGenerateResponse flux2ProTextToImage(@Valid @RequestBody Flux2ProTextToImageRequest request, @RequestParam("apiKey") String apiKey);
+
+    @PostMapping("/api/v1/jobs/createTask")
+    @Headers("Content-Type: application/json")
+    ImageGenerateResponse flux2ImageToImage(@Valid @RequestBody Flux2ImageToImageRequest request, @RequestParam("apiKey") String apiKey);
+
+    @PostMapping("/api/v1/jobs/createTask")
+    @Headers("Content-Type: application/json")
+    ImageGenerateResponse flux2TextToImage(@Valid @RequestBody Flux2TextToImageRequest request, @RequestParam("apiKey") String apiKey);
+
+    @PostMapping("/api/v1/jobs/createTask")
+    @Headers("Content-Type: application/json")
+    ImageGenerateResponse imagen4Ultra(@Valid @RequestBody Imagen4UltraRequest request, @RequestParam("apiKey") String apiKey);
+
+    @PostMapping("/api/v1/jobs/createTask")
+    @Headers("Content-Type: application/json")
+    ImageGenerateResponse imagen4Generate(@Valid @RequestBody Imagen4GenerateRequest request, @RequestParam("apiKey") String apiKey);
+
+    @PostMapping("/api/v1/jobs/createTask")
+    @Headers("Content-Type: application/json")
+    ImageGenerateResponse imagen4Fast(@Valid @RequestBody Imagen4FastRequest request, @RequestParam("apiKey") String apiKey);
+
+
 }

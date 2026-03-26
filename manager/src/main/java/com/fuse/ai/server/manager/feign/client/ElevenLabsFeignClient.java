@@ -2,7 +2,10 @@ package com.fuse.ai.server.manager.feign.client;
 
 import com.fuse.ai.server.manager.feign.config.FeignConfig;
 import com.fuse.ai.server.manager.feign.fallback.ErrorFallback;
-import com.fuse.ai.server.manager.model.request.*;
+import com.fuse.ai.server.manager.model.request.audio.ElevenLabsAudioIsolationRequest;
+import com.fuse.ai.server.manager.model.request.audio.ElevenLabsSTTRequest;
+import com.fuse.ai.server.manager.model.request.audio.ElevenLabsSoundEffectRequest;
+import com.fuse.ai.server.manager.model.request.audio.ElevenLabsTTSRequest;
 import com.fuse.ai.server.manager.model.response.ElevenLabsResponse;
 import feign.Headers;
 import org.springframework.cloud.openfeign.FeignClient;

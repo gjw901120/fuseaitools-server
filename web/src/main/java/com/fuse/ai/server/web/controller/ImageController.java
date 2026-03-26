@@ -4,6 +4,7 @@ import com.fuse.ai.server.web.model.dto.request.image.*;
 import com.fuse.ai.server.web.model.dto.request.user.UserJwtDTO;
 import com.fuse.ai.server.web.service.FluxKontextService;
 import com.fuse.ai.server.web.service.Gpt4oImageService;
+import com.fuse.ai.server.web.service.ImagenService;
 import com.fuse.ai.server.web.service.NanoBananaService;
 import com.fuse.common.core.entity.vo.ResponseResult;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,9 @@ public class ImageController {
 
     @Autowired
     private NanoBananaService nanoBananaService;
+
+    @Autowired
+    private ImagenService imagenService;
 
     @PostMapping("/gpt4o-image/generate")
     public ResponseResult<?> gpt4oImageGenerate(@Valid @RequestBody Gpt4oImageGenerateDTO request,
@@ -62,5 +66,62 @@ public class ImageController {
 
         return ResponseResult.success(nanoBananaService.nanoBananaProGenerate(request, userJwtDTO));
     }
+
+    @PostMapping("/nano-banana-2/generate")
+    public ResponseResult<?> nanoBanana2Generate(@Valid @RequestBody NanoBanana2DTO request,
+                                                 @AuthenticationPrincipal UserJwtDTO userJwtDTO) {
+
+        return ResponseResult.success(nanoBananaService.nanoBanana2Generate(request, userJwtDTO));
+    }
+
+    @PostMapping("/flux-2/text-to-image")
+    public ResponseResult<?> flux2TextToImage(@Valid @RequestBody Flux2TextToImageDTO request,
+                                             @AuthenticationPrincipal UserJwtDTO userJwtDTO) {
+
+        return ResponseResult.success(fluxKontextService.flux2TextToImage(request, userJwtDTO));
+    }
+
+    @PostMapping("/flux-2/image-to-image")
+    public ResponseResult<?> flux2ImageToImage(@Valid @RequestBody Flux2ImageToImageDTO request,
+                                             @AuthenticationPrincipal UserJwtDTO userJwtDTO) {
+
+        return ResponseResult.success(fluxKontextService.flux2ImageToImage(request, userJwtDTO));
+    }
+
+    @PostMapping("/flux-2-pro/image-to-image")
+    public ResponseResult<?> flux2ProImageToImage(@Valid @RequestBody Flux2ProImageToImageDTO request,
+                                                 @AuthenticationPrincipal UserJwtDTO userJwtDTO) {
+
+        return ResponseResult.success(fluxKontextService.flux2ProImageToImage(request, userJwtDTO));
+    }
+
+    @PostMapping("/flux-2-pro/text-to-image")
+    public ResponseResult<?> flux2ProTextToImage(@Valid @RequestBody Flux2ProTextToImageDTO request,
+                                                 @AuthenticationPrincipal UserJwtDTO userJwtDTO) {
+
+        return ResponseResult.success(fluxKontextService.flux2ProTextToImage(request, userJwtDTO));
+    }
+
+    @PostMapping("/imagen4/generate")
+    public ResponseResult<?> imagen4Generate(@Valid @RequestBody Imagen4GenerateDTO request,
+                                            @AuthenticationPrincipal UserJwtDTO userJwtDTO) {
+
+        return ResponseResult.success(imagenService.generate(request, userJwtDTO));
+    }
+
+    @PostMapping("/imagen4/fast-generate")
+    public ResponseResult<?> imagen4FastGenerate(@Valid @RequestBody Imagen4FastDTO request,
+                                                @AuthenticationPrincipal UserJwtDTO userJwtDTO) {
+
+        return ResponseResult.success(imagenService.fastGenerate(request, userJwtDTO));
+    }
+
+    @PostMapping("/imagen4/ultra-generate")
+    public ResponseResult<?> imagen4UltraGenerate(@Valid @RequestBody Imagen4UltraDTO request,
+                                                 @AuthenticationPrincipal UserJwtDTO userJwtDTO) {
+
+        return ResponseResult.success(imagenService.ultraGenerate(request, userJwtDTO));
+    }
+
 
 }
