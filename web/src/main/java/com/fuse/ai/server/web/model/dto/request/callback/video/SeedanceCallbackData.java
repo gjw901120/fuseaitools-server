@@ -3,16 +3,23 @@ package com.fuse.ai.server.web.model.dto.request.callback.video;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.List;
+import java.util.Map;
 
 /**
  * Seedance回调数据
  */
+@Slf4j
 @Data
 public class SeedanceCallbackData {
+
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @JsonProperty("completeTime")
     private Long completeTime;
@@ -27,7 +34,7 @@ public class SeedanceCallbackData {
     private String model;
 
     /**
-     * 原始参数字符串
+     * 原始参数字符串（包含双重嵌套的 JSON）
      */
     @JsonProperty("param")
     private String param;
@@ -51,13 +58,13 @@ public class SeedanceCallbackData {
     @JsonProperty("failMsg")
     private String failMsg;
 
-    // ========== 内部类用于结构化解析 ==========
+    // ========== 内部类定义 ==========
 
     @Data
     public static class Param {
         private String callBackUrl;
         private String model;
-        private Input input;
+        private Input input;  // 解析后的 Input 对象
     }
 
     @Data
@@ -91,29 +98,99 @@ public class SeedanceCallbackData {
         private List<String> resultUrls;
     }
 
+    // ========== 解析方法 ==========
+
+    /**
+     * 获取解析后的 Param 对象
+     * 自动处理 input 字段的双重嵌套 JSON 字符串
+     */
+    @SneakyThrows
+    public Param getParamObject() {
+        if (param == null || param.trim().isEmpty()) {
+            log.warn("param is null or empty");
+            return null;
+        }
+
+        try {
+            // 第一层解析：param 字符串 -> Map
+            Map<String, Object> paramMap = MAPPER.readValue(param,
+                    new TypeReference<Map<String, Object>>() {});
+
+            // 处理 input 字段：如果是字符串则二次解析
+            if (paramMap.containsKey("input")) {
+                Object inputValue = paramMap.get("input");
+                if (inputValue instanceof String) {
+                    String inputStr = (String) inputValue;
+                    Input inputObj = MAPPER.readValue(inputStr, Input.class);
+                    paramMap.put("input", inputObj);
+                    log.debug("Successfully parsed nested input JSON");
+                }
+            }
+
+            // 将处理后的 Map 转换为 Param 对象
+            return MAPPER.convertValue(paramMap, Param.class);
+
+        } catch (Exception e) {
+            log.error("Failed to parse param: {}", param, e);
+            return null;
+        }
+    }
+
+    /**
+     * 获取 Input 对象（便捷方法）
+     */
+    public Input getInput() {
+        Param paramObj = getParamObject();
+        return paramObj != null ? paramObj.getInput() : null;
+    }
+
+    /**
+     * 获取回调 URL（便捷方法）
+     */
+    public String getCallBackUrl() {
+        Param paramObj = getParamObject();
+        return paramObj != null ? paramObj.getCallBackUrl() : null;
+    }
+
+    /**
+     * 获取 param 中的 model（便捷方法）
+     */
+    public String getModelFromParam() {
+        Param paramObj = getParamObject();
+        return paramObj != null ? paramObj.getModel() : null;
+    }
+
+    /**
+     * 获取解析后的 ResultJson 对象
+     */
     public ResultJson getResultObject() {
-        if (resultJson != null) {
-            return JSON.parseObject(resultJson, ResultJson.class);
+        if (resultJson != null && !resultJson.trim().isEmpty()) {
+            try {
+                return JSON.parseObject(resultJson, ResultJson.class);
+            } catch (Exception e) {
+                log.error("Failed to parse resultJson: {}", resultJson, e);
+                return null;
+            }
         }
         return null;
     }
 
+    /**
+     * 获取结果 URL 列表（便捷方法）
+     */
     public List<String> getResultUrls() {
         ResultJson result = getResultObject();
         return result != null ? result.getResultUrls() : null;
     }
 
-    // ========== 辅助方法（可选） ==========
-
-    private static final ObjectMapper MAPPER = new ObjectMapper();
-
-    @SneakyThrows
-    public Param getParamObject() {
-        return MAPPER.readValue(param, Param.class);
-    }
-
+    /**
+     * 获取解析后的 ResultJson 对象（使用 Jackson）
+     */
     @SneakyThrows
     public ResultJson getResultJsonObject() {
-        return MAPPER.readValue(resultJson, ResultJson.class);
+        if (resultJson != null && !resultJson.trim().isEmpty()) {
+            return MAPPER.readValue(resultJson, ResultJson.class);
+        }
+        return null;
     }
 }
