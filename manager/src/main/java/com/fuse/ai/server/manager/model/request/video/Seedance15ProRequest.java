@@ -63,7 +63,7 @@ public class Seedance15ProRequest extends SeedanceBaseRequest {
          * 可选值：4, 8, 12
          * 默认值：8
          */
-        private Integer duration;
+        private String duration;
 
         /**
          * 锁定摄像机，实现静态拍摄

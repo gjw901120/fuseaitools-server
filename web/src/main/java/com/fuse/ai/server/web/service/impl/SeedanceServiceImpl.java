@@ -350,7 +350,7 @@ public class SeedanceServiceImpl implements SeedanceService {
         input.setInputUrls(seedance15ProDTO.getInputUrls());
         input.setAspectRatio(seedance15ProDTO.getAspectRatio());
         input.setResolution(seedance15ProDTO.getResolution());
-        input.setDuration(Integer.valueOf(seedance15ProDTO.getDuration()));
+        input.setDuration(seedance15ProDTO.getDuration());
         input.setFixedLens(seedance15ProDTO.getFixedLens());
         input.setGenerateAudio(seedance15ProDTO.getGenerateAudio());
         input.setNsfwChecker(seedance15ProDTO.getNsfwChecker());
