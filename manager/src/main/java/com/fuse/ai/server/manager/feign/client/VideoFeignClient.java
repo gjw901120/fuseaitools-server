@@ -61,4 +61,21 @@ public interface VideoFeignClient {
     @PostMapping("/api/v1/veo/extend")
     @Headers("Content-Type: application/json")
     VideoGenerateResponse veoExtend(@Valid @RequestBody VeoExtendRequest request, @RequestParam("apiKey") String apiKey);
+
+    @PostMapping("/api/v1/jobs/createTask")
+    @Headers("Content-Type: application/json")
+    VideoGenerateResponse grokTextToVideo(@Valid @RequestBody GrokImagineTextToVideoRequest request, @RequestParam("apiKey") String apiKey);
+
+    @PostMapping("/api/v1/jobs/createTask")
+    @Headers("Content-Type: application/json")
+    VideoGenerateResponse grokImageToVideo(@Valid @RequestBody GrokImagineImageToVideoRequest request, @RequestParam("apiKey") String apiKey);
+
+    @PostMapping("/api/v1/jobs/createTask")
+    @Headers("Content-Type: application/json")
+    VideoGenerateResponse grokUpscale(@Valid @RequestBody GrokImagineUpscaleRequest request, @RequestParam("apiKey") String apiKey);
+
+    @PostMapping("/api/v1/jobs/createTask")
+    @Headers("Content-Type: application/json")
+    VideoGenerateResponse grokExtend(@Valid @RequestBody GrokImagineExtendRequest request, @RequestParam("apiKey") String apiKey);
+
 }

@@ -33,4 +33,6 @@ public interface ImageCallbackService {
     void processGptImageCallback(ImageGptImageCallbackRequest request);
     
     void processImagenCallback(ImagenCallbackRequest request);
+
+    void processGrokCallback(ImageCallbackRequest request);
 }

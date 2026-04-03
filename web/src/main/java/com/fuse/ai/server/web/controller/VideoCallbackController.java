@@ -26,7 +26,7 @@ public class VideoCallbackController {
     @PostMapping("/veo")
     public String veoCallback(@Valid @RequestBody VeoCallbackRequest request) {
 
-        videoCallbackService.VeoCallback(request);
+        videoCallbackService.veoCallback(request);
 
         return "success";
     }
@@ -37,7 +37,7 @@ public class VideoCallbackController {
     @PostMapping("/runway")
     public String runwayCallback(@Valid @RequestBody RunwayCallbackRequest request) {
 
-        videoCallbackService.RunwayCallback(request);
+        videoCallbackService.runwayCallback(request);
 
         return "success";
     }
@@ -48,7 +48,7 @@ public class VideoCallbackController {
     @PostMapping("/runway-aleph")
     public String runwayAlephCallback(@Valid @RequestBody RunwayAlephCallbackRequest request) {
 
-        videoCallbackService.RunwayAlephCallback(request);
+        videoCallbackService.runwayAlephCallback(request);
 
         return "success";
     }
@@ -59,7 +59,7 @@ public class VideoCallbackController {
     @PostMapping("/luma")
     public String lumaCallback(@Valid @RequestBody LumaCallbackRequest request) {
 
-        videoCallbackService.LumaCallback(request);
+        videoCallbackService.lumaCallback(request);
 
         return "success";
     }
@@ -70,7 +70,7 @@ public class VideoCallbackController {
     @PostMapping("/sora")
     public String soraCallback(@Valid @RequestBody SoraCallbackRequest request) {
 
-        videoCallbackService.SoraCallback(request);
+        videoCallbackService.soraCallback(request);
 
         return "success";
     }
@@ -81,7 +81,7 @@ public class VideoCallbackController {
     @PostMapping("/seedance")
     public String seedanceCallback(@Valid @RequestBody SeedanceCallbackRequest request) {
 
-        videoCallbackService.SeedanceCallback(request);
+        videoCallbackService.seedanceCallback(request);
 
         return "success";
     }
@@ -92,7 +92,7 @@ public class VideoCallbackController {
     @PostMapping("/wan")
     public String wanCallback(@Valid @RequestBody WanCallbackRequest request) {
 
-        videoCallbackService.WanCallback(request);
+        videoCallbackService.wanCallback(request);
 
         return "success";
     }
@@ -103,7 +103,7 @@ public class VideoCallbackController {
     @PostMapping("/kling")
     public String klingCallback(@Valid @RequestBody KlingCallbackRequest request) {
 
-        videoCallbackService.KlingCallback(request);
+        videoCallbackService.klingCallback(request);
 
         return "success";
     }
@@ -114,7 +114,18 @@ public class VideoCallbackController {
     @PostMapping("/hailuo")
     public String hailuoCallback(@Valid @RequestBody HailuoCallbackRequest request) {
 
-        videoCallbackService.HailuoCallback(request);
+        videoCallbackService.hailuoCallback(request);
+
+        return "success";
+    }
+
+    /**
+     * 处理Grok视频生成回调
+     */
+    @PostMapping("/grok")
+    public String grokCallback(@Valid @RequestBody VideoCallbackRequest request) {
+
+        videoCallbackService.grokCallback(request);
 
         return "success";
     }

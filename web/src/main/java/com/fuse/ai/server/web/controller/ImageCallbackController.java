@@ -1,6 +1,7 @@
 package com.fuse.ai.server.web.controller;
 
 import com.fuse.ai.server.web.model.dto.request.callback.image.*;
+import com.fuse.ai.server.web.model.dto.request.callback.video.VideoCallbackRequest;
 import com.fuse.ai.server.web.service.ImageCallbackService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -176,6 +177,22 @@ public class ImageCallbackController {
 
         } catch (Exception e) {
             log.error("Imagen image callback processing failed: taskId={}, error={}", request.getData().getTaskId(), e.getMessage(), e);
+
+            return "failed";
+        }
+    }
+
+    @PostMapping("grok")
+    public String GrokCallback(@Valid @RequestBody ImageCallbackRequest request) {
+        try {
+            String taskId = request.getData().getTaskId();
+            log.info("Received Grok image callback: taskId={}", taskId);
+
+            imageCallbackService.processGrokCallback(request);
+
+            return "success";
+        } catch (Exception e) {
+            log.error("Grok image callback processing failed: taskId={}, error={}", request.getData().getTaskId(), e.getMessage(), e);
 
             return "failed";
         }

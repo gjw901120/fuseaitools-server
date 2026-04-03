@@ -1,10 +1,7 @@
 package com.fuse.ai.server.web.controller;
 
 
-import com.fuse.ai.server.web.model.dto.request.image.QwenImageEditDTO;
-import com.fuse.ai.server.web.model.dto.request.image.QwenImageToImageDTO;
-import com.fuse.ai.server.web.model.dto.request.image.QwenTextToImageDTO;
-import com.fuse.ai.server.web.model.dto.request.image.QwenZImageDTO;
+import com.fuse.ai.server.web.model.dto.request.image.*;
 import com.fuse.ai.server.web.model.dto.request.user.UserJwtDTO;
 import com.fuse.ai.server.web.service.QwenService;
 import com.fuse.common.core.entity.vo.ResponseResult;
@@ -49,6 +46,20 @@ public class QwenController {
     public ResponseResult<?> zImage(@Valid @RequestBody QwenZImageDTO request,
                                     @AuthenticationPrincipal UserJwtDTO userJwtDTO) {
         return ResponseResult.success(qwenService.zImage(request, userJwtDTO));
+    }
+
+    @PostMapping("/v2-text-to-image")
+    public ResponseResult<?> v2TextToImage(@Valid @RequestBody Qwen2TextToImageDTO request,
+                                         @AuthenticationPrincipal UserJwtDTO userJwtDTO) {
+
+        return ResponseResult.success(qwenService.v2TextToImage(request, userJwtDTO));
+    }
+
+    @PostMapping("/v2-image-edit")
+    public ResponseResult<?> v2ImageEdit(@Valid @RequestBody Qwen2ImageEditDTO request,
+                                       @AuthenticationPrincipal UserJwtDTO userJwtDTO) {
+
+        return ResponseResult.success(qwenService.v2ImageEdit(request, userJwtDTO));
     }
 
 }

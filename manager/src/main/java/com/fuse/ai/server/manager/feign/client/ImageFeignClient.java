@@ -87,5 +87,13 @@ public interface ImageFeignClient {
     @Headers("Content-Type: application/json")
     ImageGenerateResponse imagen4Fast(@Valid @RequestBody Imagen4FastRequest request, @RequestParam("apiKey") String apiKey);
 
+    @PostMapping("/api/v1/jobs/createTask")
+    @Headers("Content-Type: application/json")
+    ImageGenerateResponse grokTextToImage(@Valid @RequestBody GrokImagineTextToImageRequest request, @RequestParam("apiKey") String apiKey);
+
+    @PostMapping("/api/v1/jobs/createTask")
+    @Headers("Content-Type: application/json")
+    ImageGenerateResponse grokImageToImage(@Valid @RequestBody GrokImagineImageToImageRequest request, @RequestParam("apiKey") String apiKey);
+
 
 }

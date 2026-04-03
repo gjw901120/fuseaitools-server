@@ -33,7 +33,7 @@ public class VideoCallbackServiceImpl implements VideoCallbackService {
     private final ObjectMapper objectMapper;
 
     @Override
-    public void VeoCallback(VeoCallbackRequest request) {
+    public void veoCallback(VeoCallbackRequest request) {
         VeoCallbackData data = request.getData();
 
         //幂等性校验
@@ -52,7 +52,7 @@ public class VideoCallbackServiceImpl implements VideoCallbackService {
     }
 
     @Override
-    public void RunwayCallback(RunwayCallbackRequest request) {
+    public void runwayCallback(RunwayCallbackRequest request) {
         RunwayCallbackData data = request.getData();
         log.info("Runway回调处理完成, taskId: {}", data.getTaskId());
 
@@ -70,7 +70,7 @@ public class VideoCallbackServiceImpl implements VideoCallbackService {
     }
 
     @Override
-    public void RunwayAlephCallback(RunwayAlephCallbackRequest request) {
+    public void runwayAlephCallback(RunwayAlephCallbackRequest request) {
         RunwayAlephCallbackData data = request.getData();
         log.info("RunwayAleph回调处理完成, taskId: {}", request.getTaskId());
 
@@ -87,7 +87,7 @@ public class VideoCallbackServiceImpl implements VideoCallbackService {
     }
 
     @Override
-    public void LumaCallback(LumaCallbackRequest request) {
+    public void lumaCallback(LumaCallbackRequest request) {
         LumaCallbackData data = request.getData();
         log.info("Luma回调处理完成, taskId: {}", data.getTaskId());
 
@@ -105,7 +105,7 @@ public class VideoCallbackServiceImpl implements VideoCallbackService {
     }
 
     @Override
-    public void SoraCallback(SoraCallbackRequest request) {
+    public void soraCallback(SoraCallbackRequest request) {
         SoraCallbackData data = request.getData();
         log.info("Sora回调处理完成, taskId: {}", data.getTaskId());
 
@@ -123,7 +123,7 @@ public class VideoCallbackServiceImpl implements VideoCallbackService {
     }
 
     @Override
-    public void SeedanceCallback(SeedanceCallbackRequest request) {
+    public void seedanceCallback(SeedanceCallbackRequest request) {
         SeedanceCallbackData data = request.getData();
         log.info("Seedance回调处理完成, taskId: {}", data.getTaskId());
         if (recordsService.isCompleted(data.getTaskId())) return;
@@ -137,7 +137,7 @@ public class VideoCallbackServiceImpl implements VideoCallbackService {
     }
 
     @Override
-    public void WanCallback(WanCallbackRequest request) {
+    public void wanCallback(WanCallbackRequest request) {
         WanCallbackData data = request.getData();
         log.info("Wan回调处理完成, taskId: {}", data.getTaskId());
         if (recordsService.isCompleted(data.getTaskId())) return;
@@ -151,7 +151,7 @@ public class VideoCallbackServiceImpl implements VideoCallbackService {
     }
 
     @Override
-    public void KlingCallback(KlingCallbackRequest request) {
+    public void klingCallback(KlingCallbackRequest request) {
         try {
             String taskId = request.getData().getTaskId();
             String state = request.getData().getState();
@@ -160,14 +160,14 @@ public class VideoCallbackServiceImpl implements VideoCallbackService {
             //幂等性校验
             if (recordsService.isCompleted(request.getData().getTaskId())) return;
 
-            log.info("Processing Kling image callback: taskId={}, state={}", taskId, state);
+            log.info("Processing Kling Video callback: taskId={}, state={}", taskId, state);
 
             if ("success".equals(state)) {
                 // 解析结果
                 KlingCallbackRequest.KlingResult result =
                         objectMapper.readValue(resultJson, KlingCallbackRequest.KlingResult.class);
 
-                log.info("Kling Image generation completed: taskId={}, resultUrls={}", taskId, result.getResultUrls());
+                log.info("Kling Video generation completed: taskId={}, resultUrls={}", taskId, result.getResultUrls());
 
                 List<String> outputUrl = new ArrayList<>();
                 for (String url : result.getResultUrls()) {
@@ -176,19 +176,19 @@ public class VideoCallbackServiceImpl implements VideoCallbackService {
                 recordsService.completed(request.getData().getTaskId(), outputUrl, new HashMap<>(), request);
 
             } else if ("fail".equals(state)) {
-                log.info("Kling Image generation failed: taskId={}, info={}", taskId, request);
+                log.info("Kling Video generation failed: taskId={}, info={}", taskId, request);
 
                 recordsService.failed(request.getData().getTaskId(), request);
             }
 
         } catch (Exception e) {
             recordsService.failed(request.getData().getTaskId(), request);
-            log.error("Failed to process Gpt Image callback: taskId={}, error={}", request.getData().getTaskId(), e);
+            log.error("Failed to process Kling Video callback: taskId={}, error={}", request.getData().getTaskId(), e);
         }
     }
 
     @Override
-    public void HailuoCallback(HailuoCallbackRequest request) {
+    public void hailuoCallback(HailuoCallbackRequest request) {
         try {
             String taskId = request.getData().getTaskId();
             String state = request.getData().getState();
@@ -197,14 +197,14 @@ public class VideoCallbackServiceImpl implements VideoCallbackService {
             //幂等性校验
             if (recordsService.isCompleted(request.getData().getTaskId())) return;
 
-            log.info("Processing Hailuo image callback: taskId={}, state={}", taskId, state);
+            log.info("Processing Hailuo Video callback: taskId={}, state={}", taskId, state);
 
             if ("success".equals(state)) {
                 // 解析结果
                 HailuoCallbackRequest.HailuoResult result =
                         objectMapper.readValue(resultJson, HailuoCallbackRequest.HailuoResult.class);
 
-                log.info("Hailuo Image generation completed: taskId={}, resultUrls={}", taskId, result.getResultUrls());
+                log.info("Hailuo Video generation completed: taskId={}, resultUrls={}", taskId, result.getResultUrls());
 
                 List<String> outputUrl = new ArrayList<>();
                 for (String url : result.getResultUrls()) {
@@ -213,15 +213,53 @@ public class VideoCallbackServiceImpl implements VideoCallbackService {
                 recordsService.completed(request.getData().getTaskId(), outputUrl, new HashMap<>(), request);
 
             } else if ("fail".equals(state)) {
-                log.info("Hailuo Image generation failed: taskId={}, info={}", taskId, request);
+                log.info("Hailuo Video generation failed: taskId={}, info={}", taskId, request);
 
                 recordsService.failed(request.getData().getTaskId(), request);
             }
 
         } catch (Exception e) {
             recordsService.failed(request.getData().getTaskId(), request);
-            log.error("Failed to process Gpt Image callback: taskId={}, error={}", request.getData().getTaskId(), e);
+            log.error("Failed to process Hailuo Video callback: taskId={}, error={}", request.getData().getTaskId(), e);
         }
+    }
+
+    @Override
+    public void grokCallback(VideoCallbackRequest request) {
+        try {
+            String taskId = request.getData().getTaskId();
+            String state = request.getData().getState();
+            String resultJson = request.getData().getResultJson();
+
+            //幂等性校验
+            if (recordsService.isCompleted(request.getData().getTaskId())) return;
+
+            log.info("Processing Grok Video callback: taskId={}, state={}", taskId, state);
+
+            if ("success".equals(state)) {
+                // 解析结果
+                VideoCallbackRequest.Result result =
+                        objectMapper.readValue(resultJson, VideoCallbackRequest.Result.class);
+
+                log.info("Grok Video generation completed: taskId={}, resultUrls={}", taskId, result.getResultUrls());
+
+                List<String> outputUrl = new ArrayList<>();
+                for (String url : result.getResultUrls()) {
+                    outputUrl.add(s3UploadUtil.uploadFileFromUrl(url));
+                }
+                recordsService.completed(request.getData().getTaskId(), outputUrl, new HashMap<>(), request);
+
+            } else if ("fail".equals(state)) {
+                log.info("Grok Video generation failed: taskId={}, info={}", taskId, request);
+
+                recordsService.failed(request.getData().getTaskId(), request);
+            }
+
+        } catch (Exception e) {
+            recordsService.failed(request.getData().getTaskId(), request);
+            log.error("Failed to process Grok Video callback: taskId={}, error={}", request.getData().getTaskId(), e);
+        }
+
     }
 
 }

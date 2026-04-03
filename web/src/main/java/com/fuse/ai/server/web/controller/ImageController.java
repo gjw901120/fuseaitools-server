@@ -2,10 +2,7 @@ package com.fuse.ai.server.web.controller;
 
 import com.fuse.ai.server.web.model.dto.request.image.*;
 import com.fuse.ai.server.web.model.dto.request.user.UserJwtDTO;
-import com.fuse.ai.server.web.service.FluxKontextService;
-import com.fuse.ai.server.web.service.Gpt4oImageService;
-import com.fuse.ai.server.web.service.ImagenService;
-import com.fuse.ai.server.web.service.NanoBananaService;
+import com.fuse.ai.server.web.service.*;
 import com.fuse.common.core.entity.vo.ResponseResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -31,6 +28,9 @@ public class ImageController {
 
     @Autowired
     private ImagenService imagenService;
+
+    @Autowired
+    private GrokService grokService;
 
     @PostMapping("/gpt4o-image/generate")
     public ResponseResult<?> gpt4oImageGenerate(@Valid @RequestBody Gpt4oImageGenerateDTO request,
@@ -121,6 +121,20 @@ public class ImageController {
                                                  @AuthenticationPrincipal UserJwtDTO userJwtDTO) {
 
         return ResponseResult.success(imagenService.ultraGenerate(request, userJwtDTO));
+    }
+
+    @PostMapping("/grok/text-to-image")
+    public ResponseResult<?> grokTextToImage(@Valid @RequestBody GrokImagineTextToImageDTO request,
+                                                  @AuthenticationPrincipal UserJwtDTO userJwtDTO) {
+
+        return ResponseResult.success(grokService.textToImage(request, userJwtDTO));
+    }
+
+    @PostMapping("/grok/image-to-image")
+    public ResponseResult<?> grokImageToImage(@Valid @RequestBody GrokImagineImageToImageDTO request,
+                                              @AuthenticationPrincipal UserJwtDTO userJwtDTO) {
+
+        return ResponseResult.success(grokService.imageToImage(request, userJwtDTO));
     }
 
 

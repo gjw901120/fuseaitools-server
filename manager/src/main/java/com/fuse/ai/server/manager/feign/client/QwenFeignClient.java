@@ -2,10 +2,7 @@ package com.fuse.ai.server.manager.feign.client;
 
 import com.fuse.ai.server.manager.feign.config.FeignConfig;
 import com.fuse.ai.server.manager.feign.fallback.ErrorFallback;
-import com.fuse.ai.server.manager.model.request.image.QwenImageEditRequest;
-import com.fuse.ai.server.manager.model.request.image.QwenImageToImageRequest;
-import com.fuse.ai.server.manager.model.request.image.QwenTextToImageRequest;
-import com.fuse.ai.server.manager.model.request.image.QwenZImageRequest;
+import com.fuse.ai.server.manager.model.request.image.*;
 import com.fuse.ai.server.manager.model.response.ImageGenerateResponse;
 import feign.Headers;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -54,4 +51,20 @@ public interface QwenFeignClient {
     @Headers("Content-Type: application/json")
     ImageGenerateResponse zImage(@Valid @RequestBody QwenZImageRequest request,
                                  @RequestParam("apiKey") String apiKey);
+
+    /**
+     * Qwen2 文生图
+     */
+    @PostMapping("/api/v1/jobs/createTask")
+    @Headers("Content-Type: application/json")
+    ImageGenerateResponse v2TextToImage(@Valid @RequestBody Qwen2TextToImageRequest request,
+                                      @RequestParam("apiKey") String apiKey);
+
+    /**
+     * Qwen2 图像编辑
+     */
+    @PostMapping("/api/v1/jobs/createTask")
+    @Headers("Content-Type: application/json")
+    ImageGenerateResponse v2ImageEdit(@Valid @RequestBody Qwen2ImageEditRequest request,
+                                    @RequestParam("apiKey") String apiKey);
 }

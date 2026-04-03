@@ -2,6 +2,7 @@ package com.fuse.ai.server.web.controller;
 
 import com.fuse.ai.server.web.model.dto.request.user.UserJwtDTO;
 import com.fuse.ai.server.web.model.dto.request.video.*;
+import com.fuse.ai.server.web.service.GrokService;
 import com.fuse.ai.server.web.service.LumaGenerateService;
 import com.fuse.ai.server.web.service.RunwayGenerateService;
 import com.fuse.ai.server.web.service.VeoGenerateService;
@@ -24,9 +25,11 @@ public class VideoController {
     @Autowired
     private RunwayGenerateService runwayGenerateService;
 
-
     @Autowired
     private LumaGenerateService lumaGenerateService;
+
+    @Autowired
+    private GrokService grokService;
 
     @PostMapping("/veo/generate")
     public ResponseResult<?> generateVideo(@Valid @RequestBody VeoGenerateDTO request,
@@ -75,6 +78,33 @@ public class VideoController {
         return ResponseResult.success(lumaGenerateService.lumaGenerate(request, userJwtDTO));
     }
 
+    @PostMapping("/grok/text-to-video")
+    public ResponseResult<?> grokTextToVideo(@Valid @RequestBody GrokImagineTextToVideoDTO request,
+                                          @AuthenticationPrincipal UserJwtDTO userJwtDTO) {
+
+        return ResponseResult.success(grokService.textToVideo(request, userJwtDTO));
+    }
+
+    @PostMapping("/grok/image-to-video")
+    public ResponseResult<?> grokImageToVideo(@Valid @RequestBody GrokImagineImageToVideoDTO request,
+                                          @AuthenticationPrincipal UserJwtDTO userJwtDTO) {
+
+        return ResponseResult.success(grokService.imageToVideo(request, userJwtDTO));
+    }
+
+    @PostMapping("/grok/upscale")
+    public ResponseResult<?> grokUpscale(@Valid @RequestBody GrokImagineUpscaleDTO request,
+                                          @AuthenticationPrincipal UserJwtDTO userJwtDTO) {
+
+        return ResponseResult.success(grokService.upscale(request, userJwtDTO));
+    }
+
+    @PostMapping("/grok/extend")
+    public ResponseResult<?> grokExtend(@Valid @RequestBody GrokImagineExtendDTO request,
+                                          @AuthenticationPrincipal UserJwtDTO userJwtDTO) {
+
+        return ResponseResult.success(grokService.extend(request, userJwtDTO));
+    }
 
 
 

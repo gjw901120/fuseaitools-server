@@ -5,17 +5,12 @@ import com.fuse.ai.server.manager.entity.UserModelTask;
 import com.fuse.ai.server.manager.enums.ImageResponseCodeEnum;
 import com.fuse.ai.server.manager.enums.TaskStatusEnum;
 import com.fuse.ai.server.manager.manager.QwenManager;
-import com.fuse.ai.server.manager.model.request.image.QwenImageEditRequest;
-import com.fuse.ai.server.manager.model.request.image.QwenImageToImageRequest;
-import com.fuse.ai.server.manager.model.request.image.QwenTextToImageRequest;
-import com.fuse.ai.server.manager.model.request.image.QwenZImageRequest;
+import com.fuse.ai.server.manager.model.request.image.*;
 import com.fuse.ai.server.manager.model.response.ImageGenerateResponse;
+import com.fuse.ai.server.web.common.utils.FeishuMessageUtil;
 import com.fuse.ai.server.web.model.bo.ExtraDataBO;
 import com.fuse.ai.server.web.model.bo.verifyCreditsBO;
-import com.fuse.ai.server.web.model.dto.request.image.QwenImageEditDTO;
-import com.fuse.ai.server.web.model.dto.request.image.QwenImageToImageDTO;
-import com.fuse.ai.server.web.model.dto.request.image.QwenTextToImageDTO;
-import com.fuse.ai.server.web.model.dto.request.image.QwenZImageDTO;
+import com.fuse.ai.server.web.model.dto.request.image.*;
 import com.fuse.ai.server.web.model.dto.request.user.UserJwtDTO;
 import com.fuse.ai.server.web.model.dto.response.BaseResponse;
 import com.fuse.ai.server.web.service.ModelsService;
@@ -76,7 +71,8 @@ public class QwenServiceImpl implements QwenService {
         ImageGenerateResponse response = qwenManager.textToImage(request, model.getRequestToken());
 
         if(!ImageResponseCodeEnum.SUCCESS.equals(response.getCode())) {
-            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, response.getMessage());
+            FeishuMessageUtil.sendExceptionMessage("Qwen textToImage error: " + response.getMessage());
+            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, "The volume of service requests is too high. Please try again later.");
         }
 
         //写入任务
@@ -126,7 +122,8 @@ public class QwenServiceImpl implements QwenService {
         ImageGenerateResponse response = qwenManager.imageToImage(request, model.getRequestToken());
 
         if(!ImageResponseCodeEnum.SUCCESS.equals(response.getCode())) {
-            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, response.getMessage());
+            FeishuMessageUtil.sendExceptionMessage("Qwen imageToImage error: " + response.getMessage());
+            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, "The volume of service requests is too high. Please try again later.");
         }
 
         ArrayList<String> inputUrls = new ArrayList<>();
@@ -180,7 +177,8 @@ public class QwenServiceImpl implements QwenService {
         ImageGenerateResponse response = qwenManager.imageEdit(request, model.getRequestToken());
 
         if(!ImageResponseCodeEnum.SUCCESS.equals(response.getCode())) {
-            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, response.getMessage());
+            FeishuMessageUtil.sendExceptionMessage("Qwen imageEdit error: " + response.getMessage());
+            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, "The volume of service requests is too high. Please try again later.");
         }
 
         ArrayList<String> inputUrls = new ArrayList<>();
@@ -225,7 +223,8 @@ public class QwenServiceImpl implements QwenService {
         ImageGenerateResponse response = qwenManager.zImage(request, model.getRequestToken());
 
         if(!ImageResponseCodeEnum.SUCCESS.equals(response.getCode())) {
-            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, response.getMessage());
+            FeishuMessageUtil.sendExceptionMessage("Qwen zImage error: " + response.getMessage());
+            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, "The volume of service requests is too high. Please try again later.");
         }
 
         //写入任务
@@ -246,5 +245,100 @@ public class QwenServiceImpl implements QwenService {
         );
 
         return new BaseResponse(recordsService.create(model, qwenZImageDTO.getPrompt(), qwenZImageDTO, userModelTask, verifyCreditsBO));
+    }
+
+    @Override
+    public BaseResponse v2TextToImage(Qwen2TextToImageDTO qwenTextToImageDTO, UserJwtDTO userJwtDTO) {
+        Models model = modelsService.getModelByName(qwenTextToImageDTO.getModel());
+
+        verifyCreditsBO verifyCreditsBO = userCreditsService.verifyCredits(userJwtDTO.getId(), model, new ExtraDataBO());
+
+        // 实现视频生成逻辑
+        Qwen2TextToImageRequest request = new Qwen2TextToImageRequest();
+        Qwen2TextToImageRequest.TextToImageInput input = new Qwen2TextToImageRequest.TextToImageInput();
+
+        request.setModel(model.getRequestName());
+        input.setOutputFormat(qwenTextToImageDTO.getOutputFormat());
+        input.setPrompt(qwenTextToImageDTO.getPrompt());
+        input.setImageSize(qwenTextToImageDTO.getImageSize());
+        input.setSeed(qwenTextToImageDTO.getSeed());
+        request.setCallBackUrl(callbackUrl.concat("/image/qwen"));
+        request.setInput(input);
+
+        ImageGenerateResponse response = qwenManager.v2TextToImage(request, model.getRequestToken());
+
+        if(!ImageResponseCodeEnum.SUCCESS.equals(response.getCode())) {
+            FeishuMessageUtil.sendExceptionMessage("Qwen v2TextToImage error: " + response.getMessage());
+            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, "The volume of service requests is too high. Please try again later.");
+        }
+
+        //写入任务
+        UserModelTask userModelTask = UserModelTask.create(
+                userJwtDTO.getId(),
+                "",
+                0,
+                0,
+                TaskStatusEnum.PROCESSING,
+                "",
+                response.getData().getTaskId(),
+                new ArrayList<>(),
+                new ArrayList<>(),
+                new HashMap<>(),
+                request,
+                new HashMap<>(),
+                new HashMap<>()
+        );
+
+        return new BaseResponse(recordsService.create(model, qwenTextToImageDTO.getPrompt(), qwenTextToImageDTO, userModelTask, verifyCreditsBO));
+    }
+
+    @Override
+    public BaseResponse v2ImageEdit(Qwen2ImageEditDTO qwenImageEditDTO, UserJwtDTO userJwtDTO) {
+        Models model = modelsService.getModelByName(qwenImageEditDTO.getModel());
+
+        verifyCreditsBO verifyCreditsBO = userCreditsService.verifyCredits(userJwtDTO.getId(), model, new ExtraDataBO());
+
+        // 实现视频生成逻辑
+        Qwen2ImageEditRequest request = new Qwen2ImageEditRequest();
+        Qwen2ImageEditRequest.ImageEditInput input = new Qwen2ImageEditRequest.ImageEditInput();
+
+        request.setModel(model.getRequestName());
+        input.setOutputFormat(qwenImageEditDTO.getOutputFormat());
+        input.setImageUrl(qwenImageEditDTO.getImageUrl());
+        input.setImageSize(qwenImageEditDTO.getImageSize());
+        input.setSeed(qwenImageEditDTO.getSeed());
+        input.setPrompt(qwenImageEditDTO.getPrompt());
+
+        request.setCallBackUrl(callbackUrl.concat("/image/qwen"));
+        request.setInput(input);
+
+        ImageGenerateResponse response = qwenManager.v2ImageEdit(request, model.getRequestToken());
+
+        if(!ImageResponseCodeEnum.SUCCESS.equals(response.getCode())) {
+            FeishuMessageUtil.sendExceptionMessage("Qwen v2ImageEdit error: " + response.getMessage());
+            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, "The volume of service requests is too high. Please try again later.");
+        }
+
+        ArrayList<String> inputUrls = new ArrayList<>();
+        inputUrls.add(qwenImageEditDTO.getImageUrl());
+
+        //写入任务
+        UserModelTask userModelTask = UserModelTask.create(
+                userJwtDTO.getId(),
+                "",
+                0,
+                0,
+                TaskStatusEnum.PROCESSING,
+                "",
+                response.getData().getTaskId(),
+                inputUrls,
+                new ArrayList<>(),
+                new HashMap<>(),
+                request,
+                new HashMap<>(),
+                new HashMap<>()
+        );
+
+        return new BaseResponse(recordsService.create(model, qwenImageEditDTO.getPrompt(), qwenImageEditDTO, userModelTask, verifyCreditsBO));
     }
 }

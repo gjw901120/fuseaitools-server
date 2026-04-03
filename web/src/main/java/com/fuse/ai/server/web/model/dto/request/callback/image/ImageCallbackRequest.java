@@ -6,7 +6,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class ImagenCallbackRequest {
+public class ImageCallbackRequest {
 
     /**
      * 状态码
@@ -16,7 +16,7 @@ public class ImagenCallbackRequest {
     /**
      * 回调数据
      */
-    private ImagenCallbackData data;
+    private CallbackData data;
 
     /**
      * 状态消息
@@ -24,7 +24,7 @@ public class ImagenCallbackRequest {
     private String msg;
 
     @Data
-    public static class ImagenCallbackData {
+    public static class CallbackData {
 
         /**
          * 任务完成时间戳（毫秒）

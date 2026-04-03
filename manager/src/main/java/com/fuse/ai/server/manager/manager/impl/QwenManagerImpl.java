@@ -2,10 +2,7 @@ package com.fuse.ai.server.manager.manager.impl;
 
 import com.fuse.ai.server.manager.feign.client.QwenFeignClient;
 import com.fuse.ai.server.manager.manager.QwenManager;
-import com.fuse.ai.server.manager.model.request.image.QwenImageEditRequest;
-import com.fuse.ai.server.manager.model.request.image.QwenImageToImageRequest;
-import com.fuse.ai.server.manager.model.request.image.QwenTextToImageRequest;
-import com.fuse.ai.server.manager.model.request.image.QwenZImageRequest;
+import com.fuse.ai.server.manager.model.request.image.*;
 import com.fuse.ai.server.manager.model.response.ImageGenerateResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,4 +34,15 @@ public class QwenManagerImpl implements QwenManager {
     public ImageGenerateResponse zImage(QwenZImageRequest request, String apiKey) {
         return qwenFeignClient.zImage(request, apiKey);
     }
+
+    @Override
+    public ImageGenerateResponse v2TextToImage(Qwen2TextToImageRequest request, String apiKey) {
+        return qwenFeignClient.v2TextToImage(request, apiKey);
+    }
+
+    @Override
+    public ImageGenerateResponse v2ImageEdit(Qwen2ImageEditRequest request, String apiKey) {
+        return qwenFeignClient.v2ImageEdit(request, apiKey);
+    }
+
 }

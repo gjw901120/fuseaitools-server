@@ -1,9 +1,6 @@
 package com.fuse.ai.server.manager.manager;
 
-import com.fuse.ai.server.manager.model.request.image.QwenImageEditRequest;
-import com.fuse.ai.server.manager.model.request.image.QwenImageToImageRequest;
-import com.fuse.ai.server.manager.model.request.image.QwenTextToImageRequest;
-import com.fuse.ai.server.manager.model.request.image.QwenZImageRequest;
+import com.fuse.ai.server.manager.model.request.image.*;
 import com.fuse.ai.server.manager.model.response.ImageGenerateResponse;
 
 public interface QwenManager {
@@ -27,4 +24,8 @@ public interface QwenManager {
      * Qwen Z-Image
      */
     ImageGenerateResponse zImage(QwenZImageRequest request, String apiKey);
+
+    ImageGenerateResponse v2TextToImage(Qwen2TextToImageRequest request, String apiKey);
+
+    ImageGenerateResponse v2ImageEdit(Qwen2ImageEditRequest request, String apiKey);
 }

@@ -10,33 +10,35 @@ public interface VideoCallbackService {
     /**
      * 处理Veo回调
      */
-    void VeoCallback(VeoCallbackRequest request);
+    void veoCallback(VeoCallbackRequest request);
 
     /**
      * 处理Runway回调
      */
-    void RunwayCallback(RunwayCallbackRequest request);
+    void runwayCallback(RunwayCallbackRequest request);
 
     /**
      * 处理RunwayAleph回调
      */
-    void RunwayAlephCallback(RunwayAlephCallbackRequest request);
+    void runwayAlephCallback(RunwayAlephCallbackRequest request);
 
     /**
      * 处理Luma回调
      */
-    void LumaCallback(LumaCallbackRequest request);
+    void lumaCallback(LumaCallbackRequest request);
 
     /**
      * 处理Sora回调
      */
-    void SoraCallback(SoraCallbackRequest request);
+    void soraCallback(SoraCallbackRequest request);
 
-    void SeedanceCallback(SeedanceCallbackRequest request);
+    void seedanceCallback(SeedanceCallbackRequest request);
 
-    void WanCallback(WanCallbackRequest request);
+    void wanCallback(WanCallbackRequest request);
 
-    void KlingCallback(KlingCallbackRequest request);
-    void HailuoCallback(HailuoCallbackRequest request);
+    void klingCallback(KlingCallbackRequest request);
+    void hailuoCallback(HailuoCallbackRequest request);
+
+    void grokCallback(VideoCallbackRequest request);
 
 }
