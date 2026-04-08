@@ -54,12 +54,16 @@ public abstract class ClaudeResponse {
         }
 
         @Data
+        @JsonIgnoreProperties(ignoreUnknown = true)
         public static class MessageDeltaData {
             @JsonProperty("stop_reason")
             private String stopReason;
 
             @JsonProperty("stop_sequence")
             private String stopSequence;
+
+            @JsonProperty("stop_details")
+            private String stopDetails;
         }
     }
 
