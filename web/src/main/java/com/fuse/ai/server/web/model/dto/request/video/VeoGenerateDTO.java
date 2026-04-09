@@ -4,6 +4,7 @@ import com.fuse.ai.server.web.common.enums.VeoModelEnum;
 import com.fuse.ai.server.web.common.enums.VeoGenerationTypeEnum;
 import com.fuse.ai.server.web.common.enums.VeoAspectRatioEnum;
 import com.fuse.ai.server.web.config.exception.ResponseErrorType;
+import com.fuse.ai.server.web.model.annotation.SensitiveWordCheck;
 import com.fuse.common.core.exception.BaseException;
 import lombok.Data;
 
@@ -25,6 +26,11 @@ public class VeoGenerateDTO {
      */
     @NotBlank(message = "Prompt cannot be empty")
     @Size(min = 1, max = 1000, message = "Prompt length must be between 1-1000 characters")
+    @SensitiveWordCheck(
+            enabled = true,
+            replace = false,  // false=抛出异常，true=自动替换
+            message = "Contains inappropriate content. Please modify "
+    )
     private String prompt;
 
     /**

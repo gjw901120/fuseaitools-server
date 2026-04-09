@@ -1,16 +1,12 @@
 package com.fuse.ai.server.web.model.dto.request.elevenlabs;
 
-import com.fuse.ai.server.web.common.enums.ElevenLabsModelEnum;
 import com.fuse.ai.server.web.common.enums.ElevenLabsVoiceEnum;
+import com.fuse.ai.server.web.model.annotation.SensitiveWordCheck;
 import com.fuse.common.core.exception.BaseException;
 import com.fuse.common.core.exception.error.UserErrorType;
 import lombok.Data;
 
-import javax.validation.constraints.DecimalMax;
-import javax.validation.constraints.DecimalMin;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -36,6 +32,11 @@ public class ElevenlabsTTSDTO implements Serializable {
      */
     @NotBlank(message = "Text cannot be empty")
     @Size(max = 5000, message = "Text length cannot exceed 5000 characters")
+    @SensitiveWordCheck(
+            enabled = true,
+            replace = false,  // false=抛出异常，true=自动替换
+            message = "Contains inappropriate content. Please modify "
+    )
     private String text;
 
     /**

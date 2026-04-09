@@ -1,5 +1,6 @@
 package com.fuse.ai.server.web.model.dto.request.video;
 
+import com.fuse.ai.server.web.model.annotation.SensitiveWordCheck;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
@@ -41,6 +42,11 @@ public class Kling30VideoDTO {
      * 提示词（单镜头模式必填），最大2500字符
      */
     @Size(max = 2500, message = "Prompt cannot exceed 2500 characters")
+    @SensitiveWordCheck(
+            enabled = true,
+            replace = false,  // false=抛出异常，true=自动替换
+            message = "Contains inappropriate content. Please modify "
+    )
     private String prompt;
 
     /**

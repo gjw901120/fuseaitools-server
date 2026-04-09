@@ -1,6 +1,7 @@
 package com.fuse.ai.server.web.model.dto.request.video;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fuse.ai.server.web.model.annotation.SensitiveWordCheck;
 import lombok.Data;
 
 import javax.validation.constraints.*;
@@ -68,6 +69,11 @@ public class SoraProStoryboardDTO {
          * Scene description/prompt
          */
         @NotBlank(message = "Scene description cannot be empty")
+        @SensitiveWordCheck(
+                enabled = true,
+                replace = false,  // false=抛出异常，true=自动替换
+                message = "Contains inappropriate content. Please modify "
+        )
         private String scene;
     }
 

@@ -1,5 +1,6 @@
 package com.fuse.ai.server.web.model.dto.request.image;
 
+import com.fuse.ai.server.web.model.annotation.SensitiveWordCheck;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
@@ -24,6 +25,11 @@ public class IdeogramV3TextToImageDTO {
      */
     @NotBlank(message = "Prompt cannot be empty")
     @Size(max = 5000, message = "Prompt cannot exceed 5000 characters")
+    @SensitiveWordCheck(
+            enabled = true,
+            replace = false,  // false=抛出异常，true=自动替换
+            message = "Contains inappropriate content. Please modify "
+    )
     private String prompt;
 
     /**

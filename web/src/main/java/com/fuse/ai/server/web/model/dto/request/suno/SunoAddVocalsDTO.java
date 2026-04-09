@@ -2,6 +2,7 @@ package com.fuse.ai.server.web.model.dto.request.suno;
 
 import com.fuse.ai.server.web.common.enums.SunoModelEnum;
 import com.fuse.ai.server.web.common.enums.SunoVocalGenderEnum;
+import com.fuse.ai.server.web.model.annotation.SensitiveWordCheck;
 import com.fuse.common.core.exception.BaseException;
 import com.fuse.common.core.exception.error.UserErrorType;
 import lombok.Data;
@@ -27,6 +28,11 @@ public class SunoAddVocalsDTO implements Serializable {
      * Prompt for generating audio
      */
     @NotBlank(message = "Prompt cannot be empty")
+    @SensitiveWordCheck(
+            enabled = true,
+            replace = false,  // false=抛出异常，true=自动替换
+            message = "Contains inappropriate content. Please modify "
+    )
     private String prompt;
 
     /**

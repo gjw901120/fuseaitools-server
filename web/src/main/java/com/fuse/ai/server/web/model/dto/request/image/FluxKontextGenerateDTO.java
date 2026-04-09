@@ -3,6 +3,7 @@ package com.fuse.ai.server.web.model.dto.request.image;
 import com.fuse.ai.server.web.common.enums.FluxKontextAspectRatioEnum;
 import com.fuse.ai.server.web.common.enums.FluxKontextModelEnum;
 import com.fuse.ai.server.web.common.enums.FluxKontextOutputFormatEnum;
+import com.fuse.ai.server.web.model.annotation.SensitiveWordCheck;
 import com.fuse.common.core.exception.BaseException;
 import com.fuse.common.core.exception.error.UserErrorType;
 import lombok.Data;
@@ -32,6 +33,11 @@ public class FluxKontextGenerateDTO implements Serializable {
      */
     @NotBlank(message = "The prompt cannot be empty")
     @Size(max = 5000, message = "The length of the prompt cannot exceed 5000 characters")
+    @SensitiveWordCheck(
+            enabled = true,
+            replace = false,  // false=抛出异常，true=自动替换
+            message = "Contains inappropriate content. Please modify "
+    )
     private String prompt;
 
     /**

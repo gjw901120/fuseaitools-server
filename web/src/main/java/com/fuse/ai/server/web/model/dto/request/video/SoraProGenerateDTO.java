@@ -1,6 +1,7 @@
 package com.fuse.ai.server.web.model.dto.request.video;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fuse.ai.server.web.model.annotation.SensitiveWordCheck;
 import lombok.Data;
 
 import javax.validation.constraints.*;
@@ -25,6 +26,11 @@ public class SoraProGenerateDTO {
      */
     @NotBlank(message = "Prompt cannot be empty")
     @Size(max = 10000, message = "Prompt cannot exceed 10000 characters")
+    @SensitiveWordCheck(
+            enabled = true,
+            replace = false,  // false=抛出异常，true=自动替换
+            message = "Contains inappropriate content. Please modify "
+    )
     private String prompt;
 
     /**

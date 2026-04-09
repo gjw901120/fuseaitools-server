@@ -1,5 +1,6 @@
 package com.fuse.ai.server.web.model.dto.request.video;
 
+import com.fuse.ai.server.web.model.annotation.SensitiveWordCheck;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
@@ -27,6 +28,11 @@ public class Seedance15ProDTO {
      */
     @NotBlank(message = "Prompt cannot be empty")
     @Size(min = 3, max = 2500, message = "Prompt must be between 3 and 2500 characters")
+    @SensitiveWordCheck(
+            enabled = true,
+            replace = false,  // false=抛出异常，true=自动替换
+            message = "Contains inappropriate content. Please modify "
+    )
     private String prompt;
 
     /**

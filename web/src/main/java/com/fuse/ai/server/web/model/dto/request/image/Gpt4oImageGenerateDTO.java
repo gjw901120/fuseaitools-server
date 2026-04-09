@@ -1,5 +1,6 @@
 package com.fuse.ai.server.web.model.dto.request.image;
 
+import com.fuse.ai.server.web.model.annotation.SensitiveWordCheck;
 import lombok.Data;
 
 import javax.validation.constraints.*;
@@ -27,6 +28,11 @@ public class Gpt4oImageGenerateDTO {
     /**
      * Prompt describing the desired content
      */
+    @SensitiveWordCheck(
+            enabled = true,
+            replace = false,  // false=抛出异常，true=自动替换
+            message = "Contains inappropriate content. Please modify "
+    )
     private String prompt;
 
     /**

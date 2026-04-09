@@ -2,6 +2,7 @@ package com.fuse.ai.server.web.model.dto.request.image;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fuse.ai.server.web.model.annotation.SensitiveWordCheck;
 import lombok.Data;
 import org.hibernate.validator.constraints.Range;
 import org.springframework.web.multipart.MultipartFile;
@@ -35,6 +36,11 @@ public class MidjourneyImagineDTO {
      */
     @NotBlank(message = "Prompt cannot be empty")
     @Size(max = 2000, message = "Prompt length cannot exceed 2000 characters")
+    @SensitiveWordCheck(
+            enabled = true,
+            replace = false,  // false=抛出异常，true=自动替换
+            message = "Contains inappropriate content. Please modify "
+    )
     @JsonProperty("prompt")
     private String prompt;
 
