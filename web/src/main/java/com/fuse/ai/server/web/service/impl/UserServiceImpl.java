@@ -149,10 +149,10 @@ public class UserServiceImpl implements UserService {
                     0
             );
             userManager.insert(user);
-            //初次赠送100credits
+            //初次赠送77credits
             userCreditsManager.insert(UserCredits.create(
                     user.getId(),
-                    BigDecimal.valueOf(100),
+                    BigDecimal.valueOf(77),
                     BigDecimal.valueOf(0),
                     1,
                     1
@@ -206,10 +206,10 @@ public class UserServiceImpl implements UserService {
                     .avatar(newUser.getAvatar())
                     .email(newUser.getEmail())
                     .build();
-            //初次赠送100credits
+            //初次赠送77credits
             userCreditsManager.insert(UserCredits.create(
                     newUser.getId(),
-                    BigDecimal.valueOf(100),
+                    BigDecimal.valueOf(77),
                     BigDecimal.valueOf(0),
                     1,
                     1

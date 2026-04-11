@@ -26,7 +26,7 @@ public class WanVideoToVideoDTO {
      * 视频生成提示词，1-5000字符
      */
     @NotBlank(message = "Prompt cannot be empty")
-    @Size(max = 5000, message = "Prompt cannot exceed 5000 characters")
+    @Size(min = 5, max = 5000, message = "Prompt must be between 5 and 2500 characters")
     @SensitiveWordCheck(
             enabled = true,
             replace = false,  // false=抛出异常，true=自动替换

@@ -27,7 +27,7 @@ public class Seedance15ProDTO {
      * 最小长度：3，最大长度：2500 字符
      */
     @NotBlank(message = "Prompt cannot be empty")
-    @Size(min = 3, max = 2500, message = "Prompt must be between 3 and 2500 characters")
+    @Size(min = 5, max = 2500, message = "Prompt must be between 5 and 2500 characters")
     @SensitiveWordCheck(
             enabled = true,
             replace = false,  // false=抛出异常，true=自动替换

@@ -91,7 +91,7 @@ public class SunoServiceImpl implements SunoService {
                 new HashMap<>()
         );
 
-        return new BaseResponse(recordsService.create(model, sunoGenerateDTO.getTitle(), sunoGenerateDTO, userModelTask, verifyCreditsBO));
+        return new BaseResponse(recordsService.create(model, sunoGenerateDTO.getTitle().isEmpty() ? "suno-generate" : sunoGenerateDTO.getTitle() , sunoGenerateDTO, userModelTask, verifyCreditsBO));
 
     }
 
