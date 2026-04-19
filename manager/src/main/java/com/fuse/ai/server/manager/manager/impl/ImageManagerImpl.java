@@ -91,4 +91,14 @@ public class ImageManagerImpl implements ImageManager {
     public ImageGenerateResponse imagen4Generate(Imagen4GenerateRequest request, String apiKey) {
         return imageFeignClient.imagen4Generate(request, apiKey);
     }
+
+    @Override
+    public ImageGenerateResponse wan27Image(Wan27ImageRequest request, String apiKey) {
+        return imageFeignClient.wan27Image(request, apiKey);
+    }
+
+    @Override
+    public ImageGenerateResponse wan27ImagePro(Wan27ImageProRequest request, String apiKey) {
+        return imageFeignClient.wan27ImagePro(request, apiKey);
+    }
 }

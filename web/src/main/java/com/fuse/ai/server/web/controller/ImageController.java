@@ -32,6 +32,9 @@ public class ImageController {
     @Autowired
     private GrokService grokService;
 
+    @Autowired
+    private WanService wanService;
+
     @PostMapping("/gpt4o-image/generate")
     public ResponseResult<?> gpt4oImageGenerate(@Valid @RequestBody Gpt4oImageGenerateDTO request,
                                                 @AuthenticationPrincipal UserJwtDTO userJwtDTO) {
@@ -135,6 +138,20 @@ public class ImageController {
                                               @AuthenticationPrincipal UserJwtDTO userJwtDTO) {
 
         return ResponseResult.success(grokService.imageToImage(request, userJwtDTO));
+    }
+
+    @PostMapping("/wan/2-7-image")
+    public ResponseResult<?> wan27Image(@Valid @RequestBody Wan27ImageDTO request,
+                                        @AuthenticationPrincipal UserJwtDTO userJwtDTO) {
+
+        return ResponseResult.success(wanService.v27Image(request, userJwtDTO));
+    }
+
+    @PostMapping("/wan/2-7-image-pro")
+    public ResponseResult<?> wan27ImagePro(@Valid @RequestBody Wan27ImageProDTO request,
+                                        @AuthenticationPrincipal UserJwtDTO userJwtDTO) {
+
+        return ResponseResult.success(wanService.v27ImagePro(request, userJwtDTO));
     }
 
 

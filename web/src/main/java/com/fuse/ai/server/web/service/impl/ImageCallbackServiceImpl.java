@@ -370,4 +370,35 @@ public class ImageCallbackServiceImpl implements ImageCallbackService {
         }
     }
 
+    @Override
+    public void processWanCallback(ImageCallbackRequest request) {
+        try {
+            String taskId = request.getData().getTaskId();
+            String state = request.getData().getState();
+            String resultJson = request.getData().getResultJson();
+            log.info("Processing Wan image callback: taskId={}, state={}", taskId, state);
+            if ("success".equals(state)) {
+                // 解析结果
+                ImageCallbackRequest.Result result =
+                        objectMapper.readValue(resultJson, ImageCallbackRequest.Result.class);
+
+                log.info("Wan image generation completed: taskId={}, resultUrls={}", taskId, result.getResultUrls());
+
+                List<String> outputUrl = new ArrayList<>();
+                for (String url : result.getResultUrls()) {
+                    outputUrl.add(s3UploadUtil.uploadFileFromUrl(url));
+                }
+                recordsService.completed(request.getData().getTaskId(), outputUrl, new HashMap<>(), request);
+
+            } else if ("fail".equals(state)) {
+                log.info("Wan image generation failed: taskId={}, info={}", taskId, request);
+
+                recordsService.failed(request.getData().getTaskId(), request);
+            }
+        } catch (Exception e) {
+            recordsService.failed(request.getData().getTaskId(), request);
+            log.error("Failed to process Wan callback: taskId={}, error={}", request.getData().getTaskId(), e);
+        }
+    }
+
 }

@@ -4,9 +4,7 @@ import com.fuse.ai.server.manager.enums.SoraModelEnum;
 import com.fuse.common.core.exception.BaseException;
 import com.fuse.common.core.exception.error.SystemErrorType;
 import lombok.Data;
-import org.hibernate.validator.constraints.URL;
 
-import javax.validation.constraints.NotNull;
 import java.io.Serial;
 import java.io.Serializable;
 
@@ -16,10 +14,8 @@ public class SoraGenerateRequest implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @NotNull(message = "模型类型不能为空")
     private SoraModelEnum model;
 
-    @URL(message = "回调URL格式不正确")
     private String callBackUrl;
 
     // 根据不同模型使用不同的输入对象

@@ -45,4 +45,8 @@ public interface ImageManager {
     ImageGenerateResponse imagen4Generate(Imagen4GenerateRequest request, String apiKey);
     ImageGenerateResponse imagen4Fast(Imagen4FastRequest request, String apiKey);
 
+    ImageGenerateResponse wan27Image(Wan27ImageRequest request, String apiKey);
+
+    ImageGenerateResponse wan27ImagePro(Wan27ImageProRequest request, String apiKey);
+
 }

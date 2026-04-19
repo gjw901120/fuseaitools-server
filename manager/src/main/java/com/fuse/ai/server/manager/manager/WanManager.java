@@ -1,8 +1,6 @@
 package com.fuse.ai.server.manager.manager;
 
-import com.fuse.ai.server.manager.model.request.video.WanTextToVideoRequest;
-import com.fuse.ai.server.manager.model.request.video.WanImageToVideoRequest;
-import com.fuse.ai.server.manager.model.request.video.WanVideoToVideoRequest;
+import com.fuse.ai.server.manager.model.request.video.*;
 import com.fuse.ai.server.manager.model.response.VideoGenerateResponse;
 
 public interface WanManager {
@@ -21,4 +19,12 @@ public interface WanManager {
      * Wan 视频生视频
      */
     VideoGenerateResponse wanVideoToVideo(WanVideoToVideoRequest request, String apiKey);
+
+    VideoGenerateResponse wan27TextToVideo(Wan27TextToVideoRequest request, String apiKey);
+
+    VideoGenerateResponse wan27ImageToVideo(Wan27ImageToVideoRequest request, String apiKey);
+
+    VideoGenerateResponse wan27VideoEdit(Wan27VideoEditRequest request, String apiKey);
+
+    VideoGenerateResponse wan27R2V(Wan27R2VRequest request, String apiKey);
 }

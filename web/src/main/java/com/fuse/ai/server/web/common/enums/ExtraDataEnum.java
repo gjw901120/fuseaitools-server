@@ -6,10 +6,18 @@ package com.fuse.ai.server.web.common.enums;
 public enum ExtraDataEnum {
 
     DURATION_QUALITY("duration_quality", "时间 & 质量"),
+
+    PER_DURATION_QUALITY("per_duration_quality", "每秒时间 & 质量"),
     DURATION_SIZE("duration_size", "时间 & 大小"),
+
+    PER_DURATION_SIZE("per_duration_size", "每秒时间 & 大小"),
     DURATION_SCENE_SIZE("duration_scene_size", "时间 & 场景 & 大小"),
 
+    PER_DURATION_SCENE_SIZE("per_duration_scene_size", "每秒时间 & 场景 & 大小"),
+
     DURATION_QUALITY_SCENE("duration_quality_scene", "时间 & 质量 & 场景"),
+
+    PER_DURATION_QUALITY_SCENE("per_duration_quality_scene", "每秒时间 & 质量 & 场景"),
     DURATION_SCENE("duration_scene", "时间 & 场景"),
     DURATION("duration", "时间"),
     QUALITY("quality", "质量"),

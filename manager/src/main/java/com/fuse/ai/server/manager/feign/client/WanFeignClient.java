@@ -2,9 +2,7 @@ package com.fuse.ai.server.manager.feign.client;
 
 import com.fuse.ai.server.manager.feign.config.FeignConfig;
 import com.fuse.ai.server.manager.feign.fallback.ErrorFallback;
-import com.fuse.ai.server.manager.model.request.video.WanTextToVideoRequest;
-import com.fuse.ai.server.manager.model.request.video.WanImageToVideoRequest;
-import com.fuse.ai.server.manager.model.request.video.WanVideoToVideoRequest;
+import com.fuse.ai.server.manager.model.request.video.*;
 import com.fuse.ai.server.manager.model.response.VideoGenerateResponse;
 import feign.Headers;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -42,4 +40,21 @@ public interface WanFeignClient {
     @PostMapping("/api/v1/jobs/createTask")
     @Headers("Content-Type: application/json")
     VideoGenerateResponse wanVideoToVideo(@Valid @RequestBody WanVideoToVideoRequest request, @RequestParam("apiKey") String apiKey);
+
+    @PostMapping("/api/v1/jobs/createTask")
+    @Headers("Content-Type: application/json")
+    VideoGenerateResponse wan27TextToVideo(@Valid @RequestBody Wan27TextToVideoRequest request, @RequestParam("apiKey") String apiKey);
+
+    @PostMapping("/api/v1/jobs/createTask")
+    @Headers("Content-Type: application/json")
+    VideoGenerateResponse wan27ImageToVideo(@Valid @RequestBody Wan27ImageToVideoRequest request, @RequestParam("apiKey") String apiKey);
+
+    @PostMapping("/api/v1/jobs/createTask")
+    @Headers("Content-Type: application/json")
+    VideoGenerateResponse wan27VideoEdit(@Valid @RequestBody Wan27VideoEditRequest request, @RequestParam("apiKey") String apiKey);
+
+    @PostMapping("/api/v1/jobs/createTask")
+    @Headers("Content-Type: application/json")
+    VideoGenerateResponse wan27R2V(@Valid @RequestBody Wan27R2VRequest request, @RequestParam("apiKey") String apiKey);
+
 }

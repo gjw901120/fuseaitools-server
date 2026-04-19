@@ -1,9 +1,7 @@
 package com.fuse.ai.server.web.controller;
 
 import com.fuse.ai.server.web.model.dto.request.user.UserJwtDTO;
-import com.fuse.ai.server.web.model.dto.request.video.WanImageToVideoDTO;
-import com.fuse.ai.server.web.model.dto.request.video.WanTextToVideoDTO;
-import com.fuse.ai.server.web.model.dto.request.video.WanVideoToVideoDTO;
+import com.fuse.ai.server.web.model.dto.request.video.*;
 import com.fuse.ai.server.web.service.WanService;
 import com.fuse.common.core.entity.vo.ResponseResult;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,4 +41,27 @@ public class WanController {
         return ResponseResult.success(wanService.videoToVideo(request, userJwtDTO));
     }
 
+    @PostMapping("/v27-text-to-video")
+    public ResponseResult<?> v27TextToVideo(@Valid @RequestBody Wan27TextToVideoDTO request,
+                                           @AuthenticationPrincipal UserJwtDTO userJwtDTO) {
+        return ResponseResult.success(wanService.v27TextToVideo(request, userJwtDTO));
+    }
+
+    @PostMapping("/v27-image-to-video")
+    public ResponseResult<?> v27ImageToVideo(@Valid @RequestBody Wan27ImageToVideoDTO request,
+                                           @AuthenticationPrincipal UserJwtDTO userJwtDTO) {
+        return ResponseResult.success(wanService.v27ImageToVideo(request, userJwtDTO));
+    }
+
+    @PostMapping("/v27-video-edit")
+    public ResponseResult<?> v27VideoEdit(@Valid @RequestBody Wan27VideoEditDTO request,
+                                          @AuthenticationPrincipal UserJwtDTO userJwtDTO) {
+        return ResponseResult.success(wanService.v27VideoEdit(request, userJwtDTO));
+    }
+
+    @PostMapping("/v27-r2v")
+    public ResponseResult<?> v27R2V(@Valid @RequestBody Wan27R2vDTO request,
+                                    @AuthenticationPrincipal UserJwtDTO userJwtDTO) {
+        return ResponseResult.success(wanService.v27R2V(request, userJwtDTO));
+    }
 }

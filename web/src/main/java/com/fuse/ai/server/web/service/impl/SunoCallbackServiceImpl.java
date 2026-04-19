@@ -181,4 +181,5 @@ public class SunoCallbackServiceImpl implements SunoCallbackService {
             recordsService.completed(request.getData().getTaskId(), outputUrl, new HashMap<>(), request);
         }
     }
+    
 }

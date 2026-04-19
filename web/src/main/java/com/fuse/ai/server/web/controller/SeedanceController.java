@@ -64,4 +64,17 @@ public class SeedanceController {
         return ResponseResult.success(seedanceService.pro15GenerateVideo(request, userJwtDTO));
     }
 
+    @PostMapping("/v2")
+    public ResponseResult<?> v2(@Valid @RequestBody Seedance2DTO request,
+                                              @AuthenticationPrincipal UserJwtDTO userJwtDTO) {
+
+        return ResponseResult.success(seedanceService.v2(request, userJwtDTO));
+    }
+
+    @PostMapping("/v2-fast")
+    public ResponseResult<?> v2Fast(@Valid @RequestBody Seedance2FastDTO request,
+                                           @AuthenticationPrincipal UserJwtDTO userJwtDTO) {
+
+        return ResponseResult.success(seedanceService.v2Fast(request, userJwtDTO));
+    }
 }

@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 @Service
 public class SeedanceServiceImpl implements SeedanceService {
@@ -388,5 +389,142 @@ public class SeedanceServiceImpl implements SeedanceService {
         return new BaseResponse(recordsService.create(model, seedance15ProDTO.getPrompt(), seedance15ProDTO, userModelTask, verifyCreditsBO));
     }
 
+    @Override
+    public BaseResponse v2(Seedance2DTO seedance2DTO, UserJwtDTO userJwtDTO) {
+        Models model = modelsService.getModelByName(seedance2DTO.getModel());
+
+        ExtraDataBO extraData = new ExtraDataBO();
+        extraData.setType(ExtraDataEnum.PER_DURATION_QUALITY_SCENE);
+        extraData.setDuration(Integer.valueOf(seedance2DTO.getDuration()));
+        extraData.setQuality(seedance2DTO.getResolution());
+        extraData.setScene(seedance2DTO.getReferenceVideoUrls().isEmpty() ? "without_video" : "with_video");
+
+        verifyCreditsBO verifyCreditsBO = userCreditsService.verifyCredits(userJwtDTO.getId(), model, extraData);
+
+        // 实现视频生成逻辑
+        Seedance2Request request = new Seedance2Request();
+
+        Seedance2Request.Seedance2Input input = new Seedance2Request.Seedance2Input();
+
+        input.setPrompt(seedance2DTO.getPrompt());
+        input.setAspectRatio(seedance2DTO.getAspectRatio());
+        input.setResolution(seedance2DTO.getResolution());
+        input.setNsfwChecker(seedance2DTO.getNsfwChecker());
+        input.setGenerateAudio(seedance2DTO.getGenerateAudio());
+        input.setReferenceVideoUrls(seedance2DTO.getReferenceVideoUrls());
+        input.setReferenceImageUrls(seedance2DTO.getReferenceImageUrls());
+        input.setReferenceAudioUrls(seedance2DTO.getReferenceAudioUrls());
+        input.setWebSearch(seedance2DTO.getWebSearch());
+        input.setFirstFrameUrl(seedance2DTO.getFirstFrameUrl());
+        input.setLastFrameUrl(seedance2DTO.getLastFrameUrl());
+        input.setDuration(Integer.valueOf(seedance2DTO.getDuration()));
+
+
+        request.setInput(input);
+        request.setModel(model.getRequestName());
+
+        request.setCallBackUrl(callbackUrl.concat("/video/seedance"));
+
+        VideoGenerateResponse response = seedanceManager.v2(request, model.getRequestToken());
+
+        if(!ResponseCodeEnum.SUCCESS.equals(response.getCode())) {
+            FeishuMessageUtil.sendExceptionMessage("Seedance v2 to video error: " + response.getMsg());
+            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, "The volume of service requests is too high. Please try again later.");
+        }
+
+        List<String> inputUrls = new ArrayList<>();
+        inputUrls.addAll(seedance2DTO.getReferenceVideoUrls());
+        inputUrls.addAll(seedance2DTO.getReferenceImageUrls());
+        inputUrls.addAll(seedance2DTO.getReferenceAudioUrls());
+        inputUrls.add(seedance2DTO.getFirstFrameUrl());
+        inputUrls.add(seedance2DTO.getLastFrameUrl());
+        //写入任务
+        UserModelTask userModelTask = UserModelTask.create(
+                userJwtDTO.getId(),
+                "",
+                0,
+                0,
+                TaskStatusEnum.PROCESSING,
+                "",
+                response.getData().getTaskId(),
+                inputUrls,
+                new ArrayList<>(),
+                new HashMap<>(),
+                request,
+                response,
+                new HashMap<>()
+        );
+
+        return new BaseResponse(recordsService.create(model, seedance2DTO.getPrompt(), seedance2DTO, userModelTask, verifyCreditsBO));
+    }
+
+    @Override
+    public BaseResponse v2Fast(Seedance2FastDTO seedance2FastDTO, UserJwtDTO userJwtDTO) {
+        Models model = modelsService.getModelByName(seedance2FastDTO.getModel());
+
+        ExtraDataBO extraData = new ExtraDataBO();
+        extraData.setType(ExtraDataEnum.PER_DURATION_QUALITY_SCENE);
+        extraData.setDuration(Integer.valueOf(seedance2FastDTO.getDuration()));
+        extraData.setQuality(seedance2FastDTO.getResolution());
+        extraData.setScene(seedance2FastDTO.getReferenceVideoUrls().isEmpty() ? "without_video" : "with_video");
+
+        verifyCreditsBO verifyCreditsBO = userCreditsService.verifyCredits(userJwtDTO.getId(), model, extraData);
+
+        // 实现视频生成逻辑
+        Seedance2FastRequest request = new Seedance2FastRequest();
+
+        Seedance2FastRequest.Seedance2FastInput input = new Seedance2FastRequest.Seedance2FastInput();
+
+        input.setPrompt(seedance2FastDTO.getPrompt());
+        input.setAspectRatio(seedance2FastDTO.getAspectRatio());
+        input.setResolution(seedance2FastDTO.getResolution());
+        input.setGenerateAudio(seedance2FastDTO.getGenerateAudio());
+        input.setNsfwChecker(seedance2FastDTO.getNsfwChecker());
+        input.setReferenceVideoUrls(seedance2FastDTO.getReferenceVideoUrls());
+        input.setReferenceImageUrls(seedance2FastDTO.getReferenceImageUrls());
+        input.setReferenceAudioUrls(seedance2FastDTO.getReferenceAudioUrls());
+        input.setWebSearch(seedance2FastDTO.getWebSearch());
+        input.setFirstFrameUrl(seedance2FastDTO.getFirstFrameUrl());
+        input.setLastFrameUrl(seedance2FastDTO.getLastFrameUrl());
+        input.setDuration(Integer.valueOf(seedance2FastDTO.getDuration()));
+
+
+        request.setInput(input);
+        request.setModel(model.getRequestName());
+
+        request.setCallBackUrl(callbackUrl.concat("/video/seedance"));
+
+        VideoGenerateResponse response = seedanceManager.v2Fast(request, model.getRequestToken());
+
+        if(!ResponseCodeEnum.SUCCESS.equals(response.getCode())) {
+            FeishuMessageUtil.sendExceptionMessage("Seedance v2 fast to video error: " + response.getMsg());
+            throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, "The volume of service requests is too high. Please try again later.");
+        }
+
+        List<String> inputUrls = new ArrayList<>();
+        inputUrls.addAll(seedance2FastDTO.getReferenceVideoUrls());
+        inputUrls.addAll(seedance2FastDTO.getReferenceImageUrls());
+        inputUrls.addAll(seedance2FastDTO.getReferenceAudioUrls());
+        inputUrls.add(seedance2FastDTO.getFirstFrameUrl());
+        inputUrls.add(seedance2FastDTO.getLastFrameUrl());
+        //写入任务
+        UserModelTask userModelTask = UserModelTask.create(
+                userJwtDTO.getId(),
+                "",
+                0,
+                0,
+                TaskStatusEnum.PROCESSING,
+                "",
+                response.getData().getTaskId(),
+                inputUrls,
+                new ArrayList<>(),
+                new HashMap<>(),
+                request,
+                response,
+                new HashMap<>()
+        );
+
+        return new BaseResponse(recordsService.create(model, seedance2FastDTO.getPrompt(), seedance2FastDTO, userModelTask, verifyCreditsBO));
+    }
 
 }

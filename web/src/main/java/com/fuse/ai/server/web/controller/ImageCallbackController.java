@@ -1,11 +1,13 @@
 package com.fuse.ai.server.web.controller;
 
 import com.fuse.ai.server.web.model.dto.request.callback.image.*;
-import com.fuse.ai.server.web.model.dto.request.callback.video.VideoCallbackRequest;
 import com.fuse.ai.server.web.service.ImageCallbackService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 
@@ -193,6 +195,22 @@ public class ImageCallbackController {
             return "success";
         } catch (Exception e) {
             log.error("Grok image callback processing failed: taskId={}, error={}", request.getData().getTaskId(), e.getMessage(), e);
+
+            return "failed";
+        }
+    }
+
+    @PostMapping("/wan")
+    public String WanCallback(@Valid @RequestBody ImageCallbackRequest request) {
+        try {
+            String taskId = request.getData().getTaskId();
+            log.info("Received Wan image callback: taskId={}", taskId);
+
+            imageCallbackService.processWanCallback(request);
+
+            return "success";
+        } catch (Exception e) {
+            log.error("Wan image callback processing failed: taskId={}, error={}", request.getData().getTaskId(), e.getMessage(), e);
 
             return "failed";
         }

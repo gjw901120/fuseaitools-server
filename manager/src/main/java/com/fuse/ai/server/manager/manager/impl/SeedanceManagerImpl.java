@@ -44,4 +44,15 @@ public class SeedanceManagerImpl implements SeedanceManager {
     public VideoGenerateResponse pro15ToVideo(Seedance15ProRequest request, String apiKey) {
         return seedanceFeignClient.pro15ToVideo(request, apiKey);
     }
+
+    @Override
+    public VideoGenerateResponse v2Fast(Seedance2FastRequest request, String apiKey) {
+        return seedanceFeignClient.v2Fast(request, apiKey);
+    }
+
+    @Override
+    public VideoGenerateResponse v2(Seedance2Request request, String apiKey) {
+        return seedanceFeignClient.v2(request, apiKey);
+    }
+    
 }

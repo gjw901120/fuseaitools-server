@@ -64,4 +64,15 @@ public interface SeedanceFeignClient {
     @Headers("Content-Type: application/json")
     VideoGenerateResponse pro15ToVideo(@Valid @RequestBody Seedance15ProRequest request,
                                               @RequestParam("apiKey") String apiKey);
+
+    @PostMapping("/api/v1/jobs/createTask")
+    @Headers("Content-Type: application/json")
+    VideoGenerateResponse v2Fast(@Valid @RequestBody Seedance2FastRequest request,
+                                 @RequestParam("apiKey") String apiKey);
+
+    @PostMapping("/api/v1/jobs/createTask")
+    @Headers("Content-Type: application/json")
+    VideoGenerateResponse v2(@Valid @RequestBody Seedance2Request request,
+                                 @RequestParam("apiKey") String apiKey);
+
 }

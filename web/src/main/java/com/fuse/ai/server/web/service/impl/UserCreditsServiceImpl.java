@@ -4,6 +4,7 @@ import com.fuse.ai.server.manager.entity.*;
 import com.fuse.ai.server.manager.enums.PricingTypeEnum;
 import com.fuse.ai.server.manager.enums.UserCreditTypeEnum;
 import com.fuse.ai.server.manager.manager.*;
+import com.fuse.ai.server.web.common.enums.ExtraDataEnum;
 import com.fuse.ai.server.web.config.exception.ResponseErrorType;
 import com.fuse.ai.server.web.controller.ChatController.SseCallback;
 import com.fuse.ai.server.web.exception.SseBaseException;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.List;
 
 @Service
 public class UserCreditsServiceImpl implements UserCreditsService {
@@ -63,6 +65,14 @@ public class UserCreditsServiceImpl implements UserCreditsService {
         } else if(PricingTypeEnum.ONCE.equals(model.getPricingType())){
             if(model.getIsPricingRules()  == 1) {
                 ModelsPricingRules pricingRules = switch (extraData.getType()) {
+                    case PER_DURATION_QUALITY ->
+                            modelsPricingRulesManager.getDetailByModelIdAndDurationQuality(model.getId(), 1, extraData.getQuality());
+                    case PER_DURATION_SCENE_SIZE ->
+                            modelsPricingRulesManager.getDetailByModelIdAndDurationSizeScene(model.getId(), 1, extraData.getSize(), extraData.getScene());
+                    case PER_DURATION_QUALITY_SCENE ->
+                            modelsPricingRulesManager.getDetailByModelIdAndDurationQualityScene(model.getId(), 1, extraData.getQuality(), extraData.getScene());
+                    case PER_DURATION_SIZE ->
+                            modelsPricingRulesManager.getDetailByModelIdAndDurationSize(model.getId(), 1, extraData.getSize());
                     case DURATION_QUALITY ->
                             modelsPricingRulesManager.getDetailByModelIdAndDurationQuality(model.getId(), extraData.getDuration(), extraData.getQuality());
                     case DURATION_SIZE ->
@@ -87,8 +97,14 @@ public class UserCreditsServiceImpl implements UserCreditsService {
                     throw  new BaseException(ResponseErrorType.MODEL_IS_NOT_SUPPORT,  "model is not support");
                 }
                 pricingRulesId =  pricingRules.getId();
-                ModelsPricingOnce modelsPricingOnce = modelsPricingOnceManager.getDetailById( pricingRules.getPricingId());
-                credits =  modelsPricingOnce.getCredits();
+                ModelsPricingOnce modelsPricingOnce = modelsPricingOnceManager.getDetailById(pricingRules.getPricingId());
+                if(List.of(ExtraDataEnum.PER_DURATION_QUALITY, ExtraDataEnum.PER_DURATION_SCENE_SIZE, ExtraDataEnum.PER_DURATION_QUALITY_SCENE,
+                                ExtraDataEnum.PER_DURATION_SIZE).contains(extraData.getType())) {
+                    credits =  modelsPricingOnce.getCredits().multiply(BigDecimal.valueOf(extraData.getDuration()));
+                } else {
+                    credits =  modelsPricingOnce.getCredits();
+                }
+
             } else {
                 ModelsPricingOnce modelsPricingOnce = modelsPricingOnceManager.getDetailByModelId( model.getId());
                 credits =  modelsPricingOnce.getCredits();

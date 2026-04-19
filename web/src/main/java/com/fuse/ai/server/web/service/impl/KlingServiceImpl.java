@@ -270,7 +270,7 @@ public class KlingServiceImpl implements KlingService {
         Models model = modelsService.getModelByName(kling26MotionControlDTO.getModel());
 
         ExtraDataBO extraData = new ExtraDataBO();
-        extraData.setType(ExtraDataEnum.DURATION_QUALITY);
+        extraData.setType(ExtraDataEnum.PER_DURATION_QUALITY);
         extraData.setDuration(kling26MotionControlDTO.getDuration());
         extraData.setQuality(kling26MotionControlDTO.getMode());
 
@@ -487,7 +487,7 @@ public class KlingServiceImpl implements KlingService {
         }
 
         ExtraDataBO extraData = new ExtraDataBO();
-        extraData.setType(ExtraDataEnum.DURATION_SCENE_SIZE);
+        extraData.setType(ExtraDataEnum.PER_DURATION_SCENE_SIZE);
         extraData.setDuration(duration);
         extraData.setSize(kling30VideoDTO.getMode());
         extraData.setScene(kling30VideoDTO.getSound() ? "with_sound" : "without_sound");
@@ -531,7 +531,7 @@ public class KlingServiceImpl implements KlingService {
         Models model = modelsService.getModelByName(kling30MotionControlDTO.getModel());
 
         ExtraDataBO extraData = new ExtraDataBO();
-        extraData.setType(ExtraDataEnum.DURATION_SIZE);
+        extraData.setType(ExtraDataEnum.PER_DURATION_SIZE);
         extraData.setDuration(kling30MotionControlDTO.getDuration());
         extraData.setSize(kling30MotionControlDTO.getMode());
 

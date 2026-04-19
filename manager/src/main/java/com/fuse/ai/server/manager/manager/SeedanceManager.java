@@ -34,4 +34,9 @@ public interface SeedanceManager {
      * Pro 15 图生视频
      */
     VideoGenerateResponse pro15ToVideo(Seedance15ProRequest request, String apiKey);
+
+    VideoGenerateResponse v2Fast(Seedance2FastRequest request, String apiKey);
+
+    VideoGenerateResponse v2(Seedance2Request request, String apiKey);
+
 }

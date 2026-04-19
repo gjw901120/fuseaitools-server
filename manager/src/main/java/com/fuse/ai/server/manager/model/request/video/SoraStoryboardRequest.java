@@ -1,24 +1,23 @@
 package com.fuse.ai.server.manager.model.request.video;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fuse.ai.server.manager.enums.SoraAspectRatioEnum;
 import lombok.Data;
 import org.hibernate.validator.constraints.URL;
 
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Data
 public class SoraStoryboardRequest {
 
-    @NotNull(message = "视频总长度不能为空")
+    @JsonProperty("n_frames")
     private String nFrames;
 
-    private List<@URL(message = "图片URL格式不正确") String> imageUrls;
+    @JsonProperty("image_urls")
+    private List<@URL(message = "Image Incorrect URL format") String> imageUrls;
 
+    @JsonProperty("aspect_ratio")
     private SoraAspectRatioEnum aspectRatio;
 
-    @NotEmpty(message = "场景列表不能为空")
-    @NotNull(message = "场景列表不能为null")
     private List<SoraStoryboardSceneRequest> shots;
 }

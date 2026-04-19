@@ -11,6 +11,7 @@ public interface SeedanceService {
     BaseResponse proTextToVideo(SeedanceProTextToVideoDTO request, UserJwtDTO userJwtDTO);
     BaseResponse proImageToVideo(SeedanceProImageToVideoDTO request, UserJwtDTO userJwtDTO);
     BaseResponse proFastImageToVideo(SeedanceProFastImageToVideoDTO request, UserJwtDTO userJwtDTO);
-
     BaseResponse pro15GenerateVideo(Seedance15ProDTO request, UserJwtDTO userJwtDTO);
+    BaseResponse v2(Seedance2DTO request, UserJwtDTO userJwtDTO);
+    BaseResponse v2Fast(Seedance2FastDTO request, UserJwtDTO userJwtDTO);
 }
