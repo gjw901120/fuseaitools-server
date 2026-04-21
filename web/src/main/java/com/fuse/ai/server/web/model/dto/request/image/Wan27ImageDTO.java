@@ -134,7 +134,7 @@ public class Wan27ImageDTO {
          * 颜色权重/比例
          * 用于控制该颜色在生成图像中的占比
          */
-        private Double ratio;
+        private String ratio;
     }
 
 }
