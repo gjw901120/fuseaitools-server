@@ -66,6 +66,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/user/login/google/callback", "/api/user/send-email-code", "/api/user/login-by-email").permitAll()
                 .antMatchers("/api/common/models/tree", "/api/callback/**","/api/news/**").permitAll()
                 .antMatchers("/api/common/models/price").permitAll()
+                // 健康检查接口（Docker和脚本使用）
+                .antMatchers("/healthcheck").permitAll()
                 // 示例：允许对OPTIONS方法的预检请求（用于跨域）
                 .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 // -----------------------------------
