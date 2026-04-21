@@ -95,6 +95,15 @@ public class ModelsPricingRulesManagerImpl implements ModelsPricingRulesManager 
     }
 
     @Override
+    public ModelsPricingRules getDetailByModelIdAndBatchSize(Integer modelId, Integer batchSize) {
+        LambdaQueryWrapper<ModelsPricingRules> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(ModelsPricingRules::getModelId, modelId);
+        queryWrapper.eq(ModelsPricingRules::getBatchSize, batchSize);
+        queryWrapper.eq(ModelsPricingRules::getIsDel, 0);
+        return modelsPricingRulesMapper.selectOne(queryWrapper);
+    }
+
+    @Override
     public ModelsPricingRules getDetailByModelIdAndSize(Integer modelId, String size) {
         LambdaQueryWrapper<ModelsPricingRules> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(ModelsPricingRules::getModelId, modelId);

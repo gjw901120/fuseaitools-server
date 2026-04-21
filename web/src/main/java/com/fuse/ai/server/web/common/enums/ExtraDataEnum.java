@@ -24,6 +24,8 @@ public enum ExtraDataEnum {
 
     SIZE("size", "大小"),
 
+    PER_BATCH_SIZE("per_batch_size", "批量大小"),
+
     SPEED("speed", "速度"),
     ELE_DURATION("ele_duration", "ele 时间"),
     ELE_CHARACTER("ele_character", "ele 字符");

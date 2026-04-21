@@ -91,6 +91,8 @@ public class UserCreditsServiceImpl implements UserCreditsService {
                             modelsPricingRulesManager.getDetailByModelIdAndSize(model.getId(), extraData.getSize());
                     case SPEED ->
                             modelsPricingRulesManager.getDetailByModelIdAndSpeed(model.getId(), extraData.getSpeed());
+                    case PER_BATCH_SIZE ->
+                            modelsPricingRulesManager.getDetailByModelIdAndBatchSize(model.getId(), 1);
                     default -> new ModelsPricingRules();
                 };
                 if(pricingRules == null) {
@@ -101,7 +103,9 @@ public class UserCreditsServiceImpl implements UserCreditsService {
                 if(List.of(ExtraDataEnum.PER_DURATION_QUALITY, ExtraDataEnum.PER_DURATION_SCENE_SIZE, ExtraDataEnum.PER_DURATION_QUALITY_SCENE,
                                 ExtraDataEnum.PER_DURATION_SIZE).contains(extraData.getType())) {
                     credits =  modelsPricingOnce.getCredits().multiply(BigDecimal.valueOf(extraData.getDuration()));
-                } else {
+                } else if(ExtraDataEnum.PER_BATCH_SIZE.equals(extraData.getType())) {
+                    credits =  modelsPricingOnce.getCredits().multiply(BigDecimal.valueOf(extraData.getBatchSize()));
+                }else {
                     credits =  modelsPricingOnce.getCredits();
                 }
 

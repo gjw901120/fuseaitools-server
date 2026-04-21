@@ -478,7 +478,11 @@ public class WanServiceImpl implements WanService {
     public BaseResponse v27Image(Wan27ImageDTO wan27ImageDTO, UserJwtDTO userJwtDTO) {
         Models model = modelsService.getModelByName(wan27ImageDTO.getModel());
 
-        verifyCreditsBO verifyCreditsBO = userCreditsService.verifyCredits(userJwtDTO.getId(), model, new ExtraDataBO());
+        ExtraDataBO extraData = new ExtraDataBO();
+        extraData.setType(ExtraDataEnum.PER_BATCH_SIZE);
+        extraData.setBatchSize(Integer.valueOf(wan27ImageDTO.getN()));
+
+        verifyCreditsBO verifyCreditsBO = userCreditsService.verifyCredits(userJwtDTO.getId(), model, extraData);
 
         // 实现视频生成逻辑
         Wan27ImageRequest request = new Wan27ImageRequest();
@@ -542,7 +546,11 @@ public class WanServiceImpl implements WanService {
     public BaseResponse v27ImagePro(Wan27ImageProDTO wan27ImageProDTO, UserJwtDTO userJwtDTO) {
         Models model = modelsService.getModelByName(wan27ImageProDTO.getModel());
 
-        verifyCreditsBO verifyCreditsBO = userCreditsService.verifyCredits(userJwtDTO.getId(), model, new ExtraDataBO());
+        ExtraDataBO extraData = new ExtraDataBO();
+        extraData.setType(ExtraDataEnum.PER_BATCH_SIZE);
+        extraData.setBatchSize(Integer.valueOf(wan27ImageProDTO.getN()));
+
+        verifyCreditsBO verifyCreditsBO = userCreditsService.verifyCredits(userJwtDTO.getId(), model, extraData);
 
         // 实现视频生成逻辑
         Wan27ImageProRequest request = new Wan27ImageProRequest();

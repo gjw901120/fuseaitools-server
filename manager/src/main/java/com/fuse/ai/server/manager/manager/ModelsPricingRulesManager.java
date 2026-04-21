@@ -24,6 +24,8 @@ public interface ModelsPricingRulesManager {
 
     ModelsPricingRules getDetailByModelIdAndSpeed(Integer modelId, String speed);
 
+    ModelsPricingRules getDetailByModelIdAndBatchSize(Integer modelId, Integer batchSize);
+
     List<ModelsPricingRules> getAll();
 
 }
