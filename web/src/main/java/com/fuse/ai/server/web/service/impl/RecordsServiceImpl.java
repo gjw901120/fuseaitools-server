@@ -87,8 +87,11 @@ public class RecordsServiceImpl implements RecordsService {
         Integer modelId = modelsManager.getModelIdByName(model);
         //判断是第一次会话，还是续会话
         if("".equals(userModelConversationMessage.getConversationId())) {
+
+            String extractTitle = title.length() > 20 ? title.substring(0, 20).concat("...") : title;
+
             //根据模型名称获取id
-            UserModelRecords userModelRecords = UserModelRecords.create(userModelConversation.getUserId(), modelId, title, new HashMap<>(), 0);
+            UserModelRecords userModelRecords = UserModelRecords.create(userModelConversation.getUserId(), modelId, extractTitle, new HashMap<>(), 0);
 
             //写入记录
             userModelRecordsManager.insert(userModelRecords);
