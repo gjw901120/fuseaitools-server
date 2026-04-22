@@ -87,13 +87,13 @@ server:
 feign:
   api:
     openai:
-      url: https://www.towerfun.net/v1
+      url: https://www.wolfai.top/v1
     deepseek:
-      url: https://www.towerfun.net/v1
+      url: https://www.wolfai.top/v1
     claude:
-      url: https://www.towerfun.net/v1
+      url: https://www.wolfai.top/v1
     gemini:
-      url: https://www.towerfun.net/v1
+      url: https://www.wolfai.top/v1
     elevenlabs:
       url: https://api.kie.ai
     image:
