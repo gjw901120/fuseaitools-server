@@ -117,7 +117,7 @@ public class FluxKontextServiceImpl implements FluxKontextService {
         input.setAspectRatio(flux2ImageToImageDTO.getAspectRatio());
         input.setInputUrls(flux2ImageToImageDTO.getInputUrls());
         input.setNsfwChecker(flux2ImageToImageDTO.getNsfwChecker());
-        request.setCallBackUrl(callbackUrl.concat("/image/flux-kontext"));
+        request.setCallBackUrl(callbackUrl.concat("/image/flux"));
 
         request.setInput(input);
 
@@ -168,7 +168,7 @@ public class FluxKontextServiceImpl implements FluxKontextService {
         input.setAspectRatio(flux2ProImageToImageDTO.getAspectRatio());
         input.setInputUrls(flux2ProImageToImageDTO.getInputUrls());
         input.setNsfwChecker(flux2ProImageToImageDTO.getNsfwChecker());
-        request.setCallBackUrl(callbackUrl.concat("/image/flux-kontext"));
+        request.setCallBackUrl(callbackUrl.concat("/image/flux"));
 
         request.setInput(input);
 
@@ -218,7 +218,7 @@ public class FluxKontextServiceImpl implements FluxKontextService {
         input.setResolution(flux2ProTextToImageDTO.getResolution());
         input.setAspectRatio(flux2ProTextToImageDTO.getAspectRatio());
         input.setNsfwChecker(flux2ProTextToImageDTO.getNsfwChecker());
-        request.setCallBackUrl(callbackUrl.concat("/image/flux-kontext"));
+        request.setCallBackUrl(callbackUrl.concat("/image/flux"));
 
         request.setInput(input);
 
@@ -268,7 +268,7 @@ public class FluxKontextServiceImpl implements FluxKontextService {
         input.setResolution(flux2TextToImageDTO.getResolution());
         input.setAspectRatio(flux2TextToImageDTO.getAspectRatio());
         input.setNsfwChecker(flux2TextToImageDTO.getNsfwChecker());
-        request.setCallBackUrl(callbackUrl.concat("/image/flux-kontext"));
+        request.setCallBackUrl(callbackUrl.concat("/image/flux"));
 
         request.setInput(input);
 

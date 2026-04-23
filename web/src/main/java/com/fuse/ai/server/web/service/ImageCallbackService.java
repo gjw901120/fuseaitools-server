@@ -37,4 +37,6 @@ public interface ImageCallbackService {
     void processGrokCallback(ImageCallbackRequest request);
 
     void processWanCallback(ImageCallbackRequest request);
+
+    void processFluxCallback(ImageCallbackRequest request);
 }

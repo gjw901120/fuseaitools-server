@@ -215,4 +215,20 @@ public class ImageCallbackController {
             return "failed";
         }
     }
+
+    @PostMapping("/flux")
+    public String FluxCallback(@Valid @RequestBody ImageCallbackRequest request) {
+        try {
+            String taskId = request.getData().getTaskId();
+            log.info("Received Flux image callback: taskId={}", taskId);
+
+            imageCallbackService.processFluxCallback(request);
+
+            return "success";
+        } catch (Exception e) {
+            log.error("Flux image callback processing failed: taskId={}, error={}", request.getData().getTaskId(), e.getMessage(), e);
+
+            return "failed";
+        }
+    }
 }

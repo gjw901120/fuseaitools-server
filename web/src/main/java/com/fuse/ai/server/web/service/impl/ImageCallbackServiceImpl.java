@@ -401,4 +401,34 @@ public class ImageCallbackServiceImpl implements ImageCallbackService {
         }
     }
 
+    @Override
+    public void processFluxCallback(ImageCallbackRequest request) {
+        try {
+            String taskId = request.getData().getTaskId();
+            String state = request.getData().getState();
+            String resultJson = request.getData().getResultJson();
+            log.info("Processing Flux image callback: taskId={}, state={}", taskId, state);
+            if ("success".equals(state)) {
+                // 解析结果
+                ImageCallbackRequest.Result result =
+                        objectMapper.readValue(resultJson, ImageCallbackRequest.Result.class);
+
+                log.info("Flux image generation completed: taskId={}, resultUrls={}", taskId, result.getResultUrls());
+
+                List<String> outputUrl = new ArrayList<>();
+                for (String url : result.getResultUrls()) {
+                    outputUrl.add(s3UploadUtil.uploadFileFromUrl(url));
+                }
+                recordsService.completed(request.getData().getTaskId(), outputUrl, new HashMap<>(), request);
+
+            } else if ("fail".equals(state)) {
+                log.info("Flux image generation failed: taskId={}, info={}", taskId, request);
+
+                recordsService.failed(request.getData().getTaskId(), request);
+            }
+        } catch (Exception e) {
+            recordsService.failed(request.getData().getTaskId(), request);
+            log.error("Failed to process Flux callback: taskId={}, error={}", request.getData().getTaskId(), e);
+        }
+    }
 }
