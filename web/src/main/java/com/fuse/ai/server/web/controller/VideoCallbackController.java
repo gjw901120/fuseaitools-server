@@ -130,4 +130,15 @@ public class VideoCallbackController {
         return "success";
     }
 
+    /**
+     * 处理HappyHouse视频生成回调
+     */
+    @PostMapping("/happy-house")
+    public String happyHouseCallback(@Valid @RequestBody VideoCallbackRequest request) {
+
+        videoCallbackService.happyHouseCallback(request);
+
+        return "success";
+    }
+
 }

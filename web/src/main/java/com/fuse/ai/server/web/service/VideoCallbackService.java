@@ -41,4 +41,5 @@ public interface VideoCallbackService {
 
     void grokCallback(VideoCallbackRequest request);
 
+    void happyHouseCallback(VideoCallbackRequest request);
 }

@@ -2,8 +2,10 @@ package com.fuse.ai.server.manager.feign.client;
 
 import com.fuse.ai.server.manager.feign.config.FeignConfig;
 import com.fuse.ai.server.manager.feign.fallback.ErrorFallback;
-import com.fuse.ai.server.manager.model.request.image.GptImageTextToImageRequest;
 import com.fuse.ai.server.manager.model.request.image.GptImageImageToImageRequest;
+import com.fuse.ai.server.manager.model.request.image.GptImageTextToImageRequest;
+import com.fuse.ai.server.manager.model.request.image.GptImageV2ImageToImageRequest;
+import com.fuse.ai.server.manager.model.request.image.GptImageV2TextToImageRequest;
 import com.fuse.ai.server.manager.model.response.ImageGenerateResponse;
 import feign.Headers;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -34,4 +36,18 @@ public interface GptImageFeignClient {
     @PostMapping("/api/v1/jobs/createTask")
     @Headers("Content-Type: application/json")
     ImageGenerateResponse gptImageImageToImage(@Valid @RequestBody GptImageImageToImageRequest request, @RequestParam("apiKey") String apiKey);
+
+    /**
+     * GPT Image 2.0 文生图
+     */
+    @PostMapping("/api/v1/jobs/createTask")
+    @Headers("Content-Type: application/json")
+    ImageGenerateResponse gptImageV2TextToImage(@Valid @RequestBody GptImageV2TextToImageRequest request, @RequestParam("apiKey") String apiKey);
+
+    /**
+     * GPT Image 2.0 图生图
+     */
+    @PostMapping("/api/v1/jobs/createTask")
+    @Headers("Content-Type: application/json")
+    ImageGenerateResponse gptImageV2ImageToImage(@Valid @RequestBody GptImageV2ImageToImageRequest request, @RequestParam("apiKey") String apiKey);
 }
