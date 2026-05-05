@@ -4,6 +4,7 @@ import com.fuse.ai.server.web.model.annotation.SensitiveWordCheck;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.util.List;
@@ -38,6 +39,7 @@ public class GrokImagineImageToImageDTO {
      * 参考图像的 URL 列表
      * 最多包含 5 个字符串
      */
-    @NotBlank(message = "Image urls cannot be empty")
-    private List<String> imageUrls;
+    @NotEmpty(message = "Image urls cannot be empty")
+    @Size(max = 5, message = "Image urls cannot exceed 5")
+    private List<@NotBlank(message = "Individual image url cannot be blank") String> imageUrls;
 }
