@@ -2,6 +2,7 @@ package com.fuse.ai.server.web.model.dto.request.callback.video;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -61,6 +62,7 @@ public class SeedanceCallbackData {
     // ========== 内部类定义 ==========
 
     @Data
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Param {
         private String callBackUrl;
         private String model;
@@ -68,6 +70,7 @@ public class SeedanceCallbackData {
     }
 
     @Data
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Input {
         private String prompt;
 
@@ -93,6 +96,7 @@ public class SeedanceCallbackData {
     }
 
     @Data
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class ResultJson {
         @JsonProperty("resultUrls")
         private List<String> resultUrls;

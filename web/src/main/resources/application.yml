@@ -7,6 +7,9 @@ spring:
     multipart:
       enabled: true
       max-file-size: 10MB          # 单个文件最大大小
+  mvc:
+    async:
+      request-timeout: 180000      # 异步请求超时时间：3分钟（180秒）
 
 app:
   defaultTokenAuth: false

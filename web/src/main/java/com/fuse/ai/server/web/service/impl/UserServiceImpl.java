@@ -27,6 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -127,6 +128,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public LoginResponse loginByEmail(LoginByEmailDTO loginByEmailDTO) {
         String key = RedisKeysEnum.EMAIL_CODE.format(loginByEmailDTO.getEmail());
         String storedCode = (String) redisUtil.get(key);
@@ -149,10 +151,10 @@ public class UserServiceImpl implements UserService {
                     0
             );
             userManager.insert(user);
-            //初次赠送77credits
+            //初次赠送20credits
             userCreditsManager.insert(UserCredits.create(
                     user.getId(),
-                    BigDecimal.valueOf(77),
+                    BigDecimal.valueOf(20),
                     BigDecimal.valueOf(0),
                     1,
                     1
@@ -172,6 +174,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public LoginResponse loginByGoogle(String code) {
 
 //        User user = userManager.selectByEmail(loginByGoogleDTO.getEmail());
@@ -206,10 +209,10 @@ public class UserServiceImpl implements UserService {
                     .avatar(newUser.getAvatar())
                     .email(newUser.getEmail())
                     .build();
-            //初次赠送77credits
+            //初次赠送20credits
             userCreditsManager.insert(UserCredits.create(
                     newUser.getId(),
-                    BigDecimal.valueOf(77),
+                    BigDecimal.valueOf(20),
                     BigDecimal.valueOf(0),
                     1,
                     1

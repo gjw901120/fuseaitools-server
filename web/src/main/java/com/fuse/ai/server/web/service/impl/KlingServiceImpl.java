@@ -292,7 +292,8 @@ public class KlingServiceImpl implements KlingService {
 
         request.setCallBackUrl(callbackUrl.concat("/video/kling"));
 
-        List<String> inputUrls = kling26MotionControlDTO.getInputUrls();
+        // 创建新的列表用于保存任务记录，避免修改原始DTO
+        List<String> inputUrls = new ArrayList<>(kling26MotionControlDTO.getInputUrls());
         inputUrls.addAll(kling26MotionControlDTO.getVideoUrls());
 
         VideoGenerateResponse response = klingManager.kling26MotionControl(request, model.getRequestToken());
@@ -554,7 +555,8 @@ public class KlingServiceImpl implements KlingService {
 
         request.setCallBackUrl(callbackUrl.concat("/video/kling"));
 
-        List<String> inputUrls = kling30MotionControlDTO.getInputUrls();
+        // 创建新的列表用于保存任务记录，避免修改原始DTO
+        List<String> inputUrls = new ArrayList<>(kling30MotionControlDTO.getInputUrls());
         inputUrls.addAll(kling30MotionControlDTO.getVideoUrls());
         if(kling30MotionControlDTO.getBackgroundSource() != null) {
             inputUrls.add(kling30MotionControlDTO.getBackgroundSource());

@@ -2,6 +2,7 @@ package com.fuse.ai.server.web.model.dto.request.callback.video;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
@@ -54,6 +55,7 @@ public class WanCallbackData {
     // ========== 内部类用于结构化解析 ==========
 
     @Data
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Param {
         private String callBackUrl;
         private String model;
@@ -61,6 +63,7 @@ public class WanCallbackData {
     }
 
     @Data
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Input {
         private String prompt;
         private List<String> videoUrls;
@@ -70,6 +73,7 @@ public class WanCallbackData {
     }
 
     @Data
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class ResultJson {
         private List<String> resultUrls;
     }

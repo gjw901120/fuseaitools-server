@@ -1,5 +1,6 @@
 package com.fuse.ai.server.web.model.dto.request.callback.video;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
@@ -24,6 +25,7 @@ public class VideoCallbackRequest {
     private String msg;
 
     @Data
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class CallbackData {
 
         /**
@@ -82,6 +84,7 @@ public class VideoCallbackRequest {
      * 结果解析
      */
     @Data
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Result {
 
         /**
