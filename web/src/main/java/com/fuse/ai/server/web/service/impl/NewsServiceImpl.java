@@ -27,9 +27,11 @@ public class NewsServiceImpl implements NewsService {
     public NewsDetailVO getDetail(String path) {
         News news = newsManager.getDetail(path);
         NewsDetailVO newsDetailVO = new NewsDetailVO();
-        BeanUtils.copyProperties(news, newsDetailVO);
-        newsDetailVO.setPrevPath(newsManager.getPrevNewsPath(path));
-        newsDetailVO.setNextPath(newsManager.getNextNewsPath(path));
+        if( news != null) {
+            BeanUtils.copyProperties(news, newsDetailVO);
+            newsDetailVO.setPrevPath(newsManager.getPrevNewsPath(path));
+            newsDetailVO.setNextPath(newsManager.getNextNewsPath(path));
+        }
         return newsDetailVO;
     }
 }
