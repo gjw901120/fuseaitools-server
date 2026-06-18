@@ -6,6 +6,7 @@ import lombok.Data;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -55,7 +56,7 @@ public class Seedance2FastDTO {
      * 大小：单张 < 30MB
      */
     @Size(max = 9, message = "Maximum 9 reference images allowed (including first and last frames)")
-    private List<String> referenceImageUrls;
+    private List<String> referenceImageUrls = new ArrayList<>();
 
     /**
      * 输入视频 URL 或者 asset://{assetId} 列表
@@ -70,7 +71,7 @@ public class Seedance2FastDTO {
      * 帧率：24-60 FPS
      */
     @Size(max = 3, message = "Maximum 3 reference videos allowed")
-    private List<String> referenceVideoUrls;
+    private List<String> referenceVideoUrls = new ArrayList<>();
 
     /**
      * 输入音频 URL 或者 asset://{assetId} 列表
@@ -80,7 +81,7 @@ public class Seedance2FastDTO {
      * 大小：单个 < 15MB
      */
     @Size(max = 3, message = "Maximum 3 reference audios allowed")
-    private List<String> referenceAudioUrls;
+    private List<String> referenceAudioUrls = new ArrayList<>();
 
     /**
      * 是否返回视频最后一帧图片（已废弃）

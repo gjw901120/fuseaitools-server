@@ -5,6 +5,7 @@ import com.fuse.ai.server.web.model.annotation.SensitiveWordCheck;
 import lombok.Data;
 
 import javax.validation.constraints.*;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -36,7 +37,7 @@ public class SoraProGenerateDTO {
     /**
      * URL of the image to use as the first frame
      */
-    private List<String> imageUrls;
+    private List<String> imageUrls = new ArrayList<>();
 
     /**
      * Aspect ratio of the image

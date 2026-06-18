@@ -23,6 +23,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -58,7 +59,10 @@ public class Gpt4oImageServiceImpl implements Gpt4oImageService {
 
         BeanUtils.copyProperties(gpt4oImageGenerateDTO, request);
 
-        List<String> inputUrls = new ArrayList<>(gpt4oImageGenerateDTO.getImageUrls());
+        List<String> inputUrls = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(gpt4oImageGenerateDTO.getImageUrls())) {
+            inputUrls.addAll(gpt4oImageGenerateDTO.getImageUrls());
+        }
 
         request.setFilesUrl(gpt4oImageGenerateDTO.getImageUrls());
         request.setCallBackUrl(callbackUrl.concat("/image/gpt4o-image"));

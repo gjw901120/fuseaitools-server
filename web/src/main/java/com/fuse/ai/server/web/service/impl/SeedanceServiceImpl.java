@@ -24,6 +24,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -397,7 +400,7 @@ public class SeedanceServiceImpl implements SeedanceService {
         extraData.setType(ExtraDataEnum.PER_DURATION_QUALITY_SCENE);
         extraData.setDuration(Integer.valueOf(seedance2DTO.getDuration()));
         extraData.setQuality(seedance2DTO.getResolution());
-        extraData.setScene(seedance2DTO.getReferenceVideoUrls().isEmpty() ? "without_video" : "with_video");
+        extraData.setScene(CollectionUtils.isEmpty(seedance2DTO.getReferenceVideoUrls()) ? "without_video" : "with_video");
 
         verifyCreditsBO verifyCreditsBO = userCreditsService.verifyCredits(userJwtDTO.getId(), model, extraData);
 
@@ -433,11 +436,21 @@ public class SeedanceServiceImpl implements SeedanceService {
         }
 
         List<String> inputUrls = new ArrayList<>();
-        inputUrls.addAll(seedance2DTO.getReferenceVideoUrls());
-        inputUrls.addAll(seedance2DTO.getReferenceImageUrls());
-        inputUrls.addAll(seedance2DTO.getReferenceAudioUrls());
-        inputUrls.add(seedance2DTO.getFirstFrameUrl());
-        inputUrls.add(seedance2DTO.getLastFrameUrl());
+        if (!CollectionUtils.isEmpty(seedance2DTO.getReferenceVideoUrls())) {
+            inputUrls.addAll(seedance2DTO.getReferenceVideoUrls());
+        }
+        if (!CollectionUtils.isEmpty(seedance2DTO.getReferenceImageUrls())) {
+            inputUrls.addAll(seedance2DTO.getReferenceImageUrls());
+        }
+        if (!CollectionUtils.isEmpty(seedance2DTO.getReferenceAudioUrls())) {
+            inputUrls.addAll(seedance2DTO.getReferenceAudioUrls());
+        }
+        if (StringUtils.hasText(seedance2DTO.getFirstFrameUrl())) {
+            inputUrls.add(seedance2DTO.getFirstFrameUrl());
+        }
+        if (StringUtils.hasText(seedance2DTO.getLastFrameUrl())) {
+            inputUrls.add(seedance2DTO.getLastFrameUrl());
+        }
         //写入任务
         UserModelTask userModelTask = UserModelTask.create(
                 userJwtDTO.getId(),
@@ -466,7 +479,8 @@ public class SeedanceServiceImpl implements SeedanceService {
         extraData.setType(ExtraDataEnum.PER_DURATION_QUALITY_SCENE);
         extraData.setDuration(Integer.valueOf(seedance2FastDTO.getDuration()));
         extraData.setQuality(seedance2FastDTO.getResolution());
-        extraData.setScene(seedance2FastDTO.getReferenceVideoUrls().isEmpty() ? "without_video" : "with_video");
+        List<String> referenceVideoUrls = seedance2FastDTO.getReferenceVideoUrls();
+        extraData.setScene(CollectionUtils.isEmpty(referenceVideoUrls) ? "without_video" : "with_video");
 
         verifyCreditsBO verifyCreditsBO = userCreditsService.verifyCredits(userJwtDTO.getId(), model, extraData);
 
@@ -502,11 +516,21 @@ public class SeedanceServiceImpl implements SeedanceService {
         }
 
         List<String> inputUrls = new ArrayList<>();
-        inputUrls.addAll(seedance2FastDTO.getReferenceVideoUrls());
-        inputUrls.addAll(seedance2FastDTO.getReferenceImageUrls());
-        inputUrls.addAll(seedance2FastDTO.getReferenceAudioUrls());
-        inputUrls.add(seedance2FastDTO.getFirstFrameUrl());
-        inputUrls.add(seedance2FastDTO.getLastFrameUrl());
+        if (!CollectionUtils.isEmpty(seedance2FastDTO.getReferenceVideoUrls())) {
+            inputUrls.addAll(seedance2FastDTO.getReferenceVideoUrls());
+        }
+        if (!CollectionUtils.isEmpty(seedance2FastDTO.getReferenceImageUrls())) {
+            inputUrls.addAll(seedance2FastDTO.getReferenceImageUrls());
+        }
+        if (!CollectionUtils.isEmpty(seedance2FastDTO.getReferenceAudioUrls())) {
+            inputUrls.addAll(seedance2FastDTO.getReferenceAudioUrls());
+        }
+        if (StringUtils.hasText(seedance2FastDTO.getFirstFrameUrl())) {
+            inputUrls.add(seedance2FastDTO.getFirstFrameUrl());
+        }
+        if (StringUtils.hasText(seedance2FastDTO.getLastFrameUrl())) {
+            inputUrls.add(seedance2FastDTO.getLastFrameUrl());
+        }
         //写入任务
         UserModelTask userModelTask = UserModelTask.create(
                 userJwtDTO.getId(),

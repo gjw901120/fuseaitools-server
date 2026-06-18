@@ -5,6 +5,7 @@ import com.fuse.ai.server.web.model.annotation.SensitiveWordCheck;
 import lombok.Data;
 
 import javax.validation.constraints.*;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -37,7 +38,7 @@ public class SoraProStoryboardDTO {
     /**
      * Image files to use as input
      */
-    private List<String> imageUrls;
+    private List<String> imageUrls = new ArrayList<>();
 
     /**
      * Aspect ratio of the image

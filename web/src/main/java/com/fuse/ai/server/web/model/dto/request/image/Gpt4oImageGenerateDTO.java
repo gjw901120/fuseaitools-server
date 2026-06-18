@@ -4,6 +4,7 @@ import com.fuse.ai.server.web.model.annotation.SensitiveWordCheck;
 import lombok.Data;
 
 import javax.validation.constraints.*;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -23,7 +24,7 @@ public class Gpt4oImageGenerateDTO {
      * Image files list
      */
     @Size(max = 5, message = "Cannot exceed 5 image files")
-    private List<String> imageUrls;
+    private List<String> imageUrls = new ArrayList<>();
 
     /**
      * Prompt describing the desired content

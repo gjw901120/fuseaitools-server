@@ -23,6 +23,7 @@ import com.fuse.ai.server.web.service.UserCreditsService;
 import com.fuse.common.core.exception.BaseException;
 import com.fuse.common.core.exception.error.ThirdpartyErrorType;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.CollectionUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -79,7 +80,9 @@ public class SoraGenerateServiceImpl implements SoraGenerateService {
             soraRequest.setNFrames(soraGenerateDTO.getNFrames());
             soraRequest.setRemoveWatermark(soraGenerateDTO.getRemoveWatermark());
             soraRequest.setImageUrls(soraGenerateDTO.getImageUrls());
-            inputUrls.addAll(soraRequest.getImageUrls());
+            if (!CollectionUtils.isEmpty(soraRequest.getImageUrls())) {
+                inputUrls.addAll(soraRequest.getImageUrls());
+            }
             request.setInput(soraRequest);
         }
         VideoGenerateResponse response = soraManager.generateVideo(request, model.getRequestToken());
@@ -145,7 +148,9 @@ public class SoraGenerateServiceImpl implements SoraGenerateService {
             soraRequest.setRemoveWatermark(soraProGenerateDTO.getRemoveWatermark());
             soraRequest.setSize(SoraSizeEnum.fromCode(soraProGenerateDTO.getSize()));
             soraRequest.setImageUrls(soraProGenerateDTO.getImageUrls());
-            inputUrls.addAll(soraRequest.getImageUrls());
+            if (!CollectionUtils.isEmpty(soraRequest.getImageUrls())) {
+                inputUrls.addAll(soraRequest.getImageUrls());
+            }
             request.setInput(soraRequest);
         }
 
@@ -242,7 +247,9 @@ public class SoraGenerateServiceImpl implements SoraGenerateService {
         SoraStoryboardRequest soraRequest = new SoraStoryboardRequest();
 
         List<String> inputUrls = new ArrayList<>();
-        inputUrls.add(soraProStoryboardDTO.getImageUrls().get(0));
+        if (!CollectionUtils.isEmpty(soraProStoryboardDTO.getImageUrls())) {
+            inputUrls.add(soraProStoryboardDTO.getImageUrls().get(0));
+        }
 
         soraRequest.setAspectRatio(SoraAspectRatioEnum.fromCode(soraProStoryboardDTO.getAspectRatio()));
         soraRequest.setNFrames(soraProStoryboardDTO.getNFrames());
