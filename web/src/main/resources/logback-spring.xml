@@ -16,6 +16,20 @@
         </encoder>
     </appender>
 
+    <!-- 请求日志文件 -->
+    <appender name="REQUEST_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/request.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_HOME}/request.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>${FILE_MAX_HISTORY}</maxHistory>
+            <totalSizeCap>1GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
     <!-- SQL日志文件 -->
     <appender name="SQL_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOG_HOME}/sql.log</file>
@@ -78,6 +92,12 @@
     <!-- SQL日志记录器 -->
     <logger name="SQL_LOGGER" level="DEBUG" additivity="false">
         <appender-ref ref="SQL_FILE"/>
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+
+    <!-- 请求日志记录器 -->
+    <logger name="REQUEST_LOGGER" level="INFO" additivity="false">
+        <appender-ref ref="REQUEST_FILE"/>
         <appender-ref ref="CONSOLE"/>
     </logger>
 

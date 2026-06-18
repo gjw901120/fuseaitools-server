@@ -1,137 +1,232 @@
 package com.fuse.ai.server.web.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fuse.ai.server.web.common.utils.SqlContextHolder;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.ContentCachingRequestWrapper;
+import org.springframework.web.util.ContentCachingResponseWrapper;
 
-import javax.servlet.*;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
- * 请求参数日志记录过滤器 - 最终解决方案
- * 使用最高优先级确保在任何组件读取请求体前就包装请求
+ * 请求日志过滤器 - 统一记录请求/响应完整信息
+ * 格式：请求开始块（URI/Header）→ 执行 → 请求结束块（状态/耗时/SQL/Body/Response）
  */
+@Component
+@Order(2)
 @Slf4j
-public class RequestLoggingFilter implements Filter {
+public class RequestLoggingFilter extends OncePerRequestFilter {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private static final Logger REQUEST_LOG = LoggerFactory.getLogger("REQUEST_LOGGER");
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
+    private static final String START_LINE = "\n======================================== 请求开始 ========================================\n";
+    private static final String END_LINE   = "\n======================================== 请求结束 ==========================================";
+    private static final String BORDER     = "==========================================================================================";
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-            throws IOException, ServletException {
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain filterChain)
+            throws ServletException, IOException {
 
-        HttpServletRequest httpRequest = (HttpServletRequest) request;
-
-        // 检查是否为需要跳过的接口
-        if (shouldSkipLogging(httpRequest)) {
-            // 直接放行，不记录日志
-            chain.doFilter(request, response);
-            return;
+        String traceId = MDC.get("traceId");
+        if (traceId == null) {
+            traceId = "-";
         }
 
-        if ("POST".equalsIgnoreCase(httpRequest.getMethod()) &&
-                httpRequest.getRequestURI().startsWith("/api/")) {
+        long startTime = System.currentTimeMillis();
 
-            // 关键：立即包装请求，确保在任何其他过滤器读取前就缓存请求体
-            ContentCachingRequestWrapper wrappedRequest = new ContentCachingRequestWrapper(httpRequest);
+        // 包装请求（缓存请求体）
+        ContentCachingRequestWrapper requestWrapper = new ContentCachingRequestWrapper(request);
 
-            // 立即读取并记录日志，这时请求体还在缓存中
-            logRequestParameters(wrappedRequest);
+        // 包装响应（缓存响应体）
+        ContentCachingResponseWrapper responseWrapper = new ContentCachingResponseWrapper(response);
 
-            // 将包装后的请求传递给过滤器链
-            chain.doFilter(wrappedRequest, response);
-        } else {
-            // 非目标请求直接放行
-            chain.doFilter(request, response);
+        // 记录请求开始
+        logRequestStart(request, traceId);
+
+        try {
+            filterChain.doFilter(requestWrapper, responseWrapper);
+        } finally {
+            long duration = System.currentTimeMillis() - startTime;
+
+            // 记录请求结束（含SQL统计、Body、Response）
+            logRequestEnd(request, requestWrapper, responseWrapper, traceId, duration);
+
+            // 将缓存的响应体写回原始响应（必须调用，否则客户端收不到响应）
+            responseWrapper.copyBodyToResponse();
+
+            // 清理ThreadLocal
+            SqlContextHolder.clear();
         }
     }
 
-    private void logRequestParameters(ContentCachingRequestWrapper request) {
+    // ========================= 请求开始日志 =========================
+
+    private void logRequestStart(HttpServletRequest request, String traceId) {
         String uri = request.getRequestURI();
         String method = request.getMethod();
+        String queryString = request.getQueryString();
+        String headers = collectHeadersJson(request);
 
-        // 收集请求Header
+        StringBuilder sb = new StringBuilder();
+        sb.append(START_LINE);
+        sb.append("[").append(traceId).append("] ").append(method).append(" ").append(uri).append("\n");
+        sb.append("Query String: ").append(queryString != null ? queryString : "").append("\n");
+        sb.append("Headers: ").append(headers);
+
+        REQUEST_LOG.info(sb.toString());
+    }
+
+    // ========================= 请求结束日志 =========================
+
+    private void logRequestEnd(HttpServletRequest request,
+                               ContentCachingRequestWrapper requestWrapper,
+                               ContentCachingResponseWrapper responseWrapper,
+                               String traceId,
+                               long duration) {
+        String uri = request.getRequestURI();
+        String method = request.getMethod();
+        int status = responseWrapper.getStatus();
+
+        // SQL 统计
+        int sqlCount = SqlContextHolder.getSqlCount();
+        long sqlTotalTime = SqlContextHolder.getTotalCostTime();
+        List<SqlContextHolder.SqlLogEntry> sqlLogs = SqlContextHolder.getSqlLogs();
+
+        // 请求体（从缓存读取）
+        String requestBody = getRequestBody(requestWrapper);
+
+        // 响应体
+        String responseBody = getResponseBody(responseWrapper);
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(END_LINE).append("\n");
+
+        // 汇总行
+        sb.append("[").append(traceId).append("] ")
+                .append(method).append(" ").append(uri)
+                .append(" | 状态: ").append(status)
+                .append(" | 总耗时: ").append(duration).append("ms")
+                .append(" | SQL数量: ").append(sqlCount)
+                .append(" | SQL总耗时: ").append(sqlTotalTime).append("ms\n");
+
+        // 请求体
+        sb.append("Request Body: ").append(requestBody).append("\n");
+
+        // 响应体
+        sb.append("Response: ").append(responseBody);
+
+        // SQL 明细
+        for (int i = 0; i < sqlLogs.size(); i++) {
+            SqlContextHolder.SqlLogEntry entry = sqlLogs.get(i);
+            sb.append("\n  SQL[").append(i + 1).append("]: ")
+                    .append("[SQL耗时] ").append(entry.getCostTime()).append("ms")
+                    .append(" | 参数: ").append(entry.getParameters())
+                    .append(" | SQL: ").append(entry.getSql());
+        }
+
+        sb.append("\n").append(BORDER);
+        REQUEST_LOG.info(sb.toString());
+    }
+
+    // ========================= 工具方法 =========================
+
+    /**
+     * 收集所有 Header 为 JSON（脱敏 authorization）
+     */
+    private String collectHeadersJson(HttpServletRequest request) {
         Map<String, String> headers = new HashMap<>();
         Enumeration<String> headerNames = request.getHeaderNames();
         while (headerNames.hasMoreElements()) {
-            String headerName = headerNames.nextElement();
-            if (isImportantHeader(headerName)) {
-                headers.put(headerName, request.getHeader(headerName));
+            String name = headerNames.nextElement();
+            String value = request.getHeader(name);
+            if ("authorization".equalsIgnoreCase(name) && value != null && value.length() > 6) {
+                value = value.substring(0, 6) + "***";
             }
-        }
-
-        // 获取请求体内容
-        String body = getRequestBody(request);
-
-        // 记录日志
-        log.info("POST请求接口: {} {}, Header参数: {}, Body参数: {}",
-                method, uri,
-                formatHeaders(headers),
-                body != null ? body : "[请求体已被其他过滤器读取]");
-    }
-
-    /**
-     * 判断是否为重要Header
-     */
-    private boolean isImportantHeader(String headerName) {
-        String lowerHeaderName = headerName.toLowerCase();
-        return lowerHeaderName.startsWith("x-") ||
-                "authorization".equals(lowerHeaderName) ||
-                "content-type".equals(lowerHeaderName) ||
-                "user-agent".equals(lowerHeaderName) ||
-                "referer".equals(lowerHeaderName) ||
-                lowerHeaderName.contains("token") ||
-                lowerHeaderName.contains("key") ||
-                lowerHeaderName.contains("id");
-    }
-
-    /**
-     * 格式化Headers输出
-     */
-    private String formatHeaders(Map<String, String> headers) {
-        if (headers.isEmpty()) {
-            return "{}";
+            headers.put(name, value);
         }
         try {
-            return objectMapper.writeValueAsString(headers);
+            return OBJECT_MAPPER.writeValueAsString(headers);
         } catch (Exception e) {
             return headers.toString();
         }
     }
 
     /**
-     * 判断是否应该跳过日志记录
+     * 读取已缓存的请求体
      */
-    private boolean shouldSkipLogging(HttpServletRequest request) {
-        String uri = request.getRequestURI();
-        // 跳过 /batch-upload 接口的日志记录
-        return uri.endsWith("/batch-upload");
+    private String getRequestBody(ContentCachingRequestWrapper request) {
+        byte[] content = request.getContentAsByteArray();
+        if (content.length > 0) {
+            return new String(content, StandardCharsets.UTF_8);
+        }
+        return "(empty)";
     }
 
     /**
-     * 获取请求体内容
+     * 读取已缓存的响应体
      */
-    private String getRequestBody(ContentCachingRequestWrapper request) {
-        try {
-            // 直接从缓存获取字节数组，不调用getReader()或getInputStream()，以免影响后续的Controller读取
-            byte[] contentAsByteArray = request.getContentAsByteArray();
-            
-            if (contentAsByteArray != null && contentAsByteArray.length > 0) {
-                String characterEncoding = request.getCharacterEncoding() != null ?
-                        request.getCharacterEncoding() : "UTF-8";
-                return new String(contentAsByteArray, characterEncoding);
+    private String getResponseBody(ContentCachingResponseWrapper response) {
+        byte[] content = response.getContentAsByteArray();
+        if (content.length > 0) {
+            String charset = response.getCharacterEncoding() != null
+                    ? response.getCharacterEncoding() : "UTF-8";
+            try {
+                return new String(content, charset);
+            } catch (Exception e) {
+                return new String(content, StandardCharsets.UTF_8);
             }
-        } catch (Exception e) {
-            log.warn("读取请求体失败: {}", e.getMessage());
         }
-        // 如果字节数组为空但Content-Length大于0，说明请求体可能已被其他过滤器读取
-        if (request.getContentLength() > 0) {
-            return "[请求体已被其他过滤器读取，Content-Length: " + request.getContentLength() + "]";
+        return "(empty)";
+    }
+
+    // ========================= 过滤规则 =========================
+
+    @Override
+    protected boolean shouldNotFilterAsyncDispatch() {
+        return true;
+    }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String uri = request.getRequestURI();
+
+        // 排除静态资源
+        if (uri.contains(".") && (uri.endsWith(".html") || uri.endsWith(".css") ||
+                uri.endsWith(".js") || uri.endsWith(".png") || uri.endsWith(".jpg") ||
+                uri.endsWith(".gif") || uri.endsWith(".ico") || uri.endsWith(".svg"))) {
+            return true;
         }
-        return "[空请求体]";
+
+        // 排除健康检查
+        if ("/healthcheck".equals(uri)) {
+            return true;
+        }
+
+        // 排除 SSE/流式请求（由 SseTraceIdFilter 处理）
+        String acceptHeader = request.getHeader("Accept");
+        if (acceptHeader != null && acceptHeader.contains("text/event-stream")) {
+            return true;
+        }
+        return uri.contains("/sse") || uri.contains("/stream") || uri.contains("/events") ||
+                uri.contains("/chat/chatgpt") || uri.contains("/chat/claude") ||
+                uri.contains("/chat/gemini") || uri.contains("/chat/deepseek");
     }
 }

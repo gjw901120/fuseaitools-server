@@ -14,6 +14,7 @@ import org.apache.ibatis.type.TypeHandlerRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
+import com.fuse.ai.server.web.common.utils.SqlContextHolder;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
@@ -128,6 +129,15 @@ public class SqlLogInterceptor implements Interceptor {
         } else {
             logSqlSuccess(logData, costTime);
         }
+
+        // 将SQL信息存入ThreadLocal，供请求日志Filter汇总输出
+        try {
+            List<String> paramList = collectParameterList(configuration, boundSql);
+            String rawSql = formatSql(boundSql.getSql());
+            SqlContextHolder.addSqlLog(rawSql, paramList, costTime);
+        } catch (Exception ex) {
+            // ignore
+        }
     }
 
     private String getSqlWithParameters(Configuration configuration, BoundSql boundSql) {
@@ -186,6 +196,41 @@ public class SqlLogInterceptor implements Interceptor {
         }
 
         return sql;
+    }
+
+    /**
+     * 收集参数值为List，供SqlContextHolder使用
+     */
+    private List<String> collectParameterList(Configuration configuration, BoundSql boundSql) {
+        Object parameterObject = boundSql.getParameterObject();
+        List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
+        List<String> paramValues = new ArrayList<>();
+
+        if (parameterObject == null || parameterMappings == null || parameterMappings.isEmpty()) {
+            return paramValues;
+        }
+
+        try {
+            TypeHandlerRegistry typeHandlerRegistry = configuration.getTypeHandlerRegistry();
+            if (typeHandlerRegistry.hasTypeHandler(parameterObject.getClass())) {
+                paramValues.add(formatParameterValue(parameterObject));
+            } else {
+                MetaObject metaObject = configuration.newMetaObject(parameterObject);
+                for (ParameterMapping parameterMapping : parameterMappings) {
+                    String propertyName = parameterMapping.getProperty();
+                    if (metaObject.hasGetter(propertyName)) {
+                        Object value = metaObject.getValue(propertyName);
+                        paramValues.add(formatParameterValue(value));
+                    } else if (boundSql.hasAdditionalParameter(propertyName)) {
+                        Object value = boundSql.getAdditionalParameter(propertyName);
+                        paramValues.add(formatParameterValue(value));
+                    }
+                }
+            }
+        } catch (Exception e) {
+            // ignore
+        }
+        return paramValues;
     }
 
     private String formatParameterValue(Object value) {
