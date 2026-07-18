@@ -2,6 +2,8 @@ package com.fuse.ai.server.manager.manager;
 
 import com.fuse.ai.server.manager.entity.User;
 
+import java.time.LocalDateTime;
+
 public interface UserManager {
 
     Integer insert(User user);
@@ -19,5 +21,7 @@ public interface UserManager {
     Integer updateById(User user);
 
     Integer updateIsSubscriptionByUserId(Integer userId, Integer isSubscription);
+
+    Long countIPByStartDateAndEndDate(String ip, LocalDateTime startDate, LocalDateTime endDate);
 
 }

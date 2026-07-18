@@ -7,6 +7,7 @@ import com.fuse.ai.server.manager.mapper.UserMapper;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 
 @Component
 public class UserManagerImpl implements UserManager {
@@ -73,6 +74,17 @@ public class UserManagerImpl implements UserManager {
         queryWrapper.eq(User::getIsDel, 0);
         User user = userMapper.selectOne(queryWrapper);
         return userMapper.update(user.setIsSubscription(isSubscription), queryWrapper);
+    }
+
+    @Override
+    public Long countIPByStartDateAndEndDate(String ip, LocalDateTime startDate, LocalDateTime endDate) {
+        LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper
+                .eq(User::getIp, ip)
+                .ge(User::getGmtCreate, startDate)
+                .le(User::getGmtCreate, endDate)
+                .eq(User::getIsDel, 0);
+        return userMapper.selectCount(queryWrapper);
     }
 
 }

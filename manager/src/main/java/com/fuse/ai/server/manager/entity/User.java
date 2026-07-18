@@ -31,6 +31,8 @@ public class User {
 
     private AuthTypeEnum authType;  // 直接使用枚举类型
 
+    private String ip;
+
     @Builder.Default
     private Integer isTopUp = 0;
 
@@ -62,7 +64,7 @@ public class User {
     /**
      * 创建用户对象的便捷方法
      */
-    public static User create(String name, String email, String thirdPartyId, String avatar, AuthTypeEnum authType,
+    public static User create(String name, String email, String thirdPartyId, String avatar, AuthTypeEnum authType, String ip,
                               Integer isTopUp, Integer isSubscription, SubscriptionPackageEnum subscriptionPackage, String timeZone, Integer timeZoneOffset) {
         return User.builder()
                 .name(name)
@@ -70,6 +72,7 @@ public class User {
                 .thirdPartyId(thirdPartyId)
                 .avatar(avatar)
                 .authType(authType)
+                .ip(ip)
                 .isTopUp(isTopUp != null ? isTopUp : 0)
                 .isSubscription(isSubscription != null ? isSubscription : 0)
                 .subscriptionPackage(subscriptionPackage)

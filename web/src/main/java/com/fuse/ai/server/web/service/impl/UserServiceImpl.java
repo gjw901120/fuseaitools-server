@@ -8,6 +8,7 @@ import com.fuse.ai.server.web.common.utils.BrevoEmailSender;
 import com.fuse.ai.server.web.common.utils.EmailSenderUtil;
 import com.fuse.ai.server.web.common.utils.JwtTokenUtil;
 import com.fuse.ai.server.web.common.utils.RedisUtil;
+import com.fuse.ai.server.web.filter.IpFilter;
 import com.fuse.ai.server.web.model.dto.request.user.*;
 import com.fuse.ai.server.web.model.dto.response.LoginResponse;
 import com.fuse.ai.server.web.model.vo.CreditsDetailVO;
@@ -138,12 +139,18 @@ public class UserServiceImpl implements UserService {
         redisUtil.delete(key);
         User user = userManager.selectByEmail(loginByEmailDTO.getEmail());
         if (user == null) {
+            String ip = IpFilter.getCurrentIp();
+            Long countIP = userManager.countIPByStartDateAndEndDate(ip, LocalDateTime.now().minusDays(1), LocalDateTime.now());
+            if(countIP >= 3) {
+                throw new BaseException(UserErrorType.USER_REGISTER_ERROR, "Registration is too frequent, please try again later");
+            }
             user = User.create(
                     "",
                     loginByEmailDTO.getEmail(),
                     "",
                     "",
                     AuthTypeEnum.fromJson(AuthTypeEnum.EMAIL.getCode()),
+                    ip,
                     0,
                     0,
                     SubscriptionPackageEnum.NONE,
@@ -190,12 +197,18 @@ public class UserServiceImpl implements UserService {
 
         //为空写入，在生成登录授权
         if(user == null) {
+            String ip = IpFilter.getCurrentIp();
+            Long countIP = userManager.countIPByStartDateAndEndDate(ip, LocalDateTime.now().minusDays(1), LocalDateTime.now());
+            if(countIP >= 3) {
+                throw new BaseException(UserErrorType.USER_REGISTER_ERROR, "Registration is too frequent, please try again later");
+            }
             User newUser = User.create(
                 (String) payload.get("name"),
                 (String) payload.get("email"),
                 payload.getSubject(),
                 (String) payload.get("picture"),
                 AuthTypeEnum.fromJson(AuthTypeEnum.GOOGLE.getCode()),
+                ip,
                 0,
                 0,
                 SubscriptionPackageEnum.NONE,
