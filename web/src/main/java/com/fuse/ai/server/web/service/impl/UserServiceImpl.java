@@ -140,8 +140,8 @@ public class UserServiceImpl implements UserService {
         User user = userManager.selectByEmail(loginByEmailDTO.getEmail());
         if (user == null) {
             String ip = IpFilter.getCurrentIp();
-            Long countIP = userManager.countIPByStartDateAndEndDate(ip, LocalDateTime.now().minusDays(1), LocalDateTime.now());
-            if(countIP >= 3) {
+            Long countIP = userManager.countIPByStartDateAndEndDate(ip, LocalDateTime.now().minusDays(7), LocalDateTime.now());
+            if(countIP >= 5) {
                 throw new BaseException(UserErrorType.USER_REGISTER_ERROR, "Registration is too frequent, please try again later");
             }
             user = User.create(
@@ -198,8 +198,8 @@ public class UserServiceImpl implements UserService {
         //为空写入，在生成登录授权
         if(user == null) {
             String ip = IpFilter.getCurrentIp();
-            Long countIP = userManager.countIPByStartDateAndEndDate(ip, LocalDateTime.now().minusDays(1), LocalDateTime.now());
-            if(countIP >= 3) {
+            Long countIP = userManager.countIPByStartDateAndEndDate(ip, LocalDateTime.now().minusDays(7), LocalDateTime.now());
+            if(countIP >= 5) {
                 throw new BaseException(UserErrorType.USER_REGISTER_ERROR, "Registration is too frequent, please try again later");
             }
             User newUser = User.create(
