@@ -140,10 +140,17 @@ public class UserServiceImpl implements UserService {
         User user = userManager.selectByEmail(loginByEmailDTO.getEmail());
         if (user == null) {
             String ip = IpFilter.getCurrentIp();
-            Long countIP = userManager.countIPByStartDateAndEndDate(ip, LocalDateTime.now().minusDays(7), LocalDateTime.now());
-            if(countIP >= 5) {
+            Long countIP = userManager.countIPByStartDateAndEndDate(ip, LocalDateTime.now().minusDays(15), LocalDateTime.now());
+            if(countIP >= 3) {
                 throw new BaseException(UserErrorType.USER_REGISTER_ERROR, "Registration is too frequent, please try again later");
             }
+            if(!"".equals(loginByEmailDTO.getDeviceId())) {
+                Long countDeviceId = userManager.countDeviceIdByStartDateAndEndDate(loginByEmailDTO.getDeviceId(), LocalDateTime.now().minusDays(30), LocalDateTime.now());
+                if(countDeviceId >= 3) {
+                    throw new BaseException(UserErrorType.USER_REGISTER_ERROR, "Registration is too frequent, please try again later");
+                }
+            }
+
             user = User.create(
                     "",
                     loginByEmailDTO.getEmail(),
@@ -151,6 +158,7 @@ public class UserServiceImpl implements UserService {
                     "",
                     AuthTypeEnum.fromJson(AuthTypeEnum.EMAIL.getCode()),
                     ip,
+                    loginByEmailDTO.getDeviceId(),
                     0,
                     0,
                     SubscriptionPackageEnum.NONE,
@@ -197,18 +205,19 @@ public class UserServiceImpl implements UserService {
 
         //为空写入，在生成登录授权
         if(user == null) {
-            String ip = IpFilter.getCurrentIp();
-            Long countIP = userManager.countIPByStartDateAndEndDate(ip, LocalDateTime.now().minusDays(7), LocalDateTime.now());
-            if(countIP >= 5) {
-                throw new BaseException(UserErrorType.USER_REGISTER_ERROR, "Registration is too frequent, please try again later");
-            }
+//            String ip = IpFilter.getCurrentIp();
+//            Long countIP = userManager.countIPByStartDateAndEndDate(ip, LocalDateTime.now().minusDays(7), LocalDateTime.now());
+//            if(countIP >= 5) {
+//                throw new BaseException(UserErrorType.USER_REGISTER_ERROR, "Registration is too frequent, please try again later");
+//            }
             User newUser = User.create(
                 (String) payload.get("name"),
                 (String) payload.get("email"),
                 payload.getSubject(),
                 (String) payload.get("picture"),
                 AuthTypeEnum.fromJson(AuthTypeEnum.GOOGLE.getCode()),
-                ip,
+                    "",
+                "",
                 0,
                 0,
                 SubscriptionPackageEnum.NONE,

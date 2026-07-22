@@ -33,6 +33,8 @@ public class User {
 
     private String ip;
 
+    private String deviceId;
+
     @Builder.Default
     private Integer isTopUp = 0;
 
@@ -64,7 +66,7 @@ public class User {
     /**
      * 创建用户对象的便捷方法
      */
-    public static User create(String name, String email, String thirdPartyId, String avatar, AuthTypeEnum authType, String ip,
+    public static User create(String name, String email, String thirdPartyId, String avatar, AuthTypeEnum authType, String ip, String deviceId,
                               Integer isTopUp, Integer isSubscription, SubscriptionPackageEnum subscriptionPackage, String timeZone, Integer timeZoneOffset) {
         return User.builder()
                 .name(name)
@@ -73,6 +75,7 @@ public class User {
                 .avatar(avatar)
                 .authType(authType)
                 .ip(ip)
+                .deviceId(deviceId)
                 .isTopUp(isTopUp != null ? isTopUp : 0)
                 .isSubscription(isSubscription != null ? isSubscription : 0)
                 .subscriptionPackage(subscriptionPackage)

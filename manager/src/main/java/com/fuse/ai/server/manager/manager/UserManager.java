@@ -24,4 +24,6 @@ public interface UserManager {
 
     Long countIPByStartDateAndEndDate(String ip, LocalDateTime startDate, LocalDateTime endDate);
 
+    Long countDeviceIdByStartDateAndEndDate(String deviceId, LocalDateTime startDate, LocalDateTime endDate);
+
 }

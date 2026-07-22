@@ -17,4 +17,6 @@ public class LoginByEmailDTO {
     @Size(min = 6, max = 6, message = "The verification code consists of 6 digits")
     private String code;
 
+    private String deviceId;
+
 }

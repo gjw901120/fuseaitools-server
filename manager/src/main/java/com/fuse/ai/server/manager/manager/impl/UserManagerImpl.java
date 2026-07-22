@@ -87,4 +87,15 @@ public class UserManagerImpl implements UserManager {
         return userMapper.selectCount(queryWrapper);
     }
 
+    @Override
+    public Long countDeviceIdByStartDateAndEndDate(String deviceId, LocalDateTime startDate, LocalDateTime endDate) {
+        LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper
+                .eq(User::getDeviceId, deviceId)
+                .ge(User::getGmtCreate, startDate)
+                .le(User::getGmtCreate, endDate)
+                .eq(User::getIsDel, 0);
+        return userMapper.selectCount(queryWrapper);
+    }
+
 }
