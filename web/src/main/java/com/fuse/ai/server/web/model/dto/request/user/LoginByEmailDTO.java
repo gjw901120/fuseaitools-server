@@ -19,7 +19,7 @@ public class LoginByEmailDTO {
     private String code;
 
     @NotBlank(message = "Request failed. Please try again later!")
-    @Pattern(regexp = "^[a-fA-F0-9]{32}$", message = "Request failed. Please try again later!")
+    @Pattern(regexp = "^[a-fA-F0-9]{64}$", message = "Request failed. Please try again later!")
     private String deviceId;
 
 }
