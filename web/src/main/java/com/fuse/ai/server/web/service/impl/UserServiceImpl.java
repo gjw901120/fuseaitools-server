@@ -140,12 +140,12 @@ public class UserServiceImpl implements UserService {
         User user = userManager.selectByEmail(loginByEmailDTO.getEmail());
         if (user == null) {
             String ip = IpFilter.getCurrentIp();
-            Long countIP = userManager.countIPByStartDateAndEndDate(ip, LocalDateTime.now().minusDays(15), LocalDateTime.now());
+            Long countIP = userManager.countIPByStartDateAndEndDate(ip, LocalDateTime.now().minusDays(180), LocalDateTime.now());
             if(countIP >= 3) {
                 throw new BaseException(UserErrorType.USER_REGISTER_ERROR, "Registration is too frequent, please try again later");
             }
             if(!"".equals(loginByEmailDTO.getDeviceId())) {
-                Long countDeviceId = userManager.countDeviceIdByStartDateAndEndDate(loginByEmailDTO.getDeviceId(), LocalDateTime.now().minusDays(30), LocalDateTime.now());
+                Long countDeviceId = userManager.countDeviceIdByStartDateAndEndDate(loginByEmailDTO.getDeviceId(), LocalDateTime.now().minusDays(180), LocalDateTime.now());
                 if(countDeviceId >= 3) {
                     throw new BaseException(UserErrorType.USER_REGISTER_ERROR, "Registration is too frequent, please try again later");
                 }
