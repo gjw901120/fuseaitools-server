@@ -30,9 +30,11 @@ public class UserController {
     }
 
     @PostMapping("/login-by-email")
-    public ResponseResult<?> loginByEmail(@RequestBody @Valid LoginByEmailDTO loginByEmailDTO) {
+    public ResponseResult<?> loginByEmail(@RequestBody @Valid LoginByEmailDTO loginByEmailDTO, HttpServletRequest request) {
 
-        return ResponseResult.success(userService.loginByEmail(loginByEmailDTO));
+        String requestId = request.getHeader("X-Request-Id");
+
+        return ResponseResult.success(userService.loginByEmail(loginByEmailDTO, requestId));
 
     }
 

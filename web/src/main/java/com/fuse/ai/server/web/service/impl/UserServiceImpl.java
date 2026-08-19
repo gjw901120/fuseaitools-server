@@ -15,6 +15,7 @@ import com.fuse.ai.server.web.model.vo.CreditsDetailVO;
 import com.fuse.ai.server.web.model.vo.UserDetailVO;
 import com.fuse.ai.server.web.service.UserService;
 import com.fuse.common.core.exception.BaseException;
+import cn.hutool.crypto.SecureUtil;
 import com.fuse.common.core.exception.error.SystemErrorType;
 import com.fuse.common.core.exception.error.ThirdpartyErrorType;
 import com.fuse.common.core.exception.error.UserErrorType;
@@ -130,7 +131,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public LoginResponse loginByEmail(LoginByEmailDTO loginByEmailDTO) {
+    public LoginResponse loginByEmail(LoginByEmailDTO loginByEmailDTO, String requestId) {
         String key = RedisKeysEnum.EMAIL_CODE.format(loginByEmailDTO.getEmail());
         String storedCode = (String) redisUtil.get(key);
         if (!loginByEmailDTO.getCode().equals(storedCode)) {
@@ -139,6 +140,11 @@ public class UserServiceImpl implements UserService {
         redisUtil.delete(key);
         User user = userManager.selectByEmail(loginByEmailDTO.getEmail());
         if (user == null) {
+            // X-Request-Id 一致性校验：md5(deviceId + email)，需在其他规则逻辑之前
+            String expectedRequestId = SecureUtil.md5(loginByEmailDTO.getDeviceId() + loginByEmailDTO.getEmail());
+            if (requestId == null || !requestId.equalsIgnoreCase(expectedRequestId)) {
+                throw new BaseException(UserErrorType.USER_REGISTER_ERROR, "Registration is too frequent, please try again later");
+            }
             String ip = IpFilter.getCurrentIp();
             Long countIP = userManager.countIPByStartDateAndEndDate(ip, LocalDateTime.now().minusDays(180), LocalDateTime.now());
             if(countIP >= 3) {

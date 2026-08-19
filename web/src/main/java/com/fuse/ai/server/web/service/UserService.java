@@ -11,7 +11,7 @@ public interface UserService {
 
     Boolean sendEmailCode(SendEmailCodeDTO sendEmailCodeDTO, HttpServletRequest request);
 
-    LoginResponse loginByEmail(LoginByEmailDTO  loginByEmailDTO);
+    LoginResponse loginByEmail(LoginByEmailDTO loginByEmailDTO, String requestId);
 
     LoginResponse loginByGoogle(String code);
 
