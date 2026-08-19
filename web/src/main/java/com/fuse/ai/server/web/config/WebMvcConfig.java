@@ -5,6 +5,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.List;
@@ -26,5 +27,18 @@ public class WebMvcConfig implements WebMvcConfigurer {
         if (!hasJsonConverter) {
             converters.add(new MappingJackson2HttpMessageConverter());
         }
+    }
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedOrigins(
+                        "https://fuseaitools.com",
+                        "https://www.fuseaitools.com"    // 两个都要，浏览器实际是 www
+                )
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                .allowedHeaders("Content-Type", "Authorization", "X-Request-Id")  // ← 关键
+                .allowCredentials(true)
+                .maxAge(3600);
     }
 }
