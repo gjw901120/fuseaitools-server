@@ -48,6 +48,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         corsConfig.addAllowedHeader("content-type");
         corsConfig.addAllowedHeader("accept");
         corsConfig.addAllowedHeader("x-requested-with");
+        corsConfig.addAllowedHeader("x-request-id");
         corsConfig.setAllowCredentials(true);
         corsConfig.setMaxAge(3600L);
             

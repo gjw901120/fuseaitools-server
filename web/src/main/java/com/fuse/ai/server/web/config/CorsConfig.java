@@ -12,7 +12,7 @@ public class CorsConfig implements WebMvcConfigurer {
         registry.addMapping("/api/**")
                 .allowedOrigins("https://www.fuseaitools.com")  // 只允许生产域名
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                .allowedHeaders("authorization", "content-type", "accept")
+                .allowedHeaders("authorization", "content-type", "accept", "x-request-id")
                 .allowCredentials(true)
                 .maxAge(3600);  // 1小时内不需要再预检
     }
