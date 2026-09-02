@@ -110,7 +110,7 @@ public class RdapDomainValidator {
             if (result == CheckResult.BLOCK) {
                 log.info("RDAP check blocked, domain {} is newly registered/changed", candidate);
                 throw new BaseException(UserErrorType.VERIFICATION_CODE_ERROR,
-                        "Your email domain was registered recently. Please use another email and try again later");
+                        "Your email is invalid. Please use a different email and try again later.");
             }
             if (result == CheckResult.NOT_FOUND) {
                 checkedAny = true; // 该层域名未注册，继续尝试父域
