@@ -10,7 +10,8 @@ public enum RedisKeysEnum {
 
     // 防刷相关
     EMAIL_ATTEMPT_COUNT("email_attempt:%s:%s", 10 * 60L), // 验证尝试次数
-    IP_BLOCK("ip_block:%s", 30 * 60L);                 // IP封禁
+    IP_BLOCK("ip_block:%s", 30 * 60L),                 // IP封禁
+    RDAP_DOMAIN_CHECK("rdap_domain_check:%s", 6 * 60 * 60L); // RDAP域名新注册校验结果缓存(默认6h)
 
 
     private final String pattern;

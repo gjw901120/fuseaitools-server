@@ -142,6 +142,11 @@ app:
     max-daily-per-email: 10     # 每个邮箱每日最多发送次数
     max-daily-per-ip: 30       # 每个IP每日最多发送次数
     max-global-daily: 1000     # 系统全局每日最多发送次数
+    # 域名新注册风控：非白名单域名邮箱注册/最后变更时间在阈值天数内则拦截验证码（防刷注册福利）
+    rdap-check-enabled: true                                   # 是否开启 RDAP 域名校验
+    rdap-min-age-days: 100                                     # 域名注册/最后变更时间阈值(天)
+    rdap-base-url: https://rdap.verisign.com/com/v1/domain/   # Verisign RDAP 查询地址(.com，.net 自动推导)
+    rdap-whitelist-domains: qq.com,163.com,gmail.com,outlook.com,hotmail.com,icloud.com,126.com,foxmail.com,yahoo.com  # 特殊邮箱域名白名单(逗号分隔)
   google:
     client-id: ${GOOGLE_CLIENT_ID}  # 第98行改为环境变量
     client-secret: ${GOOGLE_CLIENT_SECRET}  # 第99行改为环境变量

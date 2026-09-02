@@ -7,6 +7,7 @@ import com.fuse.ai.server.web.common.enums.RedisKeysEnum;
 import com.fuse.ai.server.web.common.utils.BrevoEmailSender;
 import com.fuse.ai.server.web.common.utils.EmailSenderUtil;
 import com.fuse.ai.server.web.common.utils.JwtTokenUtil;
+import com.fuse.ai.server.web.common.utils.RdapDomainValidator;
 import com.fuse.ai.server.web.common.utils.RedisUtil;
 import com.fuse.ai.server.web.filter.IpFilter;
 import com.fuse.ai.server.web.model.dto.request.user.*;
@@ -48,6 +49,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private RedisUtil redisUtil;
+
+    @Autowired
+    private RdapDomainValidator rdapDomainValidator;
 
     @Autowired
     private EmailSenderUtil emailSenderUtil;
@@ -109,6 +113,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Boolean sendEmailCode(SendEmailCodeDTO sendEmailCodeDTO, HttpServletRequest request) {
+        // 域名风控校验：拦截新注册/近期变更的域名邮箱（防刷注册福利），白名单邮箱域名直接放行
+        rdapDomainValidator.checkEmailDomain(sendEmailCodeDTO.getEmail());
+
         //验证防盗刷逻辑
         checkAntiSpam(sendEmailCodeDTO.getEmail(), request);
 
