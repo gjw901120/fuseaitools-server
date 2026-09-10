@@ -59,17 +59,28 @@ public class WanCallbackData {
     public static class Param {
         private String callBackUrl;
         private String model;
-        private Input input;
+        private String input;
+
+        @SneakyThrows
+        public Input getInputObject() {
+            if (input != null) {
+                return MAPPER.readValue(input, Input.class);
+            }
+            return null;
+        }
     }
 
     @Data
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Input {
+        private Integer duration;
+        private String firstFrameUrl;
+        private Boolean watermark;
+        private Integer seed;
+        private Boolean promptExtend;
         private String prompt;
-        private List<String> videoUrls;
-        private String duration;
         private String resolution;
-        private Boolean multiShots;
+        private Boolean nsfwChecker;
     }
 
     @Data

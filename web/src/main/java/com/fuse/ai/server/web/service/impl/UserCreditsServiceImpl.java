@@ -98,6 +98,8 @@ public class UserCreditsServiceImpl implements UserCreditsService {
                 if(pricingRules == null) {
                     throw  new BaseException(ResponseErrorType.MODEL_IS_NOT_SUPPORT,  "model is not support");
                 }
+
+
                 pricingRulesId =  pricingRules.getId();
                 ModelsPricingOnce modelsPricingOnce = modelsPricingOnceManager.getDetailById(pricingRules.getPricingId());
                 if(List.of(ExtraDataEnum.PER_DURATION_QUALITY, ExtraDataEnum.PER_DURATION_SCENE_SIZE, ExtraDataEnum.PER_DURATION_QUALITY_SCENE,
