@@ -1,5 +1,6 @@
 package com.fuse.ai.server.web.controller;
 
+import com.fuse.ai.server.web.model.dto.request.order.RefundOrderDTO;
 import com.fuse.ai.server.web.model.dto.request.user.UserJwtDTO;
 import com.fuse.ai.server.web.service.OrderService;
 import com.fuse.ai.server.web.service.StripeService;
@@ -10,6 +11,8 @@ import com.stripe.exception.StripeException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/api/refund")
@@ -22,18 +25,18 @@ public class OrderRefundController {
     private OrderService orderService;
 
     @PostMapping("/confirm-refund-recharge")
-    public ResponseResult<?> confirmRefundRecharge(@RequestBody String refundOrderId) {
+    public ResponseResult<?> confirmRefundRecharge(@Valid @RequestBody RefundOrderDTO refundOrderDTO) {
         try {
-            return ResponseResult.success(stripeService.confirmRefundRecharge(refundOrderId));
+            return ResponseResult.success(stripeService.confirmRefundRecharge(refundOrderDTO.getRefundOrderId()));
         } catch (StripeException e) {
             throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, e.getMessage());
         }
     }
 
     @PostMapping("/confirm-refund-subscription")
-    public ResponseResult<?> confirmRefundSubscription(@RequestBody String refundOrderId) {
+    public ResponseResult<?> confirmRefundSubscription(@Valid @RequestBody RefundOrderDTO refundOrderDTO) {
         try {
-            return ResponseResult.success(stripeService.confirmRefundSubscription(refundOrderId));
+            return ResponseResult.success(stripeService.confirmRefundSubscription(refundOrderDTO.getRefundOrderId()));
         } catch (StripeException e) {
             throw new BaseException(ThirdpartyErrorType.THIRDPARTY_SERVER_ERROR, e.getMessage());
         }
