@@ -18,6 +18,7 @@ import com.stripe.model.checkout.Session;
 import com.stripe.net.Webhook;
 import com.stripe.param.CustomerCreateParams;
 import com.stripe.param.InvoiceListParams;
+import com.stripe.param.ChargeRetrieveParams;
 import com.stripe.param.RefundCreateParams;
 import com.stripe.param.checkout.SessionCreateParams;
 import lombok.extern.slf4j.Slf4j;
@@ -325,8 +326,19 @@ public class StripeServiceImpl implements StripeService {
             return;
         }
 
-        Charge charge = (Charge) deserializer.getObject().get();
-        processChargeRefund(charge, event);
+        Charge webhookCharge = (Charge) deserializer.getObject().get();
+
+        // webhook payload中的Charge不包含refunds集合，需要通过API重新获取并expand
+        try {
+            Stripe.apiKey = stripeApiKey;
+            ChargeRetrieveParams retrieveParams = ChargeRetrieveParams.builder()
+                    .addExpand("refunds")
+                    .build();
+            Charge charge = Charge.retrieve(webhookCharge.getId(), retrieveParams, null);
+            processChargeRefund(charge, event);
+        } catch (StripeException e) {
+            log.error("获取Charge详情失败 - chargeId: {}", webhookCharge.getId(), e);
+        }
     }
 
     private void processChargeRefund(Charge charge, Event event) {
